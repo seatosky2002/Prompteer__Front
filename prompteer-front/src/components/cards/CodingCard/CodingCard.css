@@ -1,0 +1,103 @@
+.coding-card {
+  background: #ffffff;
+  border: 1px solid #E9ECEF;
+  border-radius: 12px;
+  padding: 10px 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.coding-card:hover {
+  box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.coding-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 8px;
+  gap: 13px;
+}
+
+.coding-title-section {
+  flex: 1;
+}
+
+.coding-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #212529;
+  margin: 0;
+  margin-top: -39px;
+}
+
+.category-tag {
+  background: #E7F5FF;
+  border-radius: 16px;
+  padding: 4px 10px;
+  flex-shrink: 0;
+}
+
+.category-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #1971C2;
+}
+
+.coding-description {
+  width: 100%;
+  padding: 8px 0;
+  flex: 1;
+}
+
+.coding-description p {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 350;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #495057;
+  margin: 0;
+}
+
+.coding-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  width: 100%;
+  padding-bottom: 8px;
+}
+
+.difficulty-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.difficulty-tag {
+  border-radius: 16px;
+  padding: 4px 10px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.difficulty-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #ffffff;
+}

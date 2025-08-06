@@ -1,0 +1,24 @@
+.comment-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  background: #ffffff;
+  padding: 20px 30px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.comment-content {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.21;
+  color: #000000;
+}
+
+.comment-author {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.21;
+  color: #000000;
+}

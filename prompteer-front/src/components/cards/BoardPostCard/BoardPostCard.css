@@ -1,0 +1,146 @@
+.board-post-card {
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 35px 20px 30px;
+  width: 1213px;
+  max-width: 1213px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+  overflow: hidden;
+}
+
+.board-post-card:hover {
+  background-color: #f8f9fa;
+}
+
+.board-post-content {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+}
+
+.board-post-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.21;
+  color: #000000;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.board-post-category {
+  background: #E7F5FF;
+  border-radius: 16px;
+  padding: 4px 10px;
+  flex-shrink: 0;
+}
+
+.category-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #1971C2;
+}
+
+.board-post-stats {
+  display: flex;
+  align-items: center;
+  gap: 45px;
+  width: 603px;
+  max-width: 603px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-item:nth-child(1) {
+  width: 72px;
+}
+
+.stat-item:nth-child(2) {
+  width: 72px;
+}
+
+.stat-item:nth-child(3) {
+  width: 50px;
+}
+
+.stat-item:nth-child(4) {
+  width: 34px;
+}
+
+.stat-item:nth-child(5) {
+  width: 50px;
+}
+
+.stat-item:nth-child(6) {
+  width: 80px;
+  max-width: 80px;
+}
+
+.stat-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.21;
+  color: #000000;
+  text-align: center;
+  width: 100%;
+}
+
+.stat-value {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.21;
+  color: #000000;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1400px) {
+  .board-post-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .board-post-card {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .board-post-content,
+  .board-post-stats {
+    width: 100%;
+  }
+  
+  .stat-item:nth-child(1),
+  .stat-item:nth-child(2),
+  .stat-item:nth-child(3),
+  .stat-item:nth-child(4),
+  .stat-item:nth-child(5),
+  .stat-item:nth-child(6) {
+    width: auto;
+  }
+}

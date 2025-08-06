@@ -1,0 +1,393 @@
+/* 메인 레이아웃 */
+.post-detail-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #F8F9FA;
+}
+
+.post-detail-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 96px 80px;
+}
+
+.post-detail-container {
+  width: 1213px;
+  max-width: 1213px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin: 0 auto;
+}
+
+/* 페이지 헤더 */
+.post-detail-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 15px;
+  padding: 20px 48px;
+  background: #228BE6;
+  border-radius: 12px;
+  height: 138px;
+  box-sizing: border-box;
+  width: 1213px !important;
+  max-width: 1213px !important;
+}
+
+.post-detail-title-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  flex: 1;
+}
+
+.post-detail-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.2;
+  color: #ffffff;
+  margin: 0;
+  width: 100%;
+  text-align: left;
+}
+
+/* 컨텐츠 영역 */
+.post-detail-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  width: 1213px;
+  margin: 0 auto;
+}
+
+/* 필터 섹션 */
+.post-detail-filters {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 1213px !important;
+  max-width: 1213px !important;
+}
+
+.tab-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 1213px !important;
+  max-width: 1213px !important;
+}
+
+.tab-buttons {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.category-filter-section {
+  width: 1213px !important;
+  max-width: 1213px !important;
+}
+
+/* 게시물 상세 */
+.post-detail-body {
+  width: 1242px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.post-detail-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.post-card-background {
+  width: 100%;
+  height: 10px;
+  background: #228BE6;
+}
+
+.post-card-content {
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 130px;
+  padding: 20px 30px 100px;
+}
+
+.post-card-main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 26px;
+}
+
+.post-card-header {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+}
+
+.post-card-title-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.post-card-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.21;
+  color: #000000;
+  margin: 0;
+}
+
+.post-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.post-card-author,
+.post-card-date {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.21;
+  color: #000000;
+}
+
+.post-card-divider {
+  width: 100%;
+  height: 0;
+  border: none;
+  border-top: 1px solid #000000;
+  margin: 0;
+}
+
+.post-card-challenge {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 5px;
+}
+
+.challenge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.challenge-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  color: #000000;
+  margin: 0;
+}
+
+.challenge-likes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.challenge-likes span {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #515151;
+}
+
+.challenge-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100%;
+  gap: 10px;
+}
+
+.problem-view-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 20px;
+  background: #F5F5F5;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.problem-view-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.problem-view-content span {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.21;
+  color: #000000;
+  flex: 1;
+}
+
+.post-card-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.21;
+  color: #000000;
+  width: 100%;
+  white-space: pre-line;
+}
+
+/* 댓글 섹션 */
+.comments-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 30px;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.comment-write-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.comment-submit-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 20px 12px;
+  background: #1971C2;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.21;
+  text-align: center;
+}
+
+.comment-submit-btn:hover {
+  background: #1864a8;
+}
+
+.comment-submit-btn:focus {
+  outline: 2px solid #1971C2;
+  outline-offset: 2px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1400px) {
+  .post-detail-main {
+    padding: 24px 48px 80px;
+  }
+  
+  .post-detail-container,
+  .post-detail-header,
+  .post-detail-filters,
+  .tab-filters,
+  .category-filter-section,
+  .post-detail-content {
+    width: 100%;
+    max-width: 1213px;
+  }
+  
+  .post-detail-body {
+    width: 100%;
+    max-width: 1242px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .post-detail-main {
+    padding: 24px 32px 80px;
+  }
+  
+  .tab-filters {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 768px) {
+  .post-detail-main {
+    padding: 16px;
+  }
+  
+  .post-detail-header {
+    padding: 16px 24px;
+    height: auto;
+  }
+  
+  .post-detail-title {
+    font-size: 32px;
+    text-align: center;
+  }
+  
+  .post-card-content {
+    padding: 16px 20px 50px;
+    gap: 60px;
+  }
+  
+  .post-card-title-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .post-card-title {
+    font-size: 20px;
+  }
+  
+  .challenge-title {
+    font-size: 24px;
+  }
+  
+  .post-card-text {
+    font-size: 16px;
+  }
+}

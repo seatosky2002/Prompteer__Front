@@ -1,0 +1,374 @@
+/* 메인 레이아웃 */
+.post-write-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #F8F9FA;
+}
+
+.post-write-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 96px 80px;
+}
+
+.post-write-container {
+  width: 1213px;
+  max-width: 1213px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin: 0 auto;
+}
+
+/* 페이지 헤더 */
+.post-write-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 15px;
+  padding: 20px 48px;
+  background: #228BE6;
+  border-radius: 12px;
+  height: 138px;
+  box-sizing: border-box;
+  width: 1213px !important;
+  max-width: 1213px !important;
+}
+
+.post-write-title-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  flex: 1;
+}
+
+.post-write-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.2;
+  color: #ffffff;
+  margin: 0;
+  width: 100%;
+  text-align: left;
+}
+
+/* 컨텐츠 영역 */
+.post-write-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 1213px;
+  margin: 0 auto;
+}
+
+/* 필터 섹션 */
+.post-write-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 1213px !important;
+  max-width: 1213px !important;
+}
+
+.tab-buttons {
+  display: flex;
+  align-items: center;
+  gap: 21px;
+}
+
+/* 작성 폼 */
+.post-write-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.form-card-background {
+  width: 100%;
+  height: 10px;
+  background: #228BE6;
+}
+
+.form-card-content {
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  padding: 100px 30px;
+}
+
+.form-sections {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 30px;
+}
+
+/* 폼 섹션 */
+.form-section {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 20px;
+}
+
+.form-section-content {
+  align-items: flex-start;
+}
+
+.form-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.21;
+  color: #000000;
+  width: 161px;
+  flex-shrink: 0;
+}
+
+/* 입력 필드 */
+.form-input {
+  width: 831px;
+  height: 45px;
+  background: #ffffff;
+  border: 1px solid #495057;
+  border-radius: 4px;
+  padding: 12px 16px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.2;
+  color: #000000;
+  box-sizing: border-box;
+}
+
+.form-input-small {
+  width: 122px;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #1971C2;
+  box-shadow: 0 0 0 2px rgba(25, 113, 194, 0.2);
+}
+
+.form-input::placeholder {
+  color: #999999;
+}
+
+/* 카테고리 버튼 */
+.category-buttons {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.category-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  height: 40px;
+  background: #E0E0E0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #495057;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.category-btn:hover {
+  background: #d0d0d0;
+}
+
+.category-btn.active {
+  background: #1971C2;
+  color: #ffffff;
+}
+
+/* 텍스트 영역 */
+.content-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  width: 831px;
+}
+
+.form-textarea {
+  width: 100%;
+  height: 358px;
+  background: #ffffff;
+  border: 1px solid #495057;
+  border-radius: 4px;
+  padding: 16px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #000000;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: #1971C2;
+  box-shadow: 0 0 0 2px rgba(25, 113, 194, 0.2);
+}
+
+.form-textarea::placeholder {
+  color: #999999;
+}
+
+/* 제출 버튼 */
+.form-submit-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.submit-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 20px 12px;
+  background: #1971C2;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.21;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+.submit-btn:hover {
+  background: #1864a8;
+}
+
+.submit-btn:focus {
+  outline: 2px solid #1971C2;
+  outline-offset: 2px;
+}
+
+.submit-btn:active {
+  background: #164c87;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1400px) {
+  .post-write-main {
+    padding: 24px 48px 80px;
+  }
+  
+  .post-write-container,
+  .post-write-header,
+  .post-write-filters,
+  .post-write-content {
+    width: 100%;
+    max-width: 1213px;
+  }
+  
+  .form-input {
+    width: 100%;
+  }
+  
+  .content-input-wrapper {
+    width: 100%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .post-write-main {
+    padding: 24px 32px 80px;
+  }
+  
+  .post-write-filters {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .form-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .form-label {
+    width: auto;
+  }
+  
+  .category-buttons {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .post-write-main {
+    padding: 16px;
+  }
+  
+  .post-write-header {
+    padding: 16px 24px;
+    height: auto;
+  }
+  
+  .post-write-title {
+    font-size: 32px;
+    text-align: center;
+  }
+  
+  .form-card-content {
+    padding: 50px 20px;
+    gap: 30px;
+  }
+  
+  .form-sections {
+    gap: 20px;
+  }
+  
+  .form-label {
+    font-size: 20px;
+  }
+  
+  .form-input,
+  .form-textarea {
+    font-size: 14px;
+  }
+  
+  .form-textarea {
+    height: 250px;
+  }
+  
+  .category-buttons {
+    justify-content: flex-start;
+  }
+  
+  .category-btn {
+    font-size: 12px;
+    padding: 8px 12px;
+    height: 36px;
+  }
+}

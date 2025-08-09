@@ -22,7 +22,7 @@
   flex-direction: column;
   justify-content: stretch;
   align-items: stretch;
-  height: 900px;
+  min-height: 900px; /* 최소 높이로 변경하여 유연성 확보 */
   width: 100%;
   max-width: 1440px; /* 헤더와 동일한 max-width */
   margin: 0 auto;
@@ -267,24 +267,24 @@
 /* Frame 56: 우측 미리보기 영역 */
 .frame-56 {
   flex: 1; /* 남은 공간을 차지 */
-  min-width: 300px; /* 최소 너비 보장 */
+  min-width: 500px; /* 이미지 크기에 맞춰 최소 너비 증가 */
   align-self: stretch;
-  padding: 80px 24px 711px; /* 피그마와 정확히 일치 */
+  padding: 20px 24px; /* 패딩 최적화 */
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* justify-start */
-  align-items: flex-start; /* items-start */
+  justify-content: flex-start;
+  align-items: center; /* 중앙 정렬 */
   overflow-x: auto;
   overflow-y: auto;
 }
 
 /* Frame 57: 미리보기 컨텐츠 */
 .preview-content {
-  align-self: stretch; /* self-stretch */
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* justify-start */
-  align-items: center; /* items-center */
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
 
 .preview-message {
@@ -300,6 +300,223 @@
   line-height: 1.2;
   margin: 0;
 }
+
+/* Frame 56 내부 결과 액션 바 - 피그마 44-2711 */
+.result-action-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 17px 16px 16px;
+  background: #FFFFFF;
+  border-top: 1px solid #E9ECEF;
+  width: 100%;
+  position: sticky; /* sticky 포지션으로 하단 고정 */
+  bottom: 0;
+  margin-top: auto; /* 여백을 위쪽으로 밀어서 하단에 고정 */
+}
+
+.result-action-btn {
+  padding: 10px 20px 12px;
+  background: #1971C2;
+  border-radius: 6px;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.result-action-btn:hover {
+  background: #1864AB;
+}
+
+.result-action-btn span {
+  text-align: center;
+  color: #FFFFFF;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.21;
+}
+
+/* 생성된 이미지 영역 */
+.generated-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  flex: 1;
+  margin-bottom: 20px; /* 버튼과의 간격 */
+}
+
+.generated-image-placeholder {
+  width: 468px; /* 피그마 명세에 따른 실제 크기 */
+  height: 745px; /* 피그마 명세에 따른 실제 크기 */
+  background: #F8F9FA;
+  border: 1px solid #E9ECEF;
+  border-radius: 8px;
+  padding: 10px; /* 피그마 명세에 따른 패딩 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto; /* 중앙 정렬 */
+  opacity: 1;
+}
+
+.image-placeholder {
+  color: #868E96;
+  font-size: 16px;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 결과 안내 문구 - 피그마 99-1581 Frame 152 */
+.result-notice {
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  align-self: stretch;
+  gap: 10px;
+  padding: 0px 40px;
+  width: 100%;
+}
+
+.result-notice p {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: right;
+  color: #495057;
+  margin: 0;
+  width: 100%;
+}
+
+/* 구경하기 섹션 래퍼 */
+.others-section-wrapper {
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* 구경하기 섹션 */
+.others-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #FFFFFF;
+  padding: 10px 40px;
+  border-top: 1px solid #E9ECEF;
+}
+
+.others-container {
+  width: 100%;
+  max-width: 1360px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.others-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.others-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.2;
+  color: #000000;
+  margin: 0;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.filter-btn {
+  padding: 10px 16px;
+  background: #E0E0E0;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #495057;
+}
+
+.filter-btn.active {
+  background: #1971C2;
+  color: #FFFFFF;
+}
+
+/* 다른 사람 이미지 그리드 */
+.others-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.other-image-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  width: 322px;
+}
+
+.other-image-placeholder {
+  width: 100%;
+  height: 491px;
+  background: #F8F9FA;
+  border: 1px solid #E9ECEF;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #868E96;
+  font-size: 16px;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.image-likes {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  width: 100%;
+}
+
+.heart {
+  font-size: 18px;
+}
+
+.like-count {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #515151;
+}
+
+/* 구경하기 토글 버튼 - 더 이상 사용하지 않음 */
 
 
 

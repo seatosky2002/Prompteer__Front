@@ -14,7 +14,7 @@ const CodingProblem = () => {
   const [editorCode, setEditorCode] = useState('');
   const [consoleOutput, setConsoleOutput] = useState('');
   const [showResult, setShowResult] = useState(false);
-  const [showOthersWork, setShowOthersWork] = useState(false);
+  const [showOthersWork, setShowOthersWork] = useState(true); // 기본값을 true로 변경
 
   // 문제 데이터 (실제로는 API에서 가져옴)
   const getProblemData = (problemId) => {
@@ -87,7 +87,7 @@ const CodingProblem = () => {
 
   const handleRetry = () => {
     setShowResult(false);
-    setShowOthersWork(false);
+    // showOthersWork는 항상 true 유지
     setConsoleOutput('');
     setActiveTab('Prompt');
   };
@@ -100,9 +100,7 @@ const CodingProblem = () => {
     navigate('/board/write');
   };
 
-  const handleViewOthers = () => {
-    setShowOthersWork(true);
-  };
+  // handleViewOthers 함수 제거 - 항상 표시되므로 불필요
 
   return (
     <div className="coding-problem-page">
@@ -315,16 +313,10 @@ const CodingProblem = () => {
                     <button className="sort-btn">랜덤순</button>
                   </div>
                 </div>
-                {!showOthersWork && (
-                  <button className="view-others-btn" onClick={handleViewOthers}>
-                    다른 사람들의 풀이 보기
-                  </button>
-                )}
               </div>
 
-              {showOthersWork && (
-                <div className="others-work-section">
-                  <div className="others-work-grid">
+              <div className="others-work-section">
+                <div className="others-work-grid">
                     {[1, 2, 3, 4, 5, 6].map((item) => (
                       <div key={item} className="work-card">
                         <div className="work-stats">
@@ -362,7 +354,6 @@ const CodingProblem = () => {
                     ))}
                   </div>
                 </div>
-              )}
             </>
           )}
         </div>

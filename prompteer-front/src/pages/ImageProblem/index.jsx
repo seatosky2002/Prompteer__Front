@@ -8,6 +8,9 @@ const ImageProblem = () => {
   const { id } = useParams();
   const [promptText, setPromptText] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerated, setIsGenerated] = useState(false);
+  const [showOthersImages, setShowOthersImages] = useState(true); // 기본값을 true로 변경
+  const [sortBy, setSortBy] = useState('likes'); // 'likes' or 'random'
 
   // 문제 데이터
   const problemData = {
@@ -41,16 +44,36 @@ const ImageProblem = () => {
   };
 
   const handleGenerate = () => {
-    if (!promptText.trim()) return;
+    if (!promptText.trim()) {
+      alert('프롬프트를 입력해주세요!');
+      return;
+    }
     
     setIsGenerating(true);
     // 임시 생성 로직
     setTimeout(() => {
       setIsGenerating(false);
-      // 실제로는 여기서 이미지 생성 결과를 처리
-      alert('이미지 생성이 완료되었습니다!');
+      setIsGenerated(true);
     }, 1500);
   };
+
+  const handleRetry = () => {
+    setPromptText('');
+    setIsGenerated(false);
+    // showOthersImages는 항상 true 유지
+  };
+
+  const handleNewProblem = () => {
+    // 다른 문제로 이동하는 로직
+    window.location.href = '/coding/';
+  };
+
+  const handleShare = () => {
+    // 프롬프트 공유 로직
+    alert('프롬프트가 게시판에 공유되었습니다!');
+  };
+
+  // toggleOthersImages 함수 제거 - 항상 표시되므로 불필요
 
   return (
     <div className="image-problem-page">
@@ -97,31 +120,106 @@ const ImageProblem = () => {
                       placeholder="이곳에 이미지 생성 프롬프트를 작성하세요..."
                       value={promptText}
                       onChange={(e) => setPromptText(e.target.value)}
+                      readOnly={isGenerated}
                     />
                   </div>
                 </div>
-                <div className="action-bar">
-                  <button 
-                    className="generate-btn"
-                    onClick={handleGenerate}
-                    disabled={isGenerating}
-                  >
-                    <span>{isGenerating ? '생성 중...' : '이미지 생성'}</span>
-                  </button>
-                </div>
+                {!isGenerated && (
+                  <div className="action-bar">
+                    <button 
+                      className="generate-btn"
+                      onClick={handleGenerate}
+                      disabled={isGenerating}
+                    >
+                      <span>{isGenerating ? '생성 중...' : '이미지 생성'}</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Frame 56: 우측 하단 미리보기 영역 */}
             <div className="frame-56">
               <div className="preview-content">
-                <div className="preview-message">
-                  <p>'이미지 생성' 버튼을 눌러<br />AI가 생성한 이미지를 확인하세요.</p>
+                {!isGenerated ? (
+                  <div className="preview-message">
+                    <p>'이미지 생성' 버튼을 눌러<br />AI가 생성한 이미지를 확인하세요.</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="generated-result">
+                      <div className="generated-image-placeholder">
+                        {/* 실제로는 생성된 이미지가 표시됩니다 */}
+                        <div className="image-placeholder">생성된 이미지</div>
+                      </div>
+                    </div>
+                    {/* 결과 버튼 바 - 피그마 44-2711 */}
+                    <div className="result-action-bar">
+                      <button className="result-action-btn" onClick={handleRetry}>
+                        <span>다시 풀기</span>
+                      </button>
+                      <button className="result-action-btn" onClick={handleNewProblem}>
+                        <span>다른 문제 풀기</span>
+                      </button>
+                      <button className="result-action-btn" onClick={handleShare}>
+                        <span>프롬프트 공유하기</span>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          {/* 하단 안내 문구 */}
+          {isGenerated && (
+            <div className="result-notice">
+              <p>*문제의 프롬포트와 그림은 해당 문제를 푼 도전자에게 모두 공개됩니다.</p>
+              <p>*프롬프트 공유하기는 해당 문제를 풀지 않아도, 모든 사람을 대상으로 게시판에 공유하는 것을 말합니다.</p>
+            </div>
+          )}
+        </div>
+
+        {/* 구경하기 섹션 - 기존 레이아웃을 밀어내지 않도록 별도 컨테이너 */}
+        {isGenerated && (
+          <div className="others-section-wrapper">
+            <div className="others-section">
+              <div className="others-container">
+                <div className="others-header">
+                  <h2 className="others-title">구경하기</h2>
+                  <div className="filter-buttons">
+                    <button 
+                      className={`filter-btn ${sortBy === 'likes' ? 'active' : ''}`}
+                      onClick={() => setSortBy('likes')}
+                    >
+                      좋아요순
+                    </button>
+                    <button 
+                      className={`filter-btn ${sortBy === 'random' ? 'active' : ''}`}
+                      onClick={() => setSortBy('random')}
+                    >
+                      랜덤순
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="others-grid">
+                  {Array.from({ length: 8 }, (_, i) => (
+                    <div key={i} className="other-image-card">
+                      <div className="other-image-placeholder">
+                        이미지 {i + 1}
+                      </div>
+                      <div className="image-likes">
+                        <span className="heart">❤️</span>
+                        <span className="like-count">10</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
       <Footer />
     </div>

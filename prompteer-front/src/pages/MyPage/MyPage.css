@@ -1,12 +1,10 @@
 .my-page {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #F8F9FA;
 }
 
 .main-content {
-  flex: 1;
   display: flex;
   justify-content: stretch;
   align-items: stretch;

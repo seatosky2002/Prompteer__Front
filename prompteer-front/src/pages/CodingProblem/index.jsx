@@ -14,7 +14,7 @@ const CodingProblem = () => {
   const [editorCode, setEditorCode] = useState('');
   const [consoleOutput, setConsoleOutput] = useState('');
   const [showResult, setShowResult] = useState(false);
-  const [showOthersWork, setShowOthersWork] = useState(false);
+  const [showOthersWork, setShowOthersWork] = useState(true); // 기본값을 true로 변경
 
   // 문제 데이터 (실제로는 API에서 가져옴)
   const getProblemData = (problemId) => {
@@ -87,7 +87,7 @@ const CodingProblem = () => {
 
   const handleRetry = () => {
     setShowResult(false);
-    setShowOthersWork(false);
+    // showOthersWork는 항상 true 유지
     setConsoleOutput('');
     setActiveTab('Prompt');
   };
@@ -100,9 +100,7 @@ const CodingProblem = () => {
     navigate('/board/write');
   };
 
-  const handleViewOthers = () => {
-    setShowOthersWork(true);
-  };
+  // handleViewOthers 함수 제거 - 항상 표시되므로 불필요
 
   return (
     <div className="coding-problem-page">
@@ -307,24 +305,18 @@ const CodingProblem = () => {
                 <p>*[프롬프트 공유하기]는 해당 문제를 풀지 않아도, 모든 사람을 대상으로 게시판에 공유하는 것을 말합니다.</p>
               </div>
 
-              {!showOthersWork && (
-                <div className="view-others-section">
-                  <div className="view-others-header">
-                    <h3>구경하기</h3>
-                    <div className="sort-buttons">
-                      <button className="sort-btn active">좋아요순</button>
-                      <button className="sort-btn">랜덤순</button>
-                    </div>
+              <div className="view-others-section">
+                <div className="view-others-header">
+                  <h3>구경하기</h3>
+                  <div className="sort-buttons">
+                    <button className="sort-btn active">좋아요순</button>
+                    <button className="sort-btn">랜덤순</button>
                   </div>
-                  <button className="view-others-btn" onClick={handleViewOthers}>
-                    다른 사람들의 풀이 보기
-                  </button>
                 </div>
-              )}
+              </div>
 
-              {showOthersWork && (
-                <div className="others-work-section">
-                  <div className="others-work-grid">
+              <div className="others-work-section">
+                <div className="others-work-grid">
                     {[1, 2, 3, 4, 5, 6].map((item) => (
                       <div key={item} className="work-card">
                         <div className="work-stats">
@@ -362,7 +354,6 @@ const CodingProblem = () => {
                     ))}
                   </div>
                 </div>
-              )}
             </>
           )}
         </div>

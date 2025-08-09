@@ -1,16 +1,14 @@
 .board-page {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #F8F9FA;
 }
 
 .board-main {
-  flex: 1;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 24px 96px 80px;
+  padding: 24px 96px 24px;
 }
 
 .board-container {
@@ -18,7 +16,7 @@
   max-width: 1213px;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 24px;
   margin: 0 auto;
 }
 
@@ -216,7 +214,7 @@
 /* 반응형 디자인 */
 @media (max-width: 1400px) {
   .board-main {
-    padding: 24px 48px 80px;
+    padding: 24px 48px 24px;
   }
   
   .board-content {
@@ -240,7 +238,7 @@
 
 @media (max-width: 1024px) {
   .board-main {
-    padding: 24px 32px 80px;
+    padding: 24px 32px 24px;
   }
   
   .board-filters,

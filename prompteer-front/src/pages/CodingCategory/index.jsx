@@ -132,6 +132,13 @@ const CodingCategory = () => {
       <Header />
       <main className="coding-category-main">
         <div className="coding-category-container">
+          {/* 페이지 헤더 */}
+          <div className="page-header">
+            <div className="page-title-section">
+              <h1 className="page-title">코딩 챌린지</h1>
+            </div>
+          </div>
+
           {/* Featured 챌린지 섹션 */}
           <div className="featured-section">
             <div className="featured-challenge">

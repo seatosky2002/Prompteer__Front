@@ -1,13 +1,11 @@
 /* 메인 레이아웃 */
 .coding-problem-page {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #FFFFFF;
 }
 
 .coding-problem-main {
-  flex: 1;
 }
 
 .coding-problem-container {

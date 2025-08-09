@@ -2,62 +2,60 @@ import React from 'react';
 import './ImageCard.css';
 
 const ImageCard = ({ 
-  challengeNumber, 
+  challengeId, 
   title, 
-  type = '이미지', 
-  difficulty = '초급',
-  backgroundImage 
+  description, 
+  category, 
+  difficulty, 
+  type,
+  onClick 
 }) => {
-  const getDifficultyColor = (level) => {
-    switch (level) {
-      case '초급':
-        return '#64BE75';
-      case '중급':
-        return '#FF9E42';
-      case '고급':
-        return '#FF6A6A';
-      default:
-        return '#64BE75';
+  const handleClick = () => {
+    if (onClick) {
+      onClick(challengeId);
     }
   };
 
-  const getBackgroundStyle = () => {
-    if (backgroundImage) {
-      return {
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      };
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty) {
+      case '초급':
+        return 'difficulty-beginner';
+      case '중급':
+        return 'difficulty-intermediate';
+      case '고급':
+        return 'difficulty-advanced';
+      default:
+        return 'difficulty-beginner';
     }
-    // 기본 그라데이션 배경
-    return {
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    };
+  };
+
+  const getTypeLabel = (type) => {
+    return type === 'image' ? '이미지' : '영상';
   };
 
   return (
-    <div className="image-card">
-      <div 
-        className="image-card-background"
-        style={getBackgroundStyle()}
-      >
-        <div className="image-card-overlay">
-          <div className="image-card-header">
-            <div className="type-tag">
-              <span className="type-text">{type}</span>
-            </div>
+    <div className="image-card" onClick={handleClick}>
+      <div className="image-card-content">
+        <div className="image-preview">
+          <div className="image-placeholder">
+            {/* 실제 구현시 이미지 표시 */}
+            <div className="placeholder-icon">🖼️</div>
+          </div>
+          <div className="type-badge">
+            <span className="type-label">{getTypeLabel(type)}</span>
           </div>
         </div>
-      </div>
-      <div className="image-card-content">
-        <div className="image-card-info">
-          <div className="challenge-info">
-            <h4 className="challenge-number">Challenge #{challengeNumber}</h4>
-            <p className="challenge-title">{title}</p>
-          </div>
-          <div className="difficulty-tag" style={{ backgroundColor: getDifficultyColor(difficulty) }}>
-            <span className="difficulty-text">{difficulty}</span>
+        <div className="card-info">
+          <div className="card-header">
+            <div className="challenge-info">
+              <h3 className="challenge-title">{title}</h3>
+              <p className="challenge-description">{description}</p>
+            </div>
+            <div className="difficulty-badge">
+              <span className={`difficulty-label ${getDifficultyColor(difficulty)}`}>
+                {difficulty}
+              </span>
+            </div>
           </div>
         </div>
       </div>

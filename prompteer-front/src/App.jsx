@@ -10,7 +10,11 @@ import CodingProblem from './pages/CodingProblem/index.jsx';
 import ImageCategory from './pages/ImageCategory/index.jsx';
 import ImageProblem from './pages/ImageProblem/index.jsx';
 import MyPage from './pages/MyPage/index.jsx';
+import Settings from "./pages/Settings/index.jsx";
+import Signup from "./pages/Signup/index.jsx";
+import Login from "./pages/Login/index.jsx";
 import './App.css';
+
 
 function App() {
   return (
@@ -28,6 +32,9 @@ function App() {
           <Route path="/category/image" element={<ImageCategory />} />
           <Route path="/image/challenge/:id" element={<ImageProblem />} />
           <Route path="/mypage" element={<MyPage />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </Router>
     </div>

@@ -1,0 +1,147 @@
+:root {
+  --color-bg: #f8f9fa;
+  --color-card: #ffffff;
+  --color-primary: #1971c2;
+  --color-text: #212529;
+  --color-muted: #868e96;
+  --radius: 12px;
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.signup-page {
+  background: var(--color-bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.signup-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+}
+
+.signup-card {
+  width: 100%;
+  max-width: 762px;
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 24px;
+  animation: fadeInUp 400ms ease;
+}
+
+.signup-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: center;
+  margin: 6px 0 18px;
+}
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-label {
+  font-size: 16px;
+  color: var(--color-text);
+}
+
+.input-field {
+  height: 41px;
+  border: none;
+  outline: none;
+  background: #f4f4f4;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+.textarea {
+  min-height: 96px;
+  border: none;
+  outline: none;
+  background: #f4f4f4;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 15px;
+  color: var(--color-text);
+  resize: vertical;
+}
+
+.tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #eef2f6;
+  color: var(--color-text);
+  border: 1px solid #e5e9ee;
+  cursor: pointer;
+  font-size: 13px;
+}
+.tag.selected {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.signup-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.signup-button {
+  width: 110px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+}
+.signup-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(25, 113, 194, 0.25);
+}
+.signup-button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

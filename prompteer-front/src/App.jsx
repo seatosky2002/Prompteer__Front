@@ -5,6 +5,8 @@ import PostDetail from './pages/PostDetail/index.jsx';
 import SharedPostDetail from './pages/SharedPostDetail/index.jsx';
 import ProblemDetail from './pages/ProblemDetail/index.jsx';
 import PostWrite from './pages/PostWrite/index.jsx';
+import CodingCategory from './pages/CodingCategory/index.jsx';
+import CodingProblem from './pages/CodingProblem/index.jsx';
 import MyPage from './pages/MyPage/index.jsx';
 import './App.css';
 
@@ -13,12 +15,14 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
-          <Route path="/" element={<PostWrite />} />
+          <Route path="/" element={<CodingCategory />} />
           <Route path="/board" element={<Board />} />
           <Route path="/board/post/:id" element={<PostDetail />} />
           <Route path="/board/shared/:id" element={<SharedPostDetail />} />
           <Route path="/board/post/:id/problem" element={<ProblemDetail />} />
           <Route path="/board/write" element={<PostWrite />} />
+          <Route path="/category/coding" element={<CodingCategory />} />
+          <Route path="/coding/problem/:id" element={<CodingProblem />} />
           <Route path="/mypage" element={<MyPage />} />
         </Routes>
       </Router>

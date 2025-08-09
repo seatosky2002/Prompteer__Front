@@ -1,0 +1,176 @@
+/* 챌린지 카드 */
+.challenge-card {
+  background: #ffffff;
+  border: 1px solid #E9ECEF;
+  border-radius: 12px;
+  padding: 25px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.challenge-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* 카드 헤더 */
+.challenge-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 13px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.challenge-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: -39px;
+  flex: 1;
+  min-width: 0;
+  max-width: calc(100% - 80px); /* 카테고리 배지 공간 확보 */
+}
+
+.challenge-card-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.2;
+  color: #212529;
+  margin: 0;
+  white-space: pre-line; /* 줄바꿈 허용 */
+  word-break: keep-all; /* 단어 단위로 줄바꿈 */
+  overflow-wrap: break-word;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.challenge-category {
+  background: #E7F5FF;
+  border-radius: 16px;
+  padding: 4px 10px;
+  flex-shrink: 0;
+  width: fit-content;
+  height: fit-content;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #1971C2;
+}
+
+/* 카드 콘텐츠 */
+.challenge-content {
+  flex: 1;
+  padding: 8px 0;
+  height: 58px;
+  overflow: hidden;
+}
+
+.challenge-description {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.challenge-desc-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 350;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #495057;
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* 카드 푸터 */
+.challenge-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.challenge-difficulty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.difficulty-badge {
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.difficulty-beginner {
+  background: #51CF66;
+}
+
+.difficulty-intermediate {
+  background: #FFD43B;
+  color: #000000;
+}
+
+.difficulty-advanced {
+  background: #FF4E4E;
+}
+
+.challenge-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 17px;
+  border-top: 1px solid #E9ECEF;
+}
+
+.participants-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.participants-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 350;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #495057;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .challenge-card {
+    padding: 20px;
+  }
+  
+  .challenge-card-title {
+    font-size: 20px;
+  }
+  
+  .challenge-desc-text {
+    font-size: 13px;
+  }
+  
+  .participants-text {
+    font-size: 13px;
+  }
+}

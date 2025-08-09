@@ -1,0 +1,315 @@
+/* 이미지 문제 페이지 전체 레이아웃 */
+.image-problem-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  background: #FFFFFF;
+}
+
+/* body 섹션 */
+.body-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 0px;
+  background: linear-gradient(0deg, #F8F9FA, #F8F9FA), #FFFFFF;
+}
+
+/* Container */
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+  height: 900px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 40px;
+  box-sizing: border-box;
+}
+
+/* Main 레이아웃 */
+.main-layout {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-self: stretch;
+  height: 100%;
+}
+
+/* 좌측 문제 정보 영역 */
+.problem-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 20px;
+  padding: 24px 25px 24px 0px;
+  border-right: 1px solid #E9ECEF;
+  overflow-x: auto;
+  overflow-y: auto;
+  width: 720px;
+  height: 100%;
+}
+
+/* 문제 헤더 */
+.problem-header-section {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+.problem-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.2;
+  color: #212529;
+  margin: 0;
+  white-space: pre-line;
+}
+
+/* 태그 */
+.problem-tags {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  width: 311px;
+}
+
+.tag {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px;
+  border-radius: 16px;
+  background: #E7F5FF;
+}
+
+.tag-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #1971C2;
+}
+
+/* 문제 섹션들 */
+.problem-sections {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 20px;
+}
+
+.problem-section {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 9px;
+}
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  padding: 0px 0px 9px;
+  border-bottom: 1px solid #E9ECEF;
+}
+
+.section-header.constrained {
+  padding: 0px 0px 5px;
+  width: 311px;
+}
+
+.section-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+  color: #212529;
+  margin: 0;
+}
+
+.section-content {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+.section-content.constrained {
+  width: 311px;
+}
+
+.section-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 350;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #495057;
+  margin: 0;
+}
+
+/* 우측 작업 영역 */
+.workspace-section {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  padding: 0px 1px 0px 0px;
+  overflow-x: auto;
+  overflow-y: auto;
+  flex: 1;
+  height: 100%;
+}
+
+/* 프롬프트 컨테이너 */
+.prompt-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+  align-self: stretch;
+  padding: 16px;
+  flex: 1;
+}
+
+.prompt-editor {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  flex: 1;
+}
+
+.editor-frame {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  align-items: stretch;
+  align-self: stretch;
+  padding: 16px 17px 692.5px;
+  background: #FFFFFF;
+  border: 1px solid #E9ECEF;
+  border-radius: 8px;
+  overflow-x: auto;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.prompt-textarea {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  font-family: 'Fira Code', monospace;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #212529;
+}
+
+.prompt-textarea::placeholder {
+  color: #757575;
+}
+
+.action-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 17px 16px 16px;
+  width: 499px;
+  background: #FFFFFF;
+  border-top: 1px solid #E9ECEF;
+}
+
+.generate-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 20px 12px;
+  background: #1971C2;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.generate-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.generate-btn span {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.21;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+/* 미리보기 컨테이너 */
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  padding: 80px 24px 711px;
+  overflow-x: auto;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.preview-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+}
+
+.preview-message {
+  text-align: center;
+}
+
+.preview-message p {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 350;
+  font-size: 16px;
+  line-height: 1.2;
+  color: #868E96;
+  margin: 0;
+}
+
+/* 반응형 */
+@media (max-width: 1440px) {
+  .image-problem-page {
+    width: 100%;
+    max-width: 1440px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .main-layout {
+    flex-direction: column;
+    padding: 0 20px;
+  }
+  
+  .problem-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #E9ECEF;
+    height: auto;
+    max-height: 50vh;
+  }
+  
+  .workspace-section {
+    width: 100%;
+    height: 50vh;
+  }
+  
+  .action-bar {
+    width: 100%;
+  }
+}

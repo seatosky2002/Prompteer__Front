@@ -307,20 +307,20 @@ const CodingProblem = () => {
                 <p>*[프롬프트 공유하기]는 해당 문제를 풀지 않아도, 모든 사람을 대상으로 게시판에 공유하는 것을 말합니다.</p>
               </div>
 
-              {!showOthersWork && (
-                <div className="view-others-section">
-                  <div className="view-others-header">
-                    <h3>구경하기</h3>
-                    <div className="sort-buttons">
-                      <button className="sort-btn active">좋아요순</button>
-                      <button className="sort-btn">랜덤순</button>
-                    </div>
+              <div className="view-others-section">
+                <div className="view-others-header">
+                  <h3>구경하기</h3>
+                  <div className="sort-buttons">
+                    <button className="sort-btn active">좋아요순</button>
+                    <button className="sort-btn">랜덤순</button>
                   </div>
+                </div>
+                {!showOthersWork && (
                   <button className="view-others-btn" onClick={handleViewOthers}>
                     다른 사람들의 풀이 보기
                   </button>
-                </div>
-              )}
+                )}
+              </div>
 
               {showOthersWork && (
                 <div className="others-work-section">

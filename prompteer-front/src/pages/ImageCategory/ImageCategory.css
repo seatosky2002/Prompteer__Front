@@ -1,24 +1,22 @@
-/* 메인 레이아웃 */
-.coding-category-page {
+/* 이미지/영상 카테고리 페이지 */
+.image-category-page {
   display: flex;
   flex-direction: column;
   background: #F8F9FA;
 }
 
-.coding-category-main {
+.image-category-main {
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding: 24px 0 24px;
 }
 
-.coding-category-container {
+.image-category-container {
   width: 100%;
   max-width: 1440px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   gap: 40px;
   margin: 0 auto;
   padding: 0 40px;
@@ -62,28 +60,30 @@
 /* Featured 챌린지 섹션 */
 .featured-section {
   display: flex;
+  flex-direction: row;
   justify-content: stretch;
   align-items: stretch;
-  width: 100%;
+  align-self: stretch;
   gap: 29px;
-  margin-bottom: 20px;
+  width: 100%;
+  height: auto;
 }
 
 .featured-challenge {
-  background: linear-gradient(90deg, #228BE6 100%);
-  border-radius: 12px;
-  padding: 48px;
-  flex: 1;
   display: flex;
   flex-direction: column;
+  align-self: stretch;
   gap: 25px;
+  padding: 48px;
   width: 100%;
-  box-sizing: border-box;
+  background: linear-gradient(90deg, #228BE6 0%, #228BE6 100%);
+  border-radius: 12px;
 }
 
 .featured-content {
   display: flex;
   flex-direction: column;
+  align-self: stretch;
   width: 100%;
 }
 
@@ -92,7 +92,7 @@
   font-weight: 700;
   font-size: 40px;
   line-height: 1.2;
-  color: #ffffff;
+  color: #FFFFFF;
   margin: 0 0 25px 0;
   width: 100%;
 }
@@ -102,26 +102,28 @@
   flex-direction: column;
   gap: 8px;
   width: 1157px;
-  max-width: 100%;
 }
 
 .featured-status {
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .status-badge {
-  background: #ffffff;
-  color: #228BE6;
-  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
   padding: 4px 10px;
+  background: #FFFFFF;
+  border-radius: 16px;
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 700;
   font-size: 13px;
   line-height: 1.2;
+  color: #228BE6;
   height: 24px;
-  display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .featured-info {
@@ -136,7 +138,7 @@
   font-weight: 700;
   font-size: 32px;
   line-height: 1.2;
-  color: #ffffff;
+  color: #FFFFFF;
   margin: 0;
   width: 100%;
 }
@@ -146,266 +148,194 @@
   font-weight: 400;
   font-size: 20px;
   line-height: 1.2;
-  color: #ffffff;
+  color: #FFFFFF;
   margin: 0;
   width: 100%;
 }
 
 .challenge-now-btn {
-  background: #ffffff;
-  color: #1971C2;
-  border: none;
-  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
   padding: 12px 24px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  border: none;
   cursor: pointer;
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 700;
   font-size: 16px;
   line-height: 1.2;
-  transition: all 0.2s ease;
+  color: #1971C2;
   width: fit-content;
+  height: fit-content;
+  align-items: center;
+  justify-content: center;
 }
 
 .challenge-now-btn:hover {
-  background: #f8f9fa;
-  transform: translateY(-1px);
+  background: #F8F9FA;
 }
 
 /* 검색 및 필터 섹션 */
 .search-filter-section {
-  width: 1248px !important;
-  max-width: 1248px !important;
   display: flex;
   flex-direction: column;
   align-items: center;
+  align-self: stretch;
   gap: 20px;
-  padding: 24px 0;
+  padding: 24px 0px;
+  width: 100%;
 }
 
 .search-container {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 25px;
-  width: 1248px !important;
-  max-width: 1248px !important;
   display: flex;
   flex-direction: column;
+  align-self: stretch;
   gap: 10px;
+  padding: 25px;
+  background: #FFFFFF;
+  border-radius: 12px;
+  width: 100%;
   box-sizing: border-box;
 }
 
 .search-box {
   display: flex;
-  justify-content: stretch;
-  align-items: stretch;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
   gap: 16px;
   width: 100%;
 }
 
 .search-input-wrapper {
   display: flex;
+  flex-direction: row;
   justify-content: flex-end;
   align-items: center;
-  background: #ffffff;
+  gap: 10px;
+  padding: 10px 20px;
+  flex: 1;
   border: 1px solid #CED4DA;
   border-radius: 8px;
-  padding: 10px 20px;
-  gap: 10px;
-  flex: 1;
+  background: #FFFFFF;
+  box-sizing: border-box;
 }
 
 .search-input {
-  background: transparent;
-  border: none;
   flex: 1;
+  border: none;
+  outline: none;
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 400;
   font-size: 16px;
   line-height: 1.2;
-  color: #000000;
-  outline: none;
+  color: #495057;
+  background: transparent;
 }
 
 .search-input::placeholder {
   color: #CED4DA;
 }
 
-.search-input-wrapper:focus-within {
-  border-color: #1971C2;
-  box-shadow: 0 0 0 2px rgba(25, 113, 194, 0.2);
-}
-
 .search-icon {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   width: 20px;
   height: 20px;
-  flex-shrink: 0;
 }
 
 .filter-buttons {
   display: flex;
+  flex-direction: row;
   justify-content: flex-end;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
+  width: fit-content;
 }
 
 .filter-btn {
-  background: #F1F3F5;
-  border: none;
-  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
   padding: 10px 16px;
+  height: 40px;
+  background: #F1F3F5;
+  border-radius: 8px;
+  border: none;
   cursor: pointer;
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 1.2;
   color: #495057;
-  transition: all 0.2s ease;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-}
-
-.filter-btn:hover {
-  background: #e9ecef;
 }
 
 .filter-btn.active {
   background: #1971C2;
-  color: #ffffff;
+  color: #FFFFFF;
+}
+
+.filter-btn:hover {
+  background: #E9ECEF;
+}
+
+.filter-btn.active:hover {
+  background: #1864a8;
 }
 
 /* 챌린지 그리드 */
 .challenges-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  width: 1248px !important;
-  max-width: 1248px !important;
-  height: 778px;
-  position: relative;
+  grid-template-columns: 384px 384px 384px;
+  column-gap: 20px;
+  row-gap: 40px;
+  justify-content: center;
+  align-self: stretch;
+  width: 100%;
+  height: 615px;
+  padding: 0;
 }
-
-.challenges-grid > *:nth-child(1) { grid-column: 1; grid-row: 1; }
-.challenges-grid > *:nth-child(2) { grid-column: 2; grid-row: 1; }
-.challenges-grid > *:nth-child(3) { grid-column: 3; grid-row: 1; }
-.challenges-grid > *:nth-child(4) { grid-column: 1; grid-row: 2; }
-.challenges-grid > *:nth-child(5) { grid-column: 2; grid-row: 2; }
-.challenges-grid > *:nth-child(6) { grid-column: 3; grid-row: 2; }
-.challenges-grid > *:nth-child(7) { grid-column: 1; grid-row: 3; }
-.challenges-grid > *:nth-child(8) { grid-column: 2; grid-row: 3; }
-.challenges-grid > *:nth-child(9) { grid-column: 3; grid-row: 3; }
 
 /* 검색 결과 없음 */
 .no-results {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 60px 20px;
-  color: #6c757d;
-}
-
-.no-results p {
+  padding: 40px;
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 400;
-  font-size: 18px;
-  line-height: 1.2;
-  margin: 0;
+  font-size: 16px;
+  color: #6C757D;
 }
 
 /* 반응형 디자인 */
-@media (max-width: 1400px) {
-  .coding-category-main {
-    padding: 24px 48px 130px;
+@media (max-width: 1200px) {
+  .image-category-main {
+    padding: 20px;
   }
   
-  .coding-category-container,
-  .featured-section,
-  .featured-challenge,
-  .search-filter-section,
-  .search-container,
-  .challenges-grid {
-    width: 100% !important;
-    max-width: 1248px !important;
+  .image-category-container {
+    max-width: 100%;
   }
   
   .challenges-grid {
-    height: auto;
-  }
-  
-  .featured-details {
-    width: 100%;
-  }
-}
-
-@media (max-width: 1024px) {
-  .coding-category-main {
-    padding: 24px 32px 100px;
-  }
-  
-  .coding-category-container,
-  .featured-section,
-  .featured-challenge,
-  .search-filter-section,
-  .search-container,
-  .challenges-grid {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-  
-  .challenges-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    grid-template-columns: 384px 384px;
+    column-gap: 20px;
+    row-gap: 40px;
+    justify-content: center;
   }
   
   .featured-challenge {
-    padding: 32px;
+    padding: 30px;
   }
   
   .featured-title {
     font-size: 32px;
-  }
-  
-  .featured-challenge-title {
-    font-size: 28px;
-  }
-  
-  .featured-challenge-subtitle {
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 768px) {
-  .coding-category-main {
-    padding: 16px;
-  }
-  
-  .coding-category-container,
-  .featured-section,
-  .featured-challenge,
-  .search-filter-section,
-  .search-container,
-  .challenges-grid {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-  
-  .challenges-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  .featured-challenge {
-    padding: 24px;
-  }
-  
-  .featured-title {
-    font-size: 28px;
   }
   
   .featured-challenge-title {
@@ -415,9 +345,17 @@
   .featured-challenge-subtitle {
     font-size: 16px;
   }
+}
+
+@media (max-width: 768px) {
+  .image-category-main {
+    padding: 16px;
+  }
   
-  .search-container {
-    padding: 20px;
+  .challenges-grid {
+    grid-template-columns: 1fr;
+    row-gap: 30px;
+    justify-content: center;
   }
   
   .search-box {
@@ -426,10 +364,24 @@
   }
   
   .search-input-wrapper {
-    padding: 12px 16px;
+    flex: none;
+    width: 100%;
   }
   
   .filter-buttons {
     justify-content: center;
+    width: 100%;
+  }
+  
+  .featured-title {
+    font-size: 28px;
+  }
+  
+  .featured-challenge-title {
+    font-size: 20px;
+  }
+  
+  .featured-challenge-subtitle {
+    font-size: 14px;
   }
 }

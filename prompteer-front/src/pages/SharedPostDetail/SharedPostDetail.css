@@ -1,17 +1,15 @@
 /* 메인 레이아웃 */
 .shared-post-detail-page {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #F8F9FA;
 }
 
 .shared-post-detail-main {
-  flex: 1;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 24px 96px 80px;
+  padding: 24px 96px 24px;
 }
 
 .shared-post-detail-container {

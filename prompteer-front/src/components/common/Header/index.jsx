@@ -12,7 +12,10 @@ const Header = () => {
 
   const isActive = (path) => {
     if (path === '/board') {
-      return location.pathname === '/board' || location.pathname === '/' || location.pathname.startsWith('/board/post');
+      return location.pathname === '/board' || location.pathname.startsWith('/board/post');
+    }
+    if (path === '/') {
+      return location.pathname === '/' || location.pathname.startsWith('/category') || location.pathname.startsWith('/coding') || location.pathname.startsWith('/image');
     }
     return location.pathname === path;
   };
@@ -25,6 +28,12 @@ const Header = () => {
         </div>
         <div className="nav-section">
           <nav className="nav-menu">
+            <div 
+              className={`nav-item ${isActive('/') ? 'active' : ''}`}
+              onClick={() => handleNavigation('/')}
+            >
+              챌린지
+            </div>
             <div 
               className={`nav-item ${isActive('/board') ? 'active' : ''}`}
               onClick={() => handleNavigation('/board')}

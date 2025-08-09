@@ -1,14 +1,17 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Board from './pages/Board/index.jsx';
-import PostDetail from './pages/PostDetail/index.jsx';
-import SharedPostDetail from './pages/SharedPostDetail/index.jsx';
-import ProblemDetail from './pages/ProblemDetail/index.jsx';
-import PostWrite from './pages/PostWrite/index.jsx';
-import CodingCategory from './pages/CodingCategory/index.jsx';
-import CodingProblem from './pages/CodingProblem/index.jsx';
-import MyPage from './pages/MyPage/index.jsx';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Board from "./pages/Board/index.jsx";
+import PostDetail from "./pages/PostDetail/index.jsx";
+import SharedPostDetail from "./pages/SharedPostDetail/index.jsx";
+import ProblemDetail from "./pages/ProblemDetail/index.jsx";
+import PostWrite from "./pages/PostWrite/index.jsx";
+import CodingCategory from "./pages/CodingCategory/index.jsx";
+import CodingProblem from "./pages/CodingProblem/index.jsx";
+import MyPage from "./pages/MyPage/index.jsx";
+import Settings from "./pages/Settings/index.jsx";
+import Signup from "./pages/Signup/index.jsx";
+import Login from "./pages/Login/index.jsx";
+import "./App.css";
 
 function App() {
   return (
@@ -24,6 +27,9 @@ function App() {
           <Route path="/category/coding" element={<CodingCategory />} />
           <Route path="/coding/problem/:id" element={<CodingProblem />} />
           <Route path="/mypage" element={<MyPage />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </Router>
     </div>

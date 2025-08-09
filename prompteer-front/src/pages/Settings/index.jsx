@@ -1,0 +1,393 @@
+import React, { useState, useEffect } from "react";
+import Header from "../../components/common/Header/index.jsx";
+import Footer from "../../components/common/Footer/index.jsx";
+import "./Settings.css";
+
+const Settings = () => {
+  const [activeTab, setActiveTab] = useState("계정");
+  const [formData, setFormData] = useState({
+    // 계정 설정
+    nickname: "뽀복",
+    email: "pobokdev@example.com",
+    username: "promptinglion7520",
+    bio: "AI와 함께 성장하는 개발자입니다.",
+    interests: [],
+    password: "",
+    newPassword: "",
+    confirmPassword: "",
+    deletePassword: "",
+
+    // 개인정보 설정
+    privacy: {
+      profilePublic: true,
+      activityVisible: true,
+      searchable: false,
+    },
+
+    // 앱 설정
+    preferences: {
+      theme: "light",
+      language: "ko",
+      autoSave: true,
+      showTutorials: true,
+    },
+  });
+
+  const allInterests = [
+    "백엔드 개발자",
+    "프론트엔드 개발자",
+    "UX/UI디자이너",
+    "프롬프트 엔지니어",
+    "기획/PM",
+    "PS",
+    "기타",
+  ];
+
+  const tabs = [
+    { id: "프로필 수정", label: "프로필 수정", icon: "👤" },
+    { id: "비밀번호 변경", label: "비밀번호 변경", icon: "🔒" },
+    { id: "회원 탈퇴", label: "회원 탈퇴", icon: "⚠️" },
+  ];
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleNestedChange = (category, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [category]: {
+        ...prev[category],
+        [field]: value,
+      },
+    }));
+  };
+
+  const handleToggleInterest = (tag) => {
+    setFormData((prev) => {
+      const isSelected = prev.interests.includes(tag);
+      const nextInterests = isSelected
+        ? prev.interests.filter((t) => t !== tag)
+        : [...prev.interests, tag];
+      return { ...prev, interests: nextInterests };
+    });
+  };
+
+  // 회원 탈퇴 모달 상태 및 핸들러
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const handleOpenDeleteModal = () => setIsDeleteModalOpen(true);
+  const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
+  const handleConfirmDelete = () => {
+    if (!formData.deletePassword?.trim()) {
+      alert("비밀번호를 입력해주세요.");
+      return;
+    }
+    // TODO: API 연동
+    alert("회원 탈퇴 요청이 전송되었습니다.");
+    setIsDeleteModalOpen(false);
+  };
+
+  useEffect(() => {
+    if (activeTab === "회원 탈퇴") setIsDeleteModalOpen(true);
+    else setIsDeleteModalOpen(false);
+  }, [activeTab]);
+
+  const handleSave = () => {
+    console.log("설정 저장:", formData);
+    // 저장 애니메이션 효과
+    const saveBtn = document.querySelector(".save-button");
+    if (saveBtn) {
+      saveBtn.textContent = "저장 완료!";
+      saveBtn.style.backgroundColor = "#51CF66";
+      setTimeout(() => {
+        saveBtn.textContent = "설정 저장";
+        saveBtn.style.backgroundColor = "#228BE6";
+      }, 2000);
+    }
+  };
+
+  const renderAccountSettings = () => (
+    <div className="settings-content-section">
+      <h3 className="section-title">프로필 수정</h3>
+
+      {/* 이메일 (비활성화, 회색 배경) */}
+      <div className="form-group">
+        <div className="input-wrapper">
+          <label htmlFor="email">이메일</label>
+          <input
+            className="input-field input-gray"
+            type="email"
+            id="email"
+            value={formData.email}
+            disabled
+            aria-readonly
+            placeholder="likelion@snu.ac.kr"
+          />
+        </div>
+      </div>
+
+      {/* 아이디 (비활성화, 회색 배경) */}
+      <div className="form-group">
+        <div className="input-wrapper">
+          <label htmlFor="username">아이디</label>
+          <input
+            className="input-field input-gray"
+            type="text"
+            id="username"
+            value={formData.username}
+            disabled
+            aria-readonly
+            placeholder="promptinglion7520"
+          />
+        </div>
+      </div>
+
+      {/* 닉네임 (흰 배경) */}
+      <div className="form-group">
+        <div className="input-wrapper">
+          <label htmlFor="nickname">닉네임</label>
+          <input
+            className="input-field input-white"
+            type="text"
+            id="nickname"
+            value={formData.nickname}
+            onChange={(e) => handleInputChange("nickname", e.target.value)}
+            placeholder="프롬프트장인이되겠어"
+          />
+        </div>
+      </div>
+
+      {/* 관심 분야 (중복 선택 가능한 태그) */}
+      <div className="form-group">
+        <div className="input-wrapper">
+          <label>관심 분야</label>
+          <div className="interest-group">
+            {allInterests.map((t) => {
+              const selected = formData.interests.includes(t);
+              return (
+                <button
+                  type="button"
+                  key={t}
+                  className={`pill ${selected ? "selected" : ""}`}
+                  onClick={() => handleToggleInterest(t)}
+                  aria-pressed={selected}
+                >
+                  {t}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* 한 줄 소개 */}
+      <div className="form-group">
+        <div className="input-wrapper">
+          <label htmlFor="bio">한 줄 소개</label>
+          <textarea
+            id="bio"
+            className="textarea"
+            value={formData.bio}
+            onChange={(e) => handleInputChange("bio", e.target.value)}
+            placeholder="AI와 함께 성장하는 개발자입니다."
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderPrivacySettings = () => (
+    <div className="settings-content-section">
+      <h3 className="section-title">비밀번호 변경</h3>
+      <div className="form-group">
+        <div className="input-wrapper">
+          <label htmlFor="password">현재 비밀번호</label>
+          <input
+            type="password"
+            id="password"
+            value={formData.password}
+            onChange={(e) => handleInputChange("password", e.target.value)}
+            placeholder="현재 비밀번호를 입력하세요"
+          />
+        </div>
+        <div className="input-wrapper">
+          <label htmlFor="newPassword">새 비밀번호</label>
+          <input
+            type="password"
+            id="newPassword"
+            value={formData.newPassword}
+            onChange={(e) => handleInputChange("newPassword", e.target.value)}
+            placeholder="새 비밀번호를 입력하세요"
+          />
+        </div>
+        <div className="input-wrapper">
+          <label htmlFor="confirmPassword">비밀번호 확인</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={(e) =>
+              handleInputChange("confirmPassword", e.target.value)
+            }
+            placeholder="새 비밀번호를 다시 입력하세요"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderAppSettings = () => (
+    <div className="settings-content-section">
+      <h3 className="section-title">회원 탈퇴</h3>
+      <p className="setting-description">
+        계정을 탈퇴하려면 아래 버튼을 클릭하세요. 팝업에서 비밀번호 확인 후
+        진행됩니다.
+      </p>
+      <div>
+        <button
+          type="button"
+          className="delete-button"
+          onClick={handleOpenDeleteModal}
+        >
+          회원 탈퇴 진행
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderActiveContent = () => {
+    // 한 페이지 안에서 탭 관리하는 칸
+    switch (activeTab) {
+      case "프로필 수정":
+        return renderAccountSettings();
+
+      case "비밀번호 변경":
+        return renderPrivacySettings();
+      case "회원 탈퇴":
+        return renderAppSettings();
+      default:
+        return renderAccountSettings();
+    }
+  };
+
+  return (
+    <div className="settings-page">
+      <Header />
+
+      <main className="settings-main">
+        <div className="settings-container">
+          {/* 설정 헤더 */}
+          <div className="settings-header">
+            <div className="settings-title-section">
+              <h1 className="settings-title">설정</h1>
+              <p className="settings-subtitle">계정 및 앱 설정을 관리하세요</p>
+            </div>
+          </div>
+
+          <div className="settings-body">
+            {/* 사이드바 탭 */}
+            <div className="settings-sidebar">
+              <nav className="settings-nav">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    className={`settings-nav-item ${
+                      activeTab === tab.id ? "active" : ""
+                    }`}
+                    onClick={() => setActiveTab(tab.id)}
+                  >
+                    <span className="nav-icon">{tab.icon}</span>
+                    <span className="nav-label">{tab.label}</span>
+                  </button>
+                ))}
+              </nav>
+            </div>
+
+            {/* 메인 콘텐츠 영역 */}
+            <div className="settings-content">
+              <div className="settings-content-wrapper">
+                {renderActiveContent()} {/* 탭 관리하는 칸 */}
+                {/* 저장 버튼 */}
+                <div className="settings-actions">
+                  <button className="save-button" onClick={handleSave}>
+                    설정 저장
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* 회원 탈퇴 모달 */}
+      {isDeleteModalOpen && (
+        <div className="modal-overlay" onClick={handleCloseDeleteModal}>
+          <div
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-modal-title"
+          >
+            <button
+              className="modal-close"
+              onClick={handleCloseDeleteModal}
+              aria-label="닫기"
+            >
+              ×
+            </button>
+            <div className="modal-header">
+              <h3 id="delete-modal-title" className="modal-title">
+                회원 탈퇴
+              </h3>
+            </div>
+            <div className="modal-body">
+              <p className="modal-description">
+                모든 기록이 전부 지워지고, 복구가 불가능합니다.
+                <br />
+                정말 탈퇴하시겠습니까?
+                <br />
+                <br />
+                탈퇴하려면 본인의 비밀번호를 입력해주세요.
+              </p>
+              <div className="modal-field">
+                <label htmlFor="deletePassword">비밀번호</label>
+                <input
+                  id="deletePassword"
+                  type="password"
+                  className="modal-input"
+                  placeholder="현재 비밀번호를 입력하세요"
+                  value={formData.deletePassword}
+                  onChange={(e) =>
+                    handleInputChange("deletePassword", e.target.value)
+                  }
+                />
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button
+                className="modal-cancel-button"
+                onClick={handleCloseDeleteModal}
+              >
+                취소
+              </button>
+              <button
+                className="modal-delete-button"
+                onClick={handleConfirmDelete}
+              >
+                탈퇴하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Footer />
+    </div>
+  );
+};
+
+export default Settings;

@@ -47,6 +47,8 @@ const ImageProblem = () => {
     // 임시 생성 로직
     setTimeout(() => {
       setIsGenerating(false);
+      // 실제로는 여기서 이미지 생성 결과를 처리
+      alert('이미지 생성이 완료되었습니다!');
     }, 1500);
   };
 
@@ -56,8 +58,8 @@ const ImageProblem = () => {
       <div className="body-section">
         <div className="container">
           <div className="main-layout">
-            {/* 좌측: 문제 정보 */}
-            <div className="problem-sidebar">
+            {/* Frame 34: 좌측 문제 정보 */}
+            <div className="frame-34">
               <div className="problem-header-section">
                 <h1 className="problem-title">{problemData.title}</h1>
               </div>
@@ -85,8 +87,8 @@ const ImageProblem = () => {
               </div>
             </div>
 
-            {/* 우측: 프롬프트 입력 영역 */}
-            <div className="workspace-section">
+            {/* Frame 50: 우측 상단 프롬프트 입력 영역 */}
+            <div className="frame-50">
               <div className="prompt-container">
                 <div className="prompt-editor">
                   <div className="editor-frame">
@@ -97,23 +99,24 @@ const ImageProblem = () => {
                       onChange={(e) => setPromptText(e.target.value)}
                     />
                   </div>
-                  <div className="action-bar">
-                    <button 
-                      className="generate-btn"
-                      onClick={handleGenerate}
-                      disabled={isGenerating}
-                    >
-                      <span>{isGenerating ? '생성 중...' : '이미지 생성'}</span>
-                    </button>
-                  </div>
+                </div>
+                <div className="action-bar">
+                  <button 
+                    className="generate-btn"
+                    onClick={handleGenerate}
+                    disabled={isGenerating}
+                  >
+                    <span>{isGenerating ? '생성 중...' : '이미지 생성'}</span>
+                  </button>
                 </div>
               </div>
+            </div>
 
-              <div className="preview-container">
-                <div className="preview-content">
-                  <div className="preview-message">
-                    <p>'이미지 생성' 버튼을 눌러<br />AI가 생성한 이미지를 확인하세요.</p>
-                  </div>
+            {/* Frame 56: 우측 하단 미리보기 영역 */}
+            <div className="frame-56">
+              <div className="preview-content">
+                <div className="preview-message">
+                  <p>'이미지 생성' 버튼을 눌러<br />AI가 생성한 이미지를 확인하세요.</p>
                 </div>
               </div>
             </div>

@@ -2,7 +2,6 @@
 .image-problem-page {
   display: flex;
   flex-direction: column;
-  align-items: center;
   width: 100%;
   background: #FFFFFF;
 }
@@ -13,7 +12,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding: 0px;
+  padding: 0px 0px 130px;
   background: linear-gradient(0deg, #F8F9FA, #F8F9FA), #FFFFFF;
 }
 
@@ -25,33 +24,35 @@
   align-items: stretch;
   height: 900px;
   width: 100%;
-  max-width: 1440px;
+  max-width: 1440px; /* 헤더와 동일한 max-width */
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0; /* 패딩 제거 - Main에서 처리 */
   box-sizing: border-box;
 }
 
-/* Main 레이아웃 */
+/* Main 레이아웃 - Figma 3등분 구조 */
 .main-layout {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-self: stretch;
-  height: 100%;
+  padding: 0px 40px;
+  flex: 1;
 }
 
-/* 좌측 문제 정보 영역 */
-.problem-sidebar {
+/* Frame 34: 좌측 문제 정보 영역 */
+.frame-34 {
+  width: 420px; /* 좌측 패딩을 고려해 너비 조정 */
+  align-self: stretch;
+  padding: 24px 25px 24px 0px; /* 피그마와 일치 - Main에서 40px 패딩 처리 */
+  border-right: 1px solid #E9ECEF; /* 피그마와 동일한 색상 */
   display: flex;
   flex-direction: column;
-  align-self: stretch;
-  gap: 20px;
-  padding: 24px 25px 24px 0px;
-  border-right: 1px solid #E9ECEF;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 20px; /* gap-5 */
   overflow-x: auto;
   overflow-y: auto;
-  width: 720px;
-  height: 100%;
 }
 
 /* 문제 헤더 */
@@ -151,49 +152,54 @@
   margin: 0;
 }
 
-/* 우측 작업 영역 */
-.workspace-section {
+/* Frame 50: 중간 프롬프트 입력 영역 */
+.frame-50 {
+  flex: 1; /* 피그마에서 fill로 되어있음 */
+  min-width: 400px; /* 최소 너비 보장 */
+  align-self: stretch;
+  padding: 0px 1px 0px 0px; /* 피그마와 정확히 일치 */
+  border-right: 1px solid #E9ECEF; /* 피그마와 동일한 색상 */
   display: flex;
   flex-direction: column;
-  align-self: stretch;
-  padding: 0px 1px 0px 0px;
+  justify-content: flex-start;
+  align-items: flex-start;
   overflow-x: auto;
   overflow-y: auto;
-  flex: 1;
-  height: 100%;
 }
 
-/* 프롬프트 컨테이너 */
+/* Frame 51: 프롬프트 컨테이너 */
 .prompt-container {
+  align-self: stretch;
+  flex: 1; /* flex-1 */
+  padding: 16px; /* p-4 */
   display: flex;
   flex-direction: column;
   justify-content: stretch;
   align-items: stretch;
-  align-self: stretch;
-  padding: 16px;
-  flex: 1;
 }
 
+/* Frame 52: 에디터 프레임 */
 .prompt-editor {
-  display: flex;
-  flex-direction: column;
   align-self: stretch;
-  flex: 1;
+  flex: 1; /* flex-1 */
+  padding: 16px 17px; /* 상단과 좌우 패딩만 적용 */
+  background: #FFFFFF; /* bg-white */
+  border-radius: 8px; /* rounded-lg */
+  border: 1px solid #E9ECEF; /* 피그마와 동일한 색상 */
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .editor-frame {
+  flex: 1; /* flex-1 */
   display: flex;
-  flex-direction: row;
-  justify-content: stretch;
-  align-items: stretch;
-  align-self: stretch;
-  padding: 16px 17px 692.5px;
-  background: #FFFFFF;
-  border: 1px solid #E9ECEF;
-  border-radius: 8px;
-  overflow-x: auto;
-  overflow-y: auto;
-  flex: 1;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .prompt-textarea {
@@ -214,27 +220,33 @@
   color: #757575;
 }
 
+/* Frame 107: 액션 바 */
 .action-bar {
+  width: 100%; /* 전체 너비 사용하여 버튼이 가려지지 않도록 */
+  max-width: 499px; /* 최대 너비는 피그마 디자인에 맞춤 */
+  padding: 17px 16px 16px; /* 피그마와 정확히 일치 */
+  background: #FFFFFF; /* bg-white */
+  border-top: 1px solid #E9ECEF; /* 피그마와 동일한 색상 */
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 17px 16px 16px;
-  width: 499px;
-  background: #FFFFFF;
-  border-top: 1px solid #E9ECEF;
+  justify-content: flex-end; /* justify-end */
+  align-items: flex-start; /* items-start */
+  gap: 12px; /* gap-3 */
+  box-sizing: border-box;
 }
 
+/* Frame 55: 생성 버튼 */
 .generate-btn {
+  padding: 10px 20px 12px; /* 피그마와 일치 */
+  background: #1971C2; /* 피그마 색상과 일치 */
+  border-radius: 6px; /* rounded-md */
+  border: none;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 10px 20px 12px;
-  background: #1971C2;
-  border-radius: 6px;
-  border: none;
+  justify-content: center; /* justify-center */
+  align-items: center; /* items-center */
   cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0; /* 버튼이 줄어들지 않도록 */
 }
 
 .generate-btn:disabled {
@@ -243,44 +255,53 @@
 }
 
 .generate-btn span {
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 1.21;
-  text-align: center;
-  color: #FFFFFF;
+  text-align: center; /* text-center */
+  justify-content: center;
+  color: #FFFFFF; /* text-white */
+  font-size: 15px; /* 피그마와 일치 */
+  font-weight: 700; /* font-bold */
+  font-family: 'Inter', sans-serif; /* font-['Inter'] */
+  line-height: 1.21; /* 피그마와 일치 */
 }
 
-/* 미리보기 컨테이너 */
-.preview-container {
+/* Frame 56: 우측 미리보기 영역 */
+.frame-56 {
+  flex: 1; /* 남은 공간을 차지 */
+  min-width: 300px; /* 최소 너비 보장 */
+  align-self: stretch;
+  padding: 80px 24px 711px; /* 피그마와 정확히 일치 */
   display: flex;
   flex-direction: column;
-  align-self: stretch;
-  padding: 80px 24px 711px;
+  justify-content: flex-start; /* justify-start */
+  align-items: flex-start; /* items-start */
   overflow-x: auto;
   overflow-y: auto;
-  flex: 1;
 }
 
+/* Frame 57: 미리보기 컨텐츠 */
 .preview-content {
+  align-self: stretch; /* self-stretch */
   display: flex;
   flex-direction: column;
-  align-items: center;
-  align-self: stretch;
+  justify-content: flex-start; /* justify-start */
+  align-items: center; /* items-center */
 }
 
 .preview-message {
-  text-align: center;
+  align-self: stretch; /* self-stretch */
+  text-align: center; /* text-center */
+  justify-content: center;
 }
 
 .preview-message p {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 350;
-  font-size: 16px;
+  color: #9CA3AF; /* text-neutral-400 */
+  font-size: 16px; /* text-base */
+  font-family: 'Noto Sans KR', sans-serif; /* font-['Noto_Sans_KR'] */
   line-height: 1.2;
-  color: #868E96;
   margin: 0;
 }
+
+
 
 /* 반응형 */
 @media (max-width: 1440px) {
@@ -296,7 +317,7 @@
     padding: 0 20px;
   }
   
-  .problem-sidebar {
+  .frame-34 {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid #E9ECEF;
@@ -304,9 +325,15 @@
     max-height: 50vh;
   }
   
-  .workspace-section {
+  .frame-50 {
     width: 100%;
-    height: 50vh;
+    height: 25vh;
+    border-right: none;
+  }
+  
+  .frame-56 {
+    width: 100%;
+    height: 25vh;
   }
   
   .action-bar {

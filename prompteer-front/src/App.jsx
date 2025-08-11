@@ -8,6 +8,7 @@ import PostWrite from './pages/PostWrite/index.jsx';
 import CodingCategory from './pages/CodingCategory/index.jsx';
 import CodingProblem from './pages/CodingProblem/index.jsx';
 import ImageCategory from './pages/ImageCategory/index.jsx';
+import ImageLanding from './pages/ImageLanding/index.jsx';
 import ImageProblem from './pages/ImageProblem/index.jsx';
 import MyPage from './pages/MyPage/index.jsx';
 import './App.css';
@@ -17,7 +18,7 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
-          <Route path="/" element={<CodingCategory />} />
+          <Route path="/" element={<ImageLanding />} />
           <Route path="/board" element={<Board />} />
           <Route path="/board/post/:id" element={<PostDetail />} />
           <Route path="/board/shared/:id" element={<SharedPostDetail />} />

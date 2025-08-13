@@ -1,0 +1,416 @@
+/* 이미지 랜딩 페이지 */
+.image-landing-page {
+  display: flex;
+  flex-direction: column;
+  background: #F8F9FA;
+}
+
+/* 메인 섹션 */
+.image-landing-main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 0 130px;
+}
+
+.image-landing-container {
+  width: 100%;
+  max-width: 1440px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 auto;
+  padding: 0 96px;
+  box-sizing: border-box;
+}
+
+/* Hero Section */
+.hero-section {
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  align-self: stretch;
+  gap: 29px;
+  width: 100%;
+}
+
+.hero-card {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 25px;
+  padding: 48px;
+  background: linear-gradient(90deg, #228BE6 0%, #228BE6 100%);
+  border-radius: 12px;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  width: 100%;
+}
+
+.hero-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.2;
+  color: #FFFFFF;
+  margin: 0 0 25px 0;
+  width: 100%;
+}
+
+.hero-challenge-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 1157px;
+}
+
+.hero-badge {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px;
+  width: fit-content;
+  height: 24px;
+  background: #FFFFFF;
+  border-radius: 16px;
+}
+
+.badge-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #228BE6;
+}
+
+.hero-text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 311px;
+}
+
+.hero-challenge-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.2;
+  color: #FFFFFF;
+  margin: 0;
+  width: 100%;
+}
+
+.hero-challenge-desc {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.2;
+  color: #FFFFFF;
+  margin: 0;
+  width: 100%;
+}
+
+.hero-try-btn {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 24px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  width: fit-content;
+  transition: background-color 0.2s ease;
+}
+
+.hero-try-btn:hover {
+  background: #F8F9FA;
+}
+
+.hero-try-btn {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+  color: #1971C2;
+}
+
+/* Search and Filter Section */
+.search-filter-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+  gap: 20px;
+  padding: 24px 0;
+  width: 100%;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 10px;
+  padding: 25px;
+  background: #FFFFFF;
+  border-radius: 12px;
+  width: 100%;
+}
+
+.search-box {
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  align-self: stretch;
+  gap: 16px;
+  width: 100%;
+}
+
+.search-input {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  align-self: stretch;
+  gap: 10px;
+  padding: 10px 20px;
+  background: #FFFFFF;
+  border: 1px solid #CED4DA;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.filter-buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.filter-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  height: 40px;
+  background: #F1F3F5;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #495057;
+}
+
+.filter-btn.active {
+  background: #1971C2;
+  color: #FFFFFF;
+}
+
+.filter-btn:hover {
+  background: #E9ECEF;
+}
+
+.filter-btn.active:hover {
+  background: #1864AB;
+}
+
+/* Challenges Section */
+.challenges-section {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  width: 100%;
+  height: 615px;
+}
+
+.challenges-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 40px 40px;
+  width: 100%;
+  height: 100%;
+}
+
+/* Challenge Card */
+.challenge-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 384px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.challenge-card:hover {
+  transform: translateY(-2px);
+}
+
+.challenge-image {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  align-self: stretch;
+  padding: 18px 18px 25px 25px;
+  width: 100%;
+  height: 239px;
+  background: linear-gradient(45deg, #E3F2FD, #BBDEFB);
+  border: 1px solid #E9ECEF;
+  border-radius: 12px;
+  position: relative;
+}
+
+/* 각 챌린지별 배경 이미지 */
+.challenge-card[data-challenge="11"] .challenge-image {
+  background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
+              url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzg0IiBoZWlnaHQ9IjIzOSIgdmlld0JveD0iMCAwIDM4NCAyMzkiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzODQiIGhlaWdodD0iMjM5IiBmaWxsPSIjRTNGMkZEIi8+Cjx0ZXh0IHg9IjE5MiIgeT0iMTIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTk3MUMyIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiPkNoYWxsZW5nZSAjMTE8L3RleHQ+Cjwvc3ZnPg==');
+  background-size: cover;
+}
+
+.challenge-card[data-challenge="12"] .challenge-image {
+  background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
+              url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzg0IiBoZWlnaHQ9IjIzOSIgdmlld0JveD0iMCAwIDM4NCAyMzkiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzODQiIGhlaWdodD0iMjM5IiBmaWxsPSIjRkZFQkVFIi8+Cjx0ZXh0IHg9IjE5MiIgeT0iMTIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjRkY2QTZBIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiPkNoYWxsZW5nZSAjMTI8L3RleHQ+Cjwvc3ZnPg==');
+  background-size: cover;
+}
+
+.challenge-card[data-challenge="13"] .challenge-image {
+  background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
+              url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzg0IiBoZWlnaHQ9IjIzOSIgdmlld0JveD0iMCAwIDM4NCAyMzkiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzODQiIGhlaWdodD0iMjM5IiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjE5MiIgeT0iMTIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjRCRTc1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiPkNoYWxsZW5nZSAjMTM8L3RleHQ+Cjwvc3ZnPg==');
+  background-size: cover;
+}
+
+.challenge-card[data-challenge="14"] .challenge-image {
+  background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
+              url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzg0IiBoZWlnaHQ9IjIzOSIgdmlld0JveD0iMCAwIDM4NCAyMzkiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzODQiIGhlaWdodD0iMjM5IiBmaWxsPSIjRkZGM0U1Ii8+Cjx0ZXh0IHg9IjE5MiIgeT0iMTIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjRkY5RTQyIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiPkNoYWxsZW5nZSAjMTQ8L3RleHQ+Cjwvc3ZnPg==');
+  background-size: cover;
+}
+
+.challenge-card[data-challenge="15"] .challenge-image {
+  background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
+              url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzg0IiBoZWlnaHQ9IjIzOSIgdmlld0JveD0iMCAwIDM4NCAyMzkiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzODQiIGhlaWdodD0iMjM5IiBmaWxsPSIjRkZGM0U1Ii8+Cjx0ZXh0IHg9IjE5MiIgeT0iMTIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjRkY5RTQyIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiPkNoYWxsZW5nZSAjMTU8L3RleHQ+Cjwvc3ZnPg==');
+  background-size: cover;
+}
+
+.challenge-card[data-challenge="16"] .challenge-image {
+  background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
+              url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzg0IiBoZWlnaHQ9IjIzOSIgdmlld0JveD0iMCAwIDM4NCAyMzkiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzODQiIGhlaWdodD0iMjM5IiBmaWxsPSIjRkZFQkVFIi8+Cjx0ZXh0IHg9IjE5MiIgeT0iMTIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjRkY2QTZBIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiPkNoYWxsZW5nZSAjMTY8L3RleHQ+Cjwvc3ZnPg==');
+  background-size: cover;
+}
+
+.challenge-type-badge {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px;
+  background: #E7F5FF;
+  border-radius: 16px;
+  width: fit-content;
+}
+
+.type-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #1971C2;
+}
+
+.challenge-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  gap: 30px;
+  padding: 0 5px;
+  width: 100%;
+}
+
+.challenge-text {
+  display: flex;
+  flex-direction: column;
+  width: auto;
+}
+
+.challenge-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+  color: #212529;
+  margin: 0;
+}
+
+.challenge-description {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #212529;
+  margin: 0;
+}
+
+.challenge-difficulty {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px;
+  height: 24px;
+  border-radius: 16px;
+  width: fit-content;
+}
+
+.difficulty-badge {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #FFFFFF;
+}
+
+/* 반응형 */
+@media (max-width: 1440px) {
+  .image-landing-page {
+    width: 100%;
+    max-width: 1440px;
+  }
+  
+  .challenges-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .challenge-card {
+    width: 100%;
+    max-width: 384px;
+  }
+}
+
+@media (max-width: 768px) {
+  .image-landing-main {
+    padding: 20px 20px 80px;
+  }
+  
+  .challenges-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero-card {
+    padding: 24px;
+  }
+  
+  .hero-title {
+    font-size: 28px;
+  }
+}

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
-import ChallengeCard from '../../components/cards/ChallengeCard/index.jsx';
 import './CodingCategory.css';
 
 const CodingCategory = () => {
@@ -10,7 +9,7 @@ const CodingCategory = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('difficulty'); // 'difficulty' or 'latest'
 
-  // 샘플 코딩 챌린지 데이터
+  // 샘플 코딩 챌린지 데이터 (9개로 수정)
   const challenges = [
     {
       id: 1,
@@ -130,101 +129,120 @@ const CodingCategory = () => {
   return (
     <div className="coding-category-page">
       <Header />
-      <main className="coding-category-main">
-        <div className="coding-category-container">
-          {/* 페이지 헤더 */}
-          <div className="page-header">
-            <div className="page-title-section">
-              <h1 className="page-title">코딩 챌린지</h1>
-            </div>
-          </div>
 
-          {/* Featured 챌린지 섹션 */}
-          <div className="featured-section">
-            <div className="featured-challenge">
-              <div className="featured-content">
-                <h1 className="featured-title">코딩 카테고리</h1>
-                <div className="featured-details">
-                  <div className="featured-status">
-                    <span className="status-badge">doing</span>
-                  </div>
-                  <div className="featured-info">
-                    <h2 className="featured-challenge-title">Challenge #12</h2>
-                    <p className="featured-challenge-subtitle">BFS 알골리즘</p>
-                  </div>
-                  <button className="challenge-now-btn" onClick={handleChallengeNow}>
-                    지금 도전하기 →
-                  </button>
-                </div>
+      {/* Main Content */}
+      <main className="coding-main">
+        {/* Featured Section */}
+        <div className="featured-section">
+          <div className="featured-content">
+            <h2 className="featured-title">코딩 카테고리</h2>
+            <div className="featured-details">
+              <div className="status-badge">doing</div>
+              <div className="featured-info">
+                <h3 className="challenge-number">Challenge #12</h3>
+                <p className="challenge-name">BFS 알골리즘</p>
               </div>
+              <button className="challenge-now-btn" onClick={handleChallengeNow}>
+                지금 도전하기 →
+              </button>
             </div>
           </div>
+        </div>
 
-          {/* 검색 및 필터 섹션 */}
-          <div className="search-filter-section">
-            <div className="search-container">
+        {/* Body Container - Figma: body_container */}
+        <div className="body-container">
+          {/* Search Container - Figma: 검색창 외부 */}
+          <div className="search-outer-container">
+            {/* Search Inner - Figma: 검색창 내부 */}
+            <div className="search-inner-container">
+              {/* Search Box - Figma: 검색창 */}
               <div className="search-box">
-                <div className="search-input-wrapper">
-                  <input
-                    type="text"
-                    placeholder="챌린지 검색..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input"
-                  />
-                  <div className="search-icon">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <path
-                        d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35"
-                        stroke="#CED4DA"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
+                <div className="search-icon">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path
+                      d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35"
+                      stroke="#CED4DA"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </div>
-                <div className="filter-buttons">
-                  <button
-                    className={`filter-btn ${sortBy === 'difficulty' ? 'active' : ''}`}
-                    onClick={() => setSortBy('difficulty')}
-                  >
-                    난이도순
-                  </button>
-                  <button
-                    className={`filter-btn ${sortBy === 'latest' ? 'active' : ''}`}
-                    onClick={() => setSortBy('latest')}
-                  >
-                    최신순
-                  </button>
-                </div>
+              </div>
+              {/* Filter Frame - Figma: Frame 106 */}
+              <div className="filter-frame">
+                <button
+                  className={`filter-btn ${sortBy === 'difficulty' ? 'active' : ''}`}
+                  onClick={() => setSortBy('difficulty')}
+                >
+                  난이도순
+                </button>
+                <button
+                  className={`filter-btn ${sortBy === 'latest' ? 'active' : ''}`}
+                  onClick={() => setSortBy('latest')}
+                >
+                  최신순
+                </button>
               </div>
             </div>
           </div>
 
-          {/* 챌린지 그리드 */}
-          <div className="challenges-grid">
+          {/* Challenges Grid Container - Figma: Frame 283 */}
+          <div className="frame-283">
             {getFilteredAndSortedChallenges().map((challenge) => (
-              <ChallengeCard
+              <div
                 key={challenge.id}
-                challengeId={challenge.id}
-                title={challenge.title}
-                description={challenge.description}
-                difficulty={challenge.difficulty}
-                participants={challenge.participants}
-                category={challenge.category}
+                className="challenge-card"
                 onClick={() => handleChallengeClick(challenge.id)}
-              />
+              >
+                {/* Frame 127 */}
+                <div className="frame-127">
+                  {/* Frame 22 */}
+                  <div className="frame-22">
+                    <h3 className="challenge-title">
+                      {challenge.title}
+                    </h3>
+                  </div>
+                  {/* Frame 21 - Category Badge */}
+                  <div className="frame-21">
+                    <span className="category-text">{challenge.category}</span>
+                  </div>
+                </div>
+                
+                {/* Frame 23 - Description */}
+                <div className="frame-23">
+                  <div className="frame-24">
+                    <p className="challenge-description-text">{challenge.description}</p>
+                  </div>
+                </div>
+                
+                {/* Frame 25 - Difficulty */}
+                <div className="frame-25">
+                  <div className="frame-26">
+                    <div className={`frame-28 difficulty-${challenge.difficulty}`}>
+                      <span className="difficulty-text">{challenge.difficulty}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Frame 29 - Participants */}
+                <div className="frame-29">
+                  <div className="frame-33">
+                    <span className="participants-text">🧑 {challenge.participants}명 참가 중</span>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
-
-          {getFilteredAndSortedChallenges().length === 0 && (
-            <div className="no-results">
-              <p>검색 결과가 없습니다.</p>
-            </div>
-          )}
         </div>
+
+        {getFilteredAndSortedChallenges().length === 0 && (
+          <div className="no-results">
+            <p>검색 결과가 없습니다.</p>
+          </div>
+        )}
       </main>
+
       <Footer />
     </div>
   );

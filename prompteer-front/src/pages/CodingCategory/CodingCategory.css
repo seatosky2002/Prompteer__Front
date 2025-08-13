@@ -1,127 +1,78 @@
-/* 메인 레이아웃 */
-.coding-category-page {
-  display: flex;
-  flex-direction: column;
-  background: #F8F9FA;
-}
-
-.coding-category-main {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 24px 0 24px;
-}
-
-.coding-category-container {
-  width: 100%;
-  max-width: 1440px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-  margin: 0 auto;
-  padding: 0 40px;
-  box-sizing: border-box;
-}
-
-/* 페이지 헤더 - Board 스타일과 동일 */
-.page-header {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: stretch;
-  gap: 15px;
-  padding: 20px 48px;
-  background: #228BE6;
-  border-radius: 12px;
-  height: 138px;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 1360px;
-}
-
-.page-title-section {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  flex: 1;
-}
-
-.page-title {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 700;
-  font-size: 32px;
-  line-height: 1.2;
-  color: #FFFFFF;
+/* Reset and base styles */
+* {
   margin: 0;
-  text-align: center;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Featured 챌린지 섹션 */
-.featured-section {
-  display: flex;
-  justify-content: stretch;
-  align-items: stretch;
-  width: 100%;
-  gap: 29px;
-  margin-bottom: 20px;
-}
-
-.featured-challenge {
-  background: linear-gradient(90deg, #228BE6 100%);
-  border-radius: 12px;
-  padding: 48px;
-  flex: 1;
+.coding-category-page {
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #F8F9FA;
   display: flex;
   flex-direction: column;
-  gap: 25px;
+}
+
+
+
+/* Main Content */
+.coding-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 96px 130px;
+  gap: 10px;
+  max-width: 1440px;
+  margin: 0 auto;
   width: 100%;
-  box-sizing: border-box;
+}
+
+/* Featured Section */
+.featured-section {
+  width: 100%;
+  display: flex;
+  gap: 29px;
 }
 
 .featured-content {
+  background: linear-gradient(90deg, #228BE6 0%, #228BE6 100%);
+  border-radius: 12px;
+  padding: 48px;
   display: flex;
   flex-direction: column;
-  width: 100%;
+  gap: 25px;
+  flex: 1;
 }
 
 .featured-title {
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 700;
   font-size: 40px;
-  line-height: 1.2;
-  color: #ffffff;
-  margin: 0 0 25px 0;
-  width: 100%;
+  line-height: 1.2em;
+  color: #FFFFFF;
+  margin: 0;
 }
 
 .featured-details {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 1157px;
-  max-width: 100%;
-}
-
-.featured-status {
-  display: flex;
-  align-items: center;
+  width: 100%;
+  max-width: 1157px;
 }
 
 .status-badge {
-  background: #ffffff;
+  background-color: #FFFFFF;
   color: #228BE6;
-  border-radius: 16px;
   padding: 4px 10px;
+  border-radius: 16px;
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 700;
   font-size: 13px;
-  line-height: 1.2;
+  line-height: 1.2em;
   height: 24px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  width: fit-content;
 }
 
 .featured-info {
@@ -131,276 +82,349 @@
   width: 311px;
 }
 
-.featured-challenge-title {
+.challenge-number {
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 700;
   font-size: 32px;
-  line-height: 1.2;
-  color: #ffffff;
+  line-height: 1.2em;
+  color: #FFFFFF;
   margin: 0;
-  width: 100%;
 }
 
-.featured-challenge-subtitle {
+.challenge-name {
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 400;
   font-size: 20px;
-  line-height: 1.2;
-  color: #ffffff;
+  line-height: 1.2em;
+  color: #FFFFFF;
   margin: 0;
-  width: 100%;
 }
 
 .challenge-now-btn {
-  background: #ffffff;
+  background-color: #FFFFFF;
   color: #1971C2;
   border: none;
   border-radius: 8px;
   padding: 12px 24px;
-  cursor: pointer;
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 700;
   font-size: 16px;
-  line-height: 1.2;
-  transition: all 0.2s ease;
+  line-height: 1.2em;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
   width: fit-content;
 }
 
 .challenge-now-btn:hover {
-  background: #f8f9fa;
-  transform: translateY(-1px);
+  background-color: #f8f9fa;
 }
 
-/* 검색 및 필터 섹션 */
-.search-filter-section {
-  width: 1248px !important;
-  max-width: 1248px !important;
+/* Body Container - Figma: body_container */
+.body-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  align-self: stretch;
   gap: 20px;
-  padding: 24px 0;
+  padding: 24px 0px;
+  width: 100%;
 }
 
-.search-container {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 25px;
-  width: 1248px !important;
-  max-width: 1248px !important;
+/* Search Outer Container - Figma: 검색창 외부 */
+.search-outer-container {
   display: flex;
   flex-direction: column;
+  align-self: stretch;
   gap: 10px;
-  box-sizing: border-box;
+  padding: 25px;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  width: 100%;
 }
 
-.search-box {
+/* Search Inner Container - Figma: 검색창 내부 */
+.search-inner-container {
   display: flex;
   justify-content: stretch;
   align-items: stretch;
+  align-self: stretch;
   gap: 16px;
   width: 100%;
 }
 
-.search-input-wrapper {
+/* Search Box - Figma: 검색창 */
+.search-box {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  background: #ffffff;
+  align-self: stretch;
+  gap: 10px;
+  padding: 10px 20px;
+  flex: 1;
   border: 1px solid #CED4DA;
   border-radius: 8px;
-  padding: 10px 20px;
-  gap: 10px;
-  flex: 1;
-}
-
-.search-input {
-  background: transparent;
-  border: none;
-  flex: 1;
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 1.2;
-  color: #000000;
-  outline: none;
-}
-
-.search-input::placeholder {
-  color: #CED4DA;
-}
-
-.search-input-wrapper:focus-within {
-  border-color: #1971C2;
-  box-shadow: 0 0 0 2px rgba(25, 113, 194, 0.2);
+  background-color: #FFFFFF;
 }
 
 .search-icon {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: 20px;
   height: 20px;
-  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.filter-buttons {
+/* Filter Frame - Figma: Frame 106 */
+.filter-frame {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
 }
 
 .filter-btn {
-  background: #F1F3F5;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 16px;
-  cursor: pointer;
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 1.2;
-  color: #495057;
-  transition: all 0.2s ease;
-  height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
+  padding: 10px 16px;
+  height: 40px;
+  background-color: #F1F3F5;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.2em;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .filter-btn:hover {
-  background: #e9ecef;
+  background-color: #E9ECEF;
 }
 
 .filter-btn.active {
-  background: #1971C2;
-  color: #ffffff;
+  background-color: #1971C2;
+  color: #FFFFFF;
 }
 
-/* 챌린지 그리드 */
-.challenges-grid {
+/* Frame 283 - Challenges Grid Container */
+.frame-283 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  width: 1248px !important;
-  max-width: 1248px !important;
+  grid-template-rows: repeat(3, 1fr);
+  justify-content: stretch;
+  align-items: stretch;
+  width: 1248px;
   height: 778px;
-  position: relative;
+  gap: 0;
 }
 
-.challenges-grid > *:nth-child(1) { grid-column: 1; grid-row: 1; }
-.challenges-grid > *:nth-child(2) { grid-column: 2; grid-row: 1; }
-.challenges-grid > *:nth-child(3) { grid-column: 3; grid-row: 1; }
-.challenges-grid > *:nth-child(4) { grid-column: 1; grid-row: 2; }
-.challenges-grid > *:nth-child(5) { grid-column: 2; grid-row: 2; }
-.challenges-grid > *:nth-child(6) { grid-column: 3; grid-row: 2; }
-.challenges-grid > *:nth-child(7) { grid-column: 1; grid-row: 3; }
-.challenges-grid > *:nth-child(8) { grid-column: 2; grid-row: 3; }
-.challenges-grid > *:nth-child(9) { grid-column: 3; grid-row: 3; }
+/* Challenge Card - Figma: 코딩 카드 */
+.challenge-card {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  padding: 25px;
+  background-color: #FFFFFF;
+  border: 1px solid #E9ECEF;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
 
-/* 검색 결과 없음 */
+.challenge-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Frame 127 - Header Row */
+.frame-127 {
+  display: flex;
+  justify-content: space-between;
+  align-self: stretch;
+  gap: 13px;
+}
+
+/* Frame 22 - Title Container */
+.frame-22 {
+  display: flex;
+  flex-direction: column;
+  gap: -39px;
+}
+
+.challenge-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.2em;
+  color: #212529;
+  white-space: pre-line;
+  margin: 0;
+}
+
+/* Frame 21 - Category Badge */
+.frame-21 {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px;
+  background-color: #E7F5FF;
+  border-radius: 16px;
+  width: fit-content;
+  height: fit-content;
+}
+
+.category-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.2em;
+  color: #1971C2;
+}
+
+/* Frame 23 - Description Container */
+.frame-23 {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  padding: 8px 0px;
+  height: 58px;
+}
+
+/* Frame 24 - Description Text Container */
+.frame-24 {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+.challenge-description-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 350;
+  font-size: 14px;
+  line-height: 1.5em;
+  color: #495057;
+  margin: 0;
+}
+
+/* Frame 25 - Difficulty Container */
+.frame-25 {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  padding: 0px 0px 8px;
+}
+
+/* Frame 26 - Difficulty Row */
+.frame-26 {
+  display: flex;
+  align-self: stretch;
+  gap: 8px;
+}
+
+/* Frame 28 - Difficulty Badge */
+.frame-28 {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  padding: 4px 10px;
+  border-radius: 16px;
+  width: fit-content;
+}
+
+.frame-28.difficulty-고급 {
+  background-color: #FF4E4E;
+}
+
+.frame-28.difficulty-중급 {
+  background-color: #FFA94D;
+}
+
+.frame-28.difficulty-초급 {
+  background-color: #64BE75;
+}
+
+.difficulty-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.2em;
+  color: #FFFFFF;
+}
+
+/* Frame 29 - Participants Container */
+.frame-29 {
+  display: flex;
+  align-self: stretch;
+  gap: 16px;
+  padding: 17px 0px 0px;
+  border-top: 1px solid #E9ECEF;
+}
+
+/* Frame 33 - Participants Text Container */
+.frame-33 {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+.participants-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 350;
+  font-size: 14px;
+  line-height: 1.2em;
+  color: #495057;
+}
+
+/* No Results */
 .no-results {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 60px 20px;
-  color: #6c757d;
+  padding: 40px;
+  color: #495057;
+  font-size: 16px;
 }
 
-.no-results p {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 400;
-  font-size: 18px;
-  line-height: 1.2;
-  margin: 0;
-}
 
-/* 반응형 디자인 */
-@media (max-width: 1400px) {
-  .coding-category-main {
+
+/* Responsive Design */
+@media (max-width: 1440px) {
+  .coding-main {
     padding: 24px 48px 130px;
   }
   
-  .coding-category-container,
-  .featured-section,
-  .featured-challenge,
-  .search-filter-section,
-  .search-container,
-  .challenges-grid {
-    width: 100% !important;
-    max-width: 1248px !important;
-  }
-  
-  .challenges-grid {
-    height: auto;
-  }
-  
-  .featured-details {
+  .frame-283 {
     width: 100%;
+    max-width: 1248px;
   }
 }
 
 @media (max-width: 1024px) {
-  .coding-category-main {
-    padding: 24px 32px 100px;
-  }
-  
-  .coding-category-container,
-  .featured-section,
-  .featured-challenge,
-  .search-filter-section,
-  .search-container,
-  .challenges-grid {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-  
-  .challenges-grid {
+  .frame-283 {
     grid-template-columns: repeat(2, 1fr);
+    height: auto;
+    width: 100%;
+  }
+  
+  .search-inner-container {
+    flex-direction: column;
     gap: 16px;
+    align-items: stretch;
   }
   
-  .featured-challenge {
-    padding: 32px;
-  }
-  
-  .featured-title {
-    font-size: 32px;
-  }
-  
-  .featured-challenge-title {
-    font-size: 28px;
-  }
-  
-  .featured-challenge-subtitle {
-    font-size: 18px;
+  .filter-frame {
+    justify-content: center;
   }
 }
 
 @media (max-width: 768px) {
-  .coding-category-main {
-    padding: 16px;
+  .coding-main {
+    padding: 20px;
   }
   
-  .coding-category-container,
-  .featured-section,
-  .featured-challenge,
-  .search-filter-section,
-  .search-container,
-  .challenges-grid {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-  
-  .challenges-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  .featured-challenge {
+  .featured-content {
     padding: 24px;
   }
   
@@ -408,28 +432,9 @@
     font-size: 28px;
   }
   
-  .featured-challenge-title {
-    font-size: 24px;
-  }
-  
-  .featured-challenge-subtitle {
-    font-size: 16px;
-  }
-  
-  .search-container {
-    padding: 20px;
-  }
-  
-  .search-box {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .search-input-wrapper {
-    padding: 12px 16px;
-  }
-  
-  .filter-buttons {
-    justify-content: center;
+  .frame-283 {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    height: auto;
   }
 }

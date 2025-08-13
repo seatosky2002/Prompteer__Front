@@ -1,98 +1,98 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
+import { getAllChallenges, filterChallengesByCategory, searchChallenges } from '../../services/challengeApi.js';
 import './ImageCategory.css';
 
 const ImageCategory = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('image'); // 'image' or 'video'
+  const [challenges, setChallenges] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // 샘플 이미지/영상 챌린지 데이터 (9개로 수정)
-  const challenges = [
-    {
-      id: 11,
-      title: 'Challenge #11\n일상 풍경 묘사 프롬프트 만들기',
-      description: '일상 풍경 묘사 프롬프트 만들기',
-      category: '이미지',
-      difficulty: '초급',
-      participants: 856,
-      createdAt: '2025-01-01'
-    },
-    {
-      id: 12,
-      title: 'Challenge #12\n사실적인 물거품',
-      description: '사실적인 물거품',
-      category: '이미지',
-      difficulty: '고급',
-      participants: 645,
-      createdAt: '2025-01-02'
-    },
-    {
-      id: 13,
-      title: 'Challenge #13\n뽀송뽀송한 아기 양',
-      description: '뽀송뽀송한 아기 양',
-      category: '이미지',
-      difficulty: '초급',
-      participants: 923,
-      createdAt: '2025-01-03'
-    },
-    {
-      id: 14,
-      title: 'Challenge #14\n바다 옆 철길을 달리는 사실적인 기차',
-      description: '바다 옆 철길을 달리는 사실적인 기차',
-      category: '영상',
-      difficulty: '초급',
-      participants: 778,
-      createdAt: '2025-01-04'
-    },
-    {
-      id: 15,
-      title: 'Challenge #15\n꿀이 흐르고 보석들이 흩어져있는 핫케이크',
-      description: '꿀이 흐르고 보석들이 흩어져있는 핫케이크',
-      category: '이미지',
-      difficulty: '중급',
-      participants: 534,
-      createdAt: '2025-01-05'
-    },
-    {
-      id: 16,
-      title: 'Challenge #16\n숲속에서 뒤를 돌아보는 흰색 요정 소녀',
-      description: '숲속에서 뒤를 돌아보는 흰색 요정 소녀',
-      category: '영상',
-      difficulty: '고급',
-      participants: 412,
-      createdAt: '2025-01-06'
-    },
-    {
-      id: 17,
-      title: 'Challenge #17\n겨울 풍경의 따뜻한 오두막',
-      description: '겨울 풍경의 따뜻한 오두막',
-      category: '이미지',
-      difficulty: '중급',
-      participants: 689,
-      createdAt: '2025-01-07'
-    },
-    {
-      id: 18,
-      title: 'Challenge #18\n우주에서 춤추는 은하계',
-      description: '우주에서 춤추는 은하계',
-      category: '영상',
-      difficulty: '고급',
-      participants: 345,
-      createdAt: '2025-01-08'
-    },
-    {
-      id: 19,
-      title: 'Challenge #19\n신비로운 마법의 숲',
-      description: '신비로운 마법의 숲',
-      category: '이미지',
-      difficulty: '초급',
-      participants: 1034,
-      createdAt: '2025-01-09'
-    }
-  ];
+  // API에서 챌린지 데이터 가져오기
+  useEffect(() => {
+    const fetchChallenges = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllChallenges();
+        
+        // API에서 받은 데이터를 image 카테고리로 필터링
+        const imageChallenges = filterChallengesByCategory(data, 'image');
+        setChallenges(imageChallenges);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch challenges:', err);
+        setError('챌린지 데이터를 불러오는데 실패했습니다.');
+        
+        // 에러 시 샘플 데이터 사용
+        const sampleChallenges = [
+          {
+            id: 11,
+            title: 'Challenge #11',
+            description: '일상 풍경 묘사 프롬프트 만들기',
+            category: '이미지',
+            difficulty: '초급',
+            participants: 856,
+            type: 'image'
+          },
+          {
+            id: 12,
+            title: 'Challenge #12',
+            description: '사실적인 물거품',
+            category: '이미지',
+            difficulty: '고급',
+            participants: 645,
+            type: 'image'
+          },
+          {
+            id: 13,
+            title: 'Challenge #13',
+            description: '뽀송뽀송한 아기 양',
+            category: '이미지',
+            difficulty: '초급',
+            participants: 923,
+            type: 'image'
+          },
+          {
+            id: 14,
+            title: 'Challenge #14',
+            description: '바다 옆 철길을 달리는 사실적인 기차',
+            category: '영상',
+            difficulty: '초급',
+            participants: 778,
+            type: 'video'
+          },
+          {
+            id: 15,
+            title: 'Challenge #15',
+            description: '꿀이 흐르고 보석들이 흩어져있는 핫케이크',
+            category: '이미지',
+            difficulty: '중급',
+            participants: 534,
+            type: 'image'
+          },
+          {
+            id: 16,
+            title: 'Challenge #16',
+            description: '숲속에서 뒤를 돌아보는 흰색 요정 소녀',
+            category: '영상',
+            difficulty: '고급',
+            participants: 412,
+            type: 'video'
+          }
+        ];
+        setChallenges(sampleChallenges);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChallenges();
+  }, []);
 
   // 필터링 및 정렬
   const getFilteredAndSortedChallenges = () => {
@@ -100,17 +100,22 @@ const ImageCategory = () => {
 
     // 검색어 필터링
     if (searchTerm) {
-      filtered = filtered.filter(challenge =>
-        challenge.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        challenge.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      filtered = searchChallenges(filtered, searchTerm);
     }
 
-    // 정렬
+    // 이미지/영상 타입별 정렬
     if (sortBy === 'image') {
-      filtered = filtered.filter(challenge => challenge.category === '이미지');
+      filtered = filtered.filter(challenge => 
+        challenge.type === 'image' || 
+        challenge.category === '이미지' ||
+        (challenge.challenge_type && challenge.challenge_type.includes('image'))
+      );
     } else if (sortBy === 'video') {
-      filtered = filtered.filter(challenge => challenge.category === '영상');
+      filtered = filtered.filter(challenge => 
+        challenge.type === 'video' || 
+        challenge.category === '영상' ||
+        (challenge.challenge_type && challenge.challenge_type.includes('video'))
+      );
     }
 
     return filtered;
@@ -187,40 +192,53 @@ const ImageCategory = () => {
           </div>
 
           {/* Challenges Grid Container - Figma: Frame 283 */}
-          <div className="frame-283">
-            {getFilteredAndSortedChallenges().map((challenge) => (
-              <div
-                key={challenge.id}
-                className="image-component"
-                onClick={() => handleChallengeClick(challenge.id)}
-              >
-                {/* Frame 17 - Main Card with Background Image */}
-                <div className="frame-17">
-                  {/* Frame 21 - Category Badge (Top Right) */}
-                  <div className="frame-21">
-                    <span className="category-text">{challenge.category}</span>
-                  </div>
-                </div>
-                
-                {/* Frame 108 - Bottom Text Section */}
-                <div className="frame-108">
-                  {/* Frame 107 - Text Content */}
-                  <div className="frame-107">
-                    <h3 className="challenge-number">{challenge.title.split('\n')[0]}</h3>
-                    <p className="challenge-description">{challenge.description}</p>
+          {loading ? (
+            <div className="loading-container">
+              <p>챌린지를 불러오는 중...</p>
+            </div>
+          ) : error ? (
+            <div className="error-container">
+              <p>{error}</p>
+              <p>임시 데이터로 표시합니다.</p>
+            </div>
+          ) : (
+            <div className="frame-283">
+              {getFilteredAndSortedChallenges().map((challenge) => (
+                <div
+                  key={challenge.id}
+                  className="image-component"
+                  onClick={() => handleChallengeClick(challenge.id)}
+                >
+                  {/* Frame 17 - Main Card with Background Image */}
+                  <div className="frame-17">
+                    {/* Frame 21 - Category Badge (Top Right) */}
+                    <div className="frame-21">
+                      <span className="category-text">{challenge.category}</span>
+                    </div>
                   </div>
                   
-                  {/* Frame 27 - Difficulty Badge */}
-                  <div className={`frame-27 difficulty-${challenge.difficulty}`}>
-                    <span className="difficulty-text">{challenge.difficulty}</span>
+                  {/* Frame 108 - Bottom Text Section */}
+                  <div className="frame-108">
+                    {/* Frame 107 - Text Content */}
+                    <div className="frame-107">
+                      <h3 className="challenge-number">
+                        {challenge.title.includes('\n') ? challenge.title.split('\n')[0] : challenge.title}
+                      </h3>
+                      <p className="challenge-description">{challenge.description}</p>
+                    </div>
+                    
+                    {/* Frame 27 - Difficulty Badge */}
+                    <div className={`frame-27 difficulty-${challenge.difficulty}`}>
+                      <span className="difficulty-text">{challenge.difficulty}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {getFilteredAndSortedChallenges().length === 0 && (
+        {!loading && !error && getFilteredAndSortedChallenges().length === 0 && (
           <div className="no-results">
             <p>검색 결과가 없습니다.</p>
           </div>

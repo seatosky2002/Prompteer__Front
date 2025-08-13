@@ -337,6 +337,34 @@
   color: #FFFFFF;
 }
 
+/* Loading and Error States */
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 40px;
+  text-align: center;
+}
+
+.loading-container p {
+  color: #495057;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.error-container p {
+  color: #DC3545;
+  font-size: 16px;
+  margin: 5px 0;
+}
+
+.error-container p:last-child {
+  color: #6C757D;
+  font-size: 14px;
+}
+
 /* No Results */
 .no-results {
   display: flex;

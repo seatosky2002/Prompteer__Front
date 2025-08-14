@@ -1,0 +1,248 @@
+/* 이미지 카드 컴포넌트 */
+.mypage-image-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 198.67px;
+  height: 245px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.mypage-image-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mypage-image-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.image-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.placeholder-icon {
+  font-size: 48px;
+  opacity: 0.7;
+}
+
+.type-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px;
+  background: #e7f5ff;
+  border-radius: 16px;
+  z-index: 2;
+}
+
+.type-label {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 14.4px;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+  min-width: 40px;
+}
+
+.card-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  padding: 0px 5px 25px 25px;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    transparent 100%
+  );
+  z-index: 2;
+}
+
+.card-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  gap: 30px;
+  width: 100%;
+}
+
+.challenge-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.challenge-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 16.8px;
+  color: #212529;
+  text-align: center;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.challenge-description {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 14.4px;
+  color: #6c757d;
+  text-align: center;
+  margin: 0;
+  line-height: 1.3;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.difficulty-badge {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px;
+  border-radius: 16px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+}
+
+.difficulty-label {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 14.4px;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+  min-width: 40px;
+}
+
+.difficulty-beginner {
+  background: #64be75;
+}
+
+.difficulty-intermediate {
+  background: #ff9e42;
+}
+
+.difficulty-advanced {
+  background: #ff6a6a;
+}
+
+/* 이미지 배경 변형들 */
+.image-card:nth-child(1) .image-card-content {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 50%, #ffcc80 100%);
+}
+
+.image-card:nth-child(2) .image-card-content {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 50%, #ce93d8 100%);
+}
+
+.image-card:nth-child(3) .image-card-content {
+  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 50%, #a5d6a7 100%);
+}
+
+.image-card:nth-child(4) .image-card-content {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 50%, #fff176 100%);
+}
+
+.image-card:nth-child(5) .image-card-content {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 50%, #f48fb1 100%);
+}
+
+.image-card:nth-child(6) .image-card-content {
+  background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 50%, #80cbc4 100%);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1440px) {
+  .mypage-image-card {
+    width: 198.67px;
+    height: 245px;
+  }
+
+  .mypage-image-card-content {
+    height: 100%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .mypage-image-card {
+    width: 198.67px;
+    height: 245px;
+  }
+
+  .mypage-image-card-content {
+    height: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .mypage-image-card {
+    width: 198.67px;
+    height: 245px;
+  }
+
+  .mypage-image-card-content {
+    height: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .mypage-image-card {
+    width: 198.67px;
+    height: 245px;
+  }
+
+  .mypage-image-card-content {
+    height: 100%;
+  }
+}

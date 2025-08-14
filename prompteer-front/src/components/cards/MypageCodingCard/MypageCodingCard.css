@@ -1,0 +1,55 @@
+.mypage-coding-card {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 16px 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 198.67px;
+  height: 193.33px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.mypage-coding-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mypage-coding-header {
+  margin-bottom: 0;
+}
+
+.mypage-coding-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19.2px;
+  color: #212529;
+  margin: 0;
+  text-align: left;
+}
+
+.mypage-coding-footer {
+  margin-top: auto;
+}
+
+.mypage-difficulty-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  min-width: 40px;
+}
+
+.mypage-difficulty-text {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 15.6px;
+  color: #ffffff;
+}

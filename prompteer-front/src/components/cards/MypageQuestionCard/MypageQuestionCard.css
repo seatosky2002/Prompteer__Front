@@ -1,0 +1,75 @@
+.mypage-question-card {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px 30px 20px 35px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  height: 62px;
+}
+
+.mypage-question-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+  max-width: 270px;
+}
+
+.mypage-question-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19.2px;
+  color: #212529;
+  margin: 0;
+  flex: 1;
+}
+
+.category-text {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14.4px;
+  color: #6c757d;
+  background: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.mypage-question-stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-label {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14.4px;
+  color: #6c757d;
+}
+
+.stat-value {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 16.8px;
+  color: #212529;
+}
+
+.stat-value.date {
+  width: auto;
+}

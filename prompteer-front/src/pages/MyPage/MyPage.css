@@ -1,26 +1,28 @@
 .my-page {
   display: flex;
   flex-direction: column;
-  background: #F8F9FA;
+  background: #f8f9fa;
+  min-height: 100vh;
 }
 
 .main-content {
   display: flex;
-  justify-content: stretch;
-  align-items: stretch;
-  padding: 0 32px;
-  gap: 32px;
-  margin-top: 32px;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0;
+  margin-top: 0;
+  flex: 1;
 }
 
 .content-container {
-  flex: 1;
+  width: 100%;
+  max-width: 1440px;
   display: flex;
   flex-direction: column;
 }
 
 .page-section {
-  flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -33,7 +35,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  flex: 1;
+  margin: 0 32px;
 }
 
 .section-header {
@@ -50,10 +52,10 @@
 }
 
 .page-title {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 700;
   font-size: 32px;
-  line-height: 1.2;
+  line-height: 38.4px;
   color: #212529;
   margin: 0;
   border-bottom: 1px solid #757575;
@@ -65,10 +67,10 @@
 }
 
 .page-description p {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 500;
   font-size: 15px;
-  line-height: 1.71;
+  line-height: 25.6px;
   color: #495057;
   margin: 0;
 }
@@ -92,10 +94,10 @@
 }
 
 .section-title {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 700;
   font-size: 20px;
-  line-height: 1.28;
+  line-height: 25.6px;
   color: #212529;
   margin: 0;
 }
@@ -108,16 +110,15 @@
 
 .coding-grid {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
 }
 
 .coding-grid-container {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: repeat(6, 198.67px);
+  grid-template-rows: repeat(3, 193.33px);
   gap: 10px;
   width: 100%;
   height: 640px;
@@ -125,59 +126,76 @@
 
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(6, 198.67px);
+  grid-template-rows: repeat(2, 245px);
   gap: 10px;
   width: 100%;
   height: 520px;
 }
 
 /* 반응형 디자인 */
+@media (max-width: 1440px) {
+  .coding-grid-container {
+    grid-template-columns: repeat(5, 198.67px);
+    grid-template-rows: repeat(4, 193.33px);
+    height: 800px;
+  }
+
+  .image-grid {
+    grid-template-columns: repeat(5, 198.67px);
+    grid-template-rows: repeat(3, 245px);
+    height: 800px;
+  }
+}
+
 @media (max-width: 1200px) {
   .coding-grid-container {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 198.67px);
+    grid-template-rows: repeat(5, 193.33px);
+    height: 1000px;
   }
-  
+
   .image-grid {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    height: 650px;
+    grid-template-columns: repeat(4, 198.67px);
+    grid-template-rows: repeat(3, 245px);
+    height: 800px;
   }
 }
 
 @media (max-width: 900px) {
-  .coding-grid-container {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    height: 800px;
+  .section-background {
+    margin: 0 16px;
+    padding: 16px;
   }
-  
+
+  .coding-grid-container {
+    grid-template-columns: repeat(3, 198.67px);
+    grid-template-rows: repeat(7, 193.33px);
+    height: 1400px;
+  }
+
   .image-grid {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    height: 750px;
+    grid-template-columns: repeat(3, 198.67px);
+    grid-template-rows: repeat(4, 245px);
+    height: 1000px;
   }
 }
 
 @media (max-width: 600px) {
-  .main-content {
-    padding: 0 16px;
-  }
-  
   .section-background {
-    padding: 16px;
+    margin: 0 8px;
+    padding: 12px;
   }
-  
+
   .coding-grid-container {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    height: 1200px;
+    grid-template-columns: repeat(2, 198.67px);
+    grid-template-rows: repeat(10, 193.33px);
+    height: 2000px;
   }
-  
+
   .image-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    height: 1000px;
+    grid-template-columns: repeat(2, 198.67px);
+    grid-template-rows: repeat(6, 245px);
+    height: 1500px;
   }
 }

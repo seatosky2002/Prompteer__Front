@@ -1,201 +1,396 @@
-.my-page {
+/* MyPage - Settings 페이지와 동일한 구조 */
+.mypage-page {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #f8f9fa;
-  min-height: 100vh;
 }
 
-.main-content {
+.mypage-main {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 0;
-  margin-top: 0;
+  padding: 24px 96px 80px;
+}
+
+.mypage-container {
+  width: 1213px;
+  max-width: 1213px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin: 0 auto;
+}
+
+/* 헤더 섹션 - Settings 페이지와 동일한 스타일 */
+.mypage-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 15px;
+  padding: 20px 48px;
+  background: #228be6;
+  border-radius: 12px;
+  height: 138px;
+  box-sizing: border-box;
+  width: 1213px !important;
+  max-width: 1213px !important;
+}
+
+.mypage-title-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
   flex: 1;
 }
 
-.content-container {
-  width: 100%;
-  max-width: 1440px;
-  display: flex;
-  flex-direction: column;
+.mypage-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 52px;
+  text-align: center;
+  color: #ffffff;
+  margin: 0;
 }
 
-.page-section {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+.mypage-subtitle {
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: center;
+  color: #ffffff;
+  margin: 8px 0 0 0;
+  opacity: 0.9;
 }
 
-.section-background {
+/* 메인 바디 */
+.mypage-body {
+  display: flex;
+  gap: 32px;
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.05);
-  padding: 9px 32px 32px;
+  overflow: hidden;
+  min-height: 600px;
+}
+
+/* 사이드바 */
+.mypage-sidebar {
+  width: 280px;
+  background: #f8f9fa;
+  border-right: 1px solid #e9ecef;
+  padding: 32px 0;
+}
+
+.mypage-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 24px;
+}
+
+.mypage-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mypage-nav-item:hover {
+  background: #e9ecef;
+}
+
+.mypage-nav-item.active {
+  background: #228be6;
+  color: #ffffff;
+}
+
+.nav-icon {
+  font-size: 20px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-label {
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.mypage-nav-item.active .nav-label {
+  font-weight: 600;
+}
+
+/* 콘텐츠 영역 */
+.mypage-content {
+  flex: 1;
+  padding: 32px;
+}
+
+.mypage-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 600px;
+}
+
+.mypage-content-section {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  margin: 0 32px;
 }
 
-.section-header {
-  display: flex;
-  align-items: flex-end;
-  gap: 20px;
-  padding-bottom: 26px;
-}
-
-.page-title-section {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.page-title {
+.section-title {
   font-family: "Noto Sans KR", sans-serif;
-  font-weight: 700;
-  font-size: 32px;
-  line-height: 38.4px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
   color: #212529;
-  margin: 0;
-  border-bottom: 1px solid #757575;
-  padding-bottom: 5px;
+  margin: 0 0 8px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e9ecef;
 }
 
-.page-description {
-  padding-bottom: 0.59px;
-}
-
-.page-description p {
-  font-family: "Noto Sans KR", sans-serif;
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 25.6px;
-  color: #495057;
-  margin: 0;
-}
-
-.content-sections {
+/* 질문 카드 스타일 */
+.questions-list {
   display: flex;
   flex-direction: column;
-  gap: 23px;
-  flex: 1;
+  gap: 16px;
 }
 
-.content-section {
+.question-card {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  transition: all 0.2s ease;
+}
+
+.question-card:hover {
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.question-header {
   display: flex;
   flex-direction: column;
   gap: 8px;
   flex: 1;
 }
 
-.section-label {
-  padding: 0 0 0.59px 10px;
-}
-
-.section-title {
+.question-title {
   font-family: "Noto Sans KR", sans-serif;
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 25.6px;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 20px;
   color: #212529;
   margin: 0;
 }
 
-.questions-list {
+.category-tag {
+  display: inline-block;
+  background: #e7f5ff;
+  color: #1971c2;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.question-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.stat-item {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 14px;
+  color: #212529;
+  font-weight: 600;
+}
+
+/* 코딩 챌린지 그리드 */
+.coding-section {
+  margin-top: 32px;
 }
 
 .coding-grid {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  width: 100%;
-}
-
-.coding-grid-container {
   display: grid;
   grid-template-columns: repeat(6, 198.67px);
   grid-template-rows: repeat(3, 193.33px);
-  gap: 10px;
-  width: 100%;
-  height: 640px;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* 이미지 챌린지 그리드 */
+.image-section {
+  margin-top: 32px;
 }
 
 .image-grid {
   display: grid;
   grid-template-columns: repeat(6, 198.67px);
   grid-template-rows: repeat(2, 245px);
-  gap: 10px;
-  width: 100%;
-  height: 520px;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 /* 반응형 디자인 */
 @media (max-width: 1440px) {
-  .coding-grid-container {
+  .mypage-main {
+    padding: 24px 48px 80px;
+  }
+
+  .mypage-container {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .mypage-header {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .coding-grid {
     grid-template-columns: repeat(5, 198.67px);
     grid-template-rows: repeat(4, 193.33px);
-    height: 800px;
   }
 
   .image-grid {
     grid-template-columns: repeat(5, 198.67px);
     grid-template-rows: repeat(3, 245px);
-    height: 800px;
   }
 }
 
 @media (max-width: 1200px) {
-  .coding-grid-container {
+  .mypage-main {
+    padding: 24px 32px 80px;
+  }
+
+  .mypage-body {
+    flex-direction: column;
+  }
+
+  .mypage-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+    padding: 24px 0;
+  }
+
+  .mypage-nav {
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .coding-grid {
     grid-template-columns: repeat(4, 198.67px);
     grid-template-rows: repeat(5, 193.33px);
-    height: 1000px;
   }
 
   .image-grid {
     grid-template-columns: repeat(4, 198.67px);
     grid-template-rows: repeat(3, 245px);
-    height: 800px;
   }
 }
 
 @media (max-width: 900px) {
-  .section-background {
-    margin: 0 16px;
-    padding: 16px;
+  .mypage-main {
+    padding: 24px 24px 80px;
   }
 
-  .coding-grid-container {
+  .mypage-header {
+    height: 120px;
+    padding: 16px 32px;
+  }
+
+  .mypage-title {
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  .mypage-subtitle {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  .coding-grid {
     grid-template-columns: repeat(3, 198.67px);
     grid-template-rows: repeat(7, 193.33px);
-    height: 1400px;
   }
 
   .image-grid {
     grid-template-columns: repeat(3, 198.67px);
     grid-template-rows: repeat(4, 245px);
-    height: 1000px;
   }
 }
 
 @media (max-width: 600px) {
-  .section-background {
-    margin: 0 8px;
-    padding: 12px;
+  .mypage-main {
+    padding: 24px 16px 80px;
   }
 
-  .coding-grid-container {
+  .mypage-header {
+    height: 100px;
+    padding: 12px 24px;
+  }
+
+  .mypage-title {
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  .mypage-subtitle {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .mypage-nav {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .coding-grid {
     grid-template-columns: repeat(2, 198.67px);
     grid-template-rows: repeat(10, 193.33px);
-    height: 2000px;
   }
 
   .image-grid {
     grid-template-columns: repeat(2, 198.67px);
     grid-template-rows: repeat(6, 245px);
-    height: 1500px;
   }
 }

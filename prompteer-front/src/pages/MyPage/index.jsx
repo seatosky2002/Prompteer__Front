@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../../components/common/Header/index.jsx";
 import MypageQuestionCard from "../../components/cards/MypageQuestionCard/index.jsx";
 import MypageCodingCard from "../../components/cards/MypageCodingCard/index.jsx";
@@ -7,6 +7,8 @@ import Footer from "../../components/common/Footer/index.jsx";
 import "./MyPage.css";
 
 const MyPage = () => {
+  const [activeTab, setActiveTab] = useState("내가 올린 질문");
+
   // 샘플 데이터
   const questions = [
     {
@@ -51,7 +53,6 @@ const MyPage = () => {
     }));
 
   // 피그마 디자인에 맞춰 12개의 이미지/영상 챌린지 (6x2 그리드)
-  // 내가 만든 더미 데이터
   const imageChallenges = [
     {
       id: 1,
@@ -139,77 +140,166 @@ const MyPage = () => {
     },
   ];
 
-  return (
-    <div className="my-page">
-      <Header />
-      <main className="main-content">
-        <div className="content-container">
-          <section className="page-section">
-            <div className="section-background">
-              <div className="section-header">
-                <div className="page-title-section">
-                  <h1 className="page-title">마이 페이지</h1>
-                </div>
-                <div className="page-description">
-                  <p>
-                    지금까지 올린 질문과 풀어낸 문제들을 볼 수 있고, 클릭하면
-                    세부 질문 및 본인의 프롬프트와 좋아요를 확인할 수 있습니다.
-                  </p>
-                </div>
-              </div>
+  const tabs = [
+    { id: "내가 올린 질문", label: "내가 올린 질문", icon: "❓" },
+    { id: "코딩 챌린지", label: "코딩 챌린지", icon: "💻" },
+    { id: "이미지/영상 챌린지", label: "이미지/영상 챌린지", icon: "🖼️" },
+  ];
 
-              <div className="content-sections">
-                {/* 내가 올린 질문 섹션 */}
-                <div className="content-section">
-                  <div className="section-label">
-                    <h2 className="section-title">내가 올린 질문</h2>
+  const renderActiveContent = () => {
+    switch (activeTab) {
+      case "내가 올린 질문":
+        return (
+          <div className="mypage-content-section">
+            <h2 className="section-title">내가 올린 질문</h2>
+            <div className="questions-list">
+              {questions.map((question) => (
+                <div key={question.id} className="question-card">
+                  <div className="question-header">
+                    <h3 className="question-title">{question.question}</h3>
+                    <span className="category-tag">{question.category}</span>
                   </div>
-                  <div className="questions-list">
-                    {questions.map((question) => (
-                      <MypageQuestionCard key={question.id} {...question} />
-                    ))}
-                  </div>
-                </div>
-
-                {/* 코딩 챌린지 섹션 */}
-                <div className="content-section">
-                  <div className="section-label">
-                    <h2 className="section-title">참여한 코딩 챌린지 목록</h2>
-                  </div>
-                  <div className="coding-grid">
-                    <div className="coding-grid-container">
-                      {codingChallenges.map((challenge) => (
-                        <MypageCodingCard key={challenge.id} {...challenge} />
-                      ))}
+                  <div className="question-stats">
+                    <div className="stat-item">
+                      <span className="stat-label">좋아요</span>
+                      <span className="stat-value">{question.likes}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">작성자</span>
+                      <span className="stat-value">{question.author}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">조회수</span>
+                      <span className="stat-value">{question.views}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">날짜</span>
+                      <span className="stat-value">{question.date}</span>
                     </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        );
 
-                {/* 이미지/영상 챌린지 섹션 */}
-                <div className="content-section">
-                  <div className="section-label">
-                    <h2 className="section-title">
-                      참여한 이미지/영상 챌린지 목록
-                    </h2>
-                  </div>
-                  <div className="image-grid">
-                    {imageChallenges.map((challenge) => (
-                      <MypageImageCard
-                        key={challenge.id}
-                        challengeId={challenge.id}
-                        title={`Challenge #${challenge.challengeNumber}`}
-                        description={challenge.title}
-                        type={challenge.type}
-                        difficulty={challenge.difficulty}
-                      />
-                    ))}
-                  </div>
-                </div>
+      case "코딩 챌린지":
+        return (
+          <div className="mypage-content-section">
+            <h2 className="section-title">참여한 코딩 챌린지 목록</h2>
+            <div className="coding-section">
+              <div className="coding-grid">
+                {codingChallenges.map((challenge) => (
+                  <MypageCodingCard key={challenge.id} {...challenge} />
+                ))}
               </div>
             </div>
-          </section>
+          </div>
+        );
+
+      case "이미지/영상 챌린지":
+        return (
+          <div className="mypage-content-section">
+            <h2 className="section-title">참여한 이미지/영상 챌린지 목록</h2>
+            <div className="image-section">
+              <div className="image-grid">
+                {imageChallenges.map((challenge) => (
+                  <MypageImageCard
+                    key={challenge.id}
+                    challengeId={challenge.id}
+                    title={`Challenge #${challenge.challengeNumber}`}
+                    description={challenge.title}
+                    type={challenge.type}
+                    difficulty={challenge.difficulty}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return (
+          <div className="mypage-content-section">
+            <h2 className="section-title">내가 올린 질문</h2>
+            <div className="questions-list">
+              {questions.map((question) => (
+                <div key={question.id} className="question-card">
+                  <div className="question-header">
+                    <h3 className="question-title">{question.question}</h3>
+                    <span className="category-tag">{question.category}</span>
+                  </div>
+                  <div className="question-stats">
+                    <div className="stat-item">
+                      <span className="stat-label">좋아요</span>
+                      <span className="stat-value">{question.likes}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">작성자</span>
+                      <span className="stat-value">{question.author}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">조회수</span>
+                      <span className="stat-value">{question.views}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">날짜</span>
+                      <span className="stat-value">{question.date}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="mypage-page">
+      <Header />
+
+      <main className="mypage-main">
+        <div className="mypage-container">
+          {/* 마이페이지 헤더 */}
+          <div className="mypage-header">
+            <div className="mypage-title-section">
+              <h1 className="mypage-title">마이 페이지</h1>
+              <p className="mypage-subtitle">
+                지금까지 올린 질문과 풀어낸 문제들을 확인하세요
+              </p>
+            </div>
+          </div>
+
+          <div className="mypage-body">
+            {/* 사이드바 탭 */}
+            <div className="mypage-sidebar">
+              <nav className="mypage-nav">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    className={`mypage-nav-item ${
+                      activeTab === tab.id ? "active" : ""
+                    }`}
+                    onClick={() => setActiveTab(tab.id)}
+                  >
+                    <span className="nav-icon">{tab.icon}</span>
+                    <span className="nav-label">{tab.label}</span>
+                  </button>
+                ))}
+              </nav>
+            </div>
+
+            {/* 메인 콘텐츠 영역 */}
+            <div className="mypage-content">
+              <div className="mypage-content-wrapper">
+                {renderActiveContent()}
+              </div>
+            </div>
+          </div>
         </div>
       </main>
+
       <Footer />
     </div>
   );

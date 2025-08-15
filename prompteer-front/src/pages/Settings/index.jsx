@@ -4,7 +4,7 @@ import Footer from "../../components/common/Footer/index.jsx";
 import "./Settings.css";
 
 const Settings = () => {
-  const [activeTab, setActiveTab] = useState("계정");
+  const [activeTab, setActiveTab] = useState("프로필 수정");
   const [formData, setFormData] = useState({
     // 계정 설정
     nickname: "뽀복",

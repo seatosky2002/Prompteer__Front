@@ -78,7 +78,13 @@ const MainPage = () => {
   };
 
   const handleCategoryClick = (category) => {
-    navigate(category.path);
+    if (category.id === "algorithm") {
+      navigate(category.path);
+    } else if (category.id === "video-image") {
+      navigate(category.path);
+    } else {
+      navigate("/category/preparing");
+    }
   };
 
   return (

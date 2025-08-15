@@ -1,0 +1,252 @@
+.preparing-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+.preparing-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+}
+
+.preparing-container {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+/* 준비중 아이콘 */
+.preparing-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-wrapper {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #228be6 0%, #1971c2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
+  box-shadow: 0 8px 32px rgba(34, 139, 230, 0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 8px 32px rgba(34, 139, 230, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(34, 139, 230, 0.4);
+  }
+}
+
+/* 메시지 섹션 */
+.preparing-message {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 500px;
+}
+
+.preparing-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1.2;
+  color: #212529;
+  margin: 0;
+}
+
+.preparing-description {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #495057;
+  margin: 0;
+}
+
+/* 액션 버튼들 */
+.preparing-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.action-btn {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 8px;
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 200px;
+}
+
+.primary-btn {
+  background: #228be6;
+  color: #ffffff;
+}
+
+.primary-btn:hover {
+  background: #1971c2;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 139, 230, 0.3);
+}
+
+.secondary-btn {
+  background: #ffffff;
+  color: #228be6;
+  border: 2px solid #228be6;
+}
+
+.secondary-btn:hover {
+  background: #228be6;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 139, 230, 0.2);
+}
+
+/* 정보 카드들 */
+.preparing-info {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.info-card {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.info-icon {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.info-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+  color: #212529;
+  margin: 0;
+  text-align: center;
+}
+
+.info-text {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #495057;
+  margin: 0;
+  text-align: center;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .preparing-content {
+    padding: 40px 16px;
+  }
+
+  .preparing-container {
+    gap: 32px;
+  }
+
+  .icon-wrapper {
+    width: 100px;
+    height: 100px;
+    font-size: 50px;
+  }
+
+  .preparing-title {
+    font-size: 28px;
+  }
+
+  .preparing-description {
+    font-size: 16px;
+  }
+
+  .preparing-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .action-btn {
+    width: 100%;
+  }
+
+  .preparing-info {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .info-card {
+    flex-direction: row;
+    text-align: left;
+    padding: 20px;
+  }
+
+  .info-icon {
+    margin-bottom: 0;
+    margin-right: 12px;
+    font-size: 28px;
+  }
+
+  .info-content {
+    flex: 1;
+  }
+
+  .info-title,
+  .info-text {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .preparing-title {
+    font-size: 24px;
+  }
+
+  .preparing-description {
+    font-size: 15px;
+  }
+
+  .action-btn {
+    font-size: 15px;
+    padding: 12px 24px;
+  }
+}

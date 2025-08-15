@@ -15,6 +15,7 @@ import MyPage from "./pages/MyPage/index.jsx";
 import Settings from "./pages/Settings/index.jsx";
 import Signup from "./pages/Signup/index.jsx";
 import Login from "./pages/Login/index.jsx";
+import Preparing from "./pages/Preparing/index.jsx";
 import "./App.css";
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/category/preparing" element={<Preparing />} />
         </Routes>
       </Router>
     </div>

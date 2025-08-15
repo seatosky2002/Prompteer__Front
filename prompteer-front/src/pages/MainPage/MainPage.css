@@ -1,0 +1,363 @@
+.main-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+.main-content {
+  flex: 1;
+  padding: 24px 96px;
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Top Challenges Section */
+.top-challenges-section {
+  margin-bottom: 48px;
+}
+
+.main-page .section-header {
+  background: linear-gradient(90deg, #228be6 0%, #228be6 100%);
+  border-radius: 12px;
+  padding: 48px;
+  margin-bottom: 15px;
+  color: white;
+}
+
+.main-page .section-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 48px;
+  margin: 0 0 15px 0;
+  color: #ffffff;
+  border-bottom: 0px;
+}
+
+.main-page .section-description {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 24px;
+  margin: 0;
+  color: #ffffff;
+}
+
+.challenges-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 47px;
+  margin-top: 15px;
+}
+
+.challenge-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Image Challenge Card */
+.image-challenge-card {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 283px;
+}
+
+.image-challenge-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.image-challenge-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.image-placeholder {
+  height: 239px;
+  background: linear-gradient(135deg, #74c0fc 0%, #339af0 100%);
+  position: relative;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="3" fill="white" opacity="0.6"/><circle cx="35" cy="15" r="2" fill="white" opacity="0.4"/><circle cx="50" cy="25" r="4" fill="white" opacity="0.7"/><circle cx="70" cy="18" r="2.5" fill="white" opacity="0.5"/><circle cx="80" cy="30" r="3.5" fill="white" opacity="0.6"/><circle cx="25" cy="40" r="2" fill="white" opacity="0.4"/><circle cx="45" cy="45" r="3" fill="white" opacity="0.5"/><circle cx="65" cy="50" r="2.5" fill="white" opacity="0.6"/><circle cx="85" cy="55" r="2" fill="white" opacity="0.4"/><circle cx="15" cy="60" r="3.5" fill="white" opacity="0.7"/><circle cx="40" cy="65" r="2.5" fill="white" opacity="0.5"/><circle cx="60" cy="70" r="3" fill="white" opacity="0.6"/><circle cx="75" cy="75" r="2" fill="white" opacity="0.4"/><circle cx="30" cy="80" r="2.5" fill="white" opacity="0.5"/></svg>');
+  background-size: cover;
+}
+
+.image-category {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background-color: #e7f5ff;
+  color: #1971c2;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.image-challenge-info {
+  padding: 5px 25px 25px 25px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.image-challenge-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19px;
+  color: #212529;
+  margin: 0 0 8px 0;
+}
+
+.image-challenge-description {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  color: #212529;
+  margin: 0;
+  flex: 1;
+}
+
+.image-challenge-meta {
+  margin-top: 8px;
+}
+
+/* Categories Section */
+.categories-section {
+  margin-bottom: 48px;
+}
+
+.main-page .categories-section .section-header {
+  background: linear-gradient(90deg, #228be6 0%, #228be6 100%);
+  border-radius: 12px;
+  padding: 20px 48px;
+  margin-bottom: 15px;
+}
+
+.main-page .categories-section .section-title {
+  font-size: 40px;
+  line-height: 48px;
+  margin: 0;
+}
+
+.categories-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.categories-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32.5px;
+}
+
+.category-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 50px 48px;
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 201px;
+  box-sizing: border-box;
+}
+
+.category-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.category-icon {
+  width: 98px;
+  height: 98px;
+  flex-shrink: 0;
+}
+
+.icon-neural,
+.icon-image,
+.icon-prison,
+.icon-docs {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+.icon-neural {
+  background: linear-gradient(135deg, #4c6ef5 0%, #364fc7 100%);
+  position: relative;
+}
+
+.icon-neural::after {
+  content: "🧠";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px;
+}
+
+.icon-image {
+  background: linear-gradient(135deg, #74c0fc 0%, #339af0 100%);
+  position: relative;
+}
+
+.icon-image::after {
+  content: "🖼️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px;
+}
+
+.icon-prison {
+  background: linear-gradient(135deg, #868e96 0%, #495057 100%);
+  position: relative;
+}
+
+.icon-prison::after {
+  content: "🔓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px;
+}
+
+.icon-docs {
+  background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+  position: relative;
+}
+
+.icon-docs::after {
+  content: "📄";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px;
+}
+
+.category-content {
+  flex: 1;
+  text-align: right;
+}
+
+.category-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 48px;
+  color: #000000;
+  margin: 0 0 8px 0;
+}
+
+.category-subtitle {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 29px;
+  color: #000000;
+  margin: 0;
+}
+
+/* Difficulty badges - 메인페이지 전용 */
+.main-page .difficulty-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.main-page .difficulty-advanced {
+  background-color: #ff4e4e;
+  color: #ffffff;
+}
+
+.main-page .difficulty-intermediate {
+  background-color: #ffd43b;
+  color: #000000;
+}
+
+.main-page .difficulty-beginner {
+  background-color: #51cf66;
+  color: #ffffff;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .main-page .main-content {
+    padding: 24px 48px;
+  }
+
+  .main-page .challenges-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .main-page .categories-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-page .main-content {
+    padding: 24px 24px;
+  }
+
+  .main-page .section-header {
+    padding: 32px 24px;
+  }
+
+  .main-page .section-title {
+    font-size: 32px;
+    line-height: 38px;
+  }
+
+  .main-page .section-description {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  .main-page .challenges-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .main-page .category-card {
+    padding: 32px 24px;
+    gap: 24px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .main-page .category-content {
+    text-align: center;
+  }
+
+  .main-page .category-title {
+    font-size: 32px;
+    line-height: 38px;
+  }
+
+  .main-page .category-subtitle {
+    font-size: 20px;
+    line-height: 24px;
+  }
+}

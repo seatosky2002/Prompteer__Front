@@ -1,183 +1,420 @@
-.my-page {
+/* MyPage - Settings 페이지와 동일한 구조 */
+.mypage-page {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #F8F9FA;
+  background: #f8f9fa;
 }
 
-.main-content {
+.mypage-main {
+  flex: 1;
   display: flex;
-  justify-content: stretch;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 96px 80px;
+}
+
+.mypage-container {
+  width: 1213px;
+  max-width: 1213px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin: 0 auto;
+}
+
+/* 헤더 섹션 - Settings 페이지와 동일한 스타일 */
+.mypage-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: stretch;
-  padding: 0 32px;
+  gap: 15px;
+  padding: 20px 48px;
+  background: #228be6;
+  border-radius: 12px;
+  height: 138px;
+  box-sizing: border-box;
+  width: 1213px !important;
+  max-width: 1213px !important;
+}
+
+.mypage-title-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  flex: 1;
+}
+
+.mypage-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 52px;
+  text-align: center;
+  color: #ffffff;
+  margin: 0;
+}
+
+.mypage-subtitle {
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: center;
+  color: #ffffff;
+  margin: 8px 0 0 0;
+  opacity: 0.9;
+}
+
+/* 메인 바디 */
+.mypage-body {
+  display: flex;
   gap: 32px;
-  margin-top: 32px;
-}
-
-.content-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.page-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.section-background {
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.05);
-  padding: 9px 32px 32px;
+  overflow: hidden;
+  min-height: 796px;
+}
+
+/* 사이드바 */
+.mypage-sidebar {
+  width: 280px;
+  background: #f8f9fa;
+  border-right: 1px solid #e9ecef;
+  padding: 32px 0;
+}
+
+.mypage-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 24px;
+}
+
+.mypage-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mypage-nav-item:hover {
+  background: #e9ecef;
+}
+
+.mypage-nav-item.active {
+  background: #228be6;
+  color: #ffffff;
+}
+
+.nav-icon {
+  font-size: 20px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-label {
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.mypage-nav-item.active .nav-label {
+  font-weight: 600;
+}
+
+/* 콘텐츠 영역 */
+.mypage-content {
+  flex: 1;
+  padding: 32px;
+}
+
+.mypage-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+}
+
+.mypage-content-section {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  flex: 1;
 }
 
-.section-header {
-  display: flex;
-  align-items: flex-end;
-  gap: 20px;
-  padding-bottom: 26px;
-}
-
-.page-title-section {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.page-title {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 700;
-  font-size: 32px;
-  line-height: 1.2;
+.section-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
   color: #212529;
-  margin: 0;
-  border-bottom: 1px solid #757575;
-  padding-bottom: 5px;
+  margin: 0 0 8px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e9ecef;
 }
 
-.page-description {
-  padding-bottom: 0.59px;
-}
-
-.page-description p {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 1.71;
-  color: #495057;
-  margin: 0;
-}
-
-.content-sections {
+/* 질문 카드 스타일 */
+.questions-list {
   display: flex;
   flex-direction: column;
-  gap: 23px;
-  flex: 1;
+  gap: 16px;
 }
 
-.content-section {
+.question-card {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.question-card:hover {
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.question-card:active {
+  cursor: pointer;
+}
+.question-header {
   display: flex;
   flex-direction: column;
   gap: 8px;
   flex: 1;
 }
 
-.section-label {
-  padding: 0 0 0.59px 10px;
-}
-
-.section-title {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 1.28;
+.question-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 20px;
   color: #212529;
   margin: 0;
 }
 
-.questions-list {
+.category-tag {
+  display: inline-block;
+  background: #e7f5ff;
+  color: #1971c2;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  flex: 0 0 auto;
+  align-self: flex-start; /* stretch 방지 */
+}
+
+.question-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.stat-item {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  align-items: center;
+  gap: 4px;
 }
+
+.stat-label {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 14px;
+  color: #212529;
+  font-weight: 600;
+}
+
+/* 코딩 챌린지 그리드 */
 
 .coding-grid {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  max-height: 663px;
+  overflow-y: auto;
+  padding-right: 8px;
+  padding-bottom: 8px;
 }
 
-.coding-grid-container {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 10px;
-  width: 100%;
-  height: 640px;
+.coding-grid::-webkit-scrollbar {
+  width: 6px;
 }
+
+.coding-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.coding-grid::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.coding-grid::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 이미지 챌린지 그리드 */
 
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 10px;
-  width: 100%;
-  height: 520px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  max-height: 663px;
+  overflow-y: auto;
+  padding-right: 8px;
+  padding-bottom: 8px;
+}
+
+.image-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.image-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.image-grid::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.image-grid::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 /* 반응형 디자인 */
-@media (max-width: 1200px) {
-  .coding-grid-container {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
+@media (max-width: 1440px) {
+  .mypage-main {
+    padding: 24px 48px 80px;
   }
-  
+
+  .mypage-container {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .mypage-header {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .coding-grid,
   .image-grid {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    height: 650px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .mypage-main {
+    padding: 24px 32px 80px;
+  }
+
+  .mypage-body {
+    flex-direction: column;
+  }
+
+  .mypage-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+    padding: 24px 0;
+  }
+
+  .mypage-nav {
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .coding-grid,
+  .image-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
   }
 }
 
 @media (max-width: 900px) {
-  .coding-grid-container {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    height: 800px;
+  .mypage-main {
+    padding: 24px 24px 80px;
   }
-  
+
+  .mypage-header {
+    height: 120px;
+    padding: 16px 32px;
+  }
+
+  .mypage-title {
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  .mypage-subtitle {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  .coding-grid,
   .image-grid {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    height: 750px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
   }
 }
 
 @media (max-width: 600px) {
-  .main-content {
-    padding: 0 16px;
+  .mypage-main {
+    padding: 24px 16px 80px;
   }
-  
-  .section-background {
-    padding: 16px;
+
+  .mypage-header {
+    height: 100px;
+    padding: 12px 24px;
   }
-  
-  .coding-grid-container {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    height: 1200px;
+
+  .mypage-title {
+    font-size: 28px;
+    line-height: 36px;
   }
-  
+
+  .mypage-subtitle {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .mypage-nav {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .coding-grid,
   .image-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    height: 1000px;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 8px;
   }
 }

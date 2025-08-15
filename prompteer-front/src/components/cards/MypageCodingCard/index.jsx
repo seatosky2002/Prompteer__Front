@@ -3,7 +3,12 @@ import "./MypageCodingCard.css";
 
 // mypage에 들어가는 단순화된 코딩 카드 컴포넌트
 
-const MypageCodingCard = ({ challengeNumber, title, difficulty = "고급" }) => {
+const MypageCodingCard = ({
+  challengeNumber,
+  title,
+  difficulty = "고급",
+  onClick,
+}) => {
   const getDifficultyColor = (level) => {
     switch (level) {
       case "초급":
@@ -18,7 +23,7 @@ const MypageCodingCard = ({ challengeNumber, title, difficulty = "고급" }) => 
   };
 
   return (
-    <div className="mypage-coding-card">
+    <div className="mypage-coding-card" onClick={onClick}>
       <div className="mypage-coding-header">
         <h3 className="mypage-coding-title">
           Challenge #{challengeNumber}

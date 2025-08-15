@@ -4,10 +4,36 @@ import MypageQuestionCard from "../../components/cards/MypageQuestionCard/index.
 import MypageCodingCard from "../../components/cards/MypageCodingCard/index.jsx";
 import MypageImageCard from "../../components/cards/MypageImageCard/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
+import CodingDetailPrompt from "../../components/cards/CodingDetailPrompt";
+import ImageDetailPrompt from "../../components/cards/ImageDetailPrompt";
 import "./MyPage.css";
 
 const MyPage = () => {
   const [activeTab, setActiveTab] = useState("내가 올린 질문");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedChallenge, setSelectedChallenge] = useState(null);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [selectedImageChallenge, setSelectedImageChallenge] = useState(null);
+
+  const handleCodingCardClick = (challenge) => {
+    setSelectedChallenge(challenge);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedChallenge(null);
+  };
+
+  const handleImageCardClick = (challenge) => {
+    setSelectedImageChallenge(challenge);
+    setIsImageModalOpen(true);
+  };
+
+  const handleCloseImageModal = () => {
+    setIsImageModalOpen(false);
+    setSelectedImageChallenge(null);
+  };
 
   // 샘플 데이터
   const questions = [
@@ -50,6 +76,13 @@ const MyPage = () => {
       description:
         "알고리즘은 뭐라고 해야할지 모르겠어서 그냥 아무말이나 적을게요:) 컴공과 부탁해요~",
       difficulty: "고급",
+      prompt:
+        "BFS 알고리즘을 사용해서 그래프의 최단 경로를 찾는 문제입니다. 주어진 그래프에서 시작점에서 도착점까지의 최단 거리를 계산하세요.",
+      output: "> 1\n> 6\n> 3\n> 30",
+      memory: "3024KB",
+      time: "68ms",
+      manualEdits: "2회",
+      likes: 10 + index,
     }));
 
   // 피그마 디자인에 맞춰 12개의 이미지/영상 챌린지 (6x2 그리드)
@@ -60,6 +93,10 @@ const MyPage = () => {
       title: "일상 풍경 묘사 프롬프트 만들기",
       type: "이미지",
       difficulty: "초급",
+      imageUrl: "https://via.placeholder.com/450x681",
+      prompt:
+        "A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.",
+      likes: 8,
     },
     {
       id: 2,
@@ -67,6 +104,10 @@ const MyPage = () => {
       title: "사실적인 물거품",
       type: "이미지",
       difficulty: "고급",
+      imageUrl: "https://via.placeholder.com/450x681",
+      prompt:
+        "A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.",
+      likes: 15,
     },
     {
       id: 3,
@@ -74,6 +115,10 @@ const MyPage = () => {
       title: "뽀송뽀송한 아기 양",
       type: "이미지",
       difficulty: "초급",
+      imageUrl: "https://via.placeholder.com/450x681",
+      prompt:
+        "A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.",
+      likes: 12,
     },
     {
       id: 4,
@@ -81,6 +126,10 @@ const MyPage = () => {
       title: "바다 옆 철길을 달리는 사실적인 기차",
       type: "영상",
       difficulty: "초급",
+      imageUrl: "https://via.placeholder.com/450x681",
+      prompt:
+        "A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.",
+      likes: 20,
     },
     {
       id: 5,
@@ -88,6 +137,10 @@ const MyPage = () => {
       title: "꿀이 흐르고 보석들이 흩어져있는 핫케이크",
       type: "이미지",
       difficulty: "중급",
+      imageUrl: "https://via.placeholder.com/450x681",
+      prompt:
+        "A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.",
+      likes: 18,
     },
     {
       id: 6,
@@ -95,6 +148,10 @@ const MyPage = () => {
       title: "숲속에서 뒤를 돌아보는 흰색 요정 소녀",
       type: "영상",
       difficulty: "고급",
+      imageUrl: "https://via.placeholder.com/450x681",
+      prompt:
+        "A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.",
+      likes: 25,
     },
     {
       id: 7,
@@ -102,6 +159,10 @@ const MyPage = () => {
       title: "일상 풍경 묘사 프롬프트 만들기",
       type: "이미지",
       difficulty: "초급",
+      imageUrl: "https://via.placeholder.com/450x681",
+      prompt:
+        "A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.",
+      likes: 14,
     },
     {
       id: 8,
@@ -109,6 +170,10 @@ const MyPage = () => {
       title: "사실적인 물거품",
       type: "이미지",
       difficulty: "고급",
+      imageUrl: "https://via.placeholder.com/450x681",
+      prompt:
+        "A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.",
+      likes: 11,
     },
     {
       id: 9,
@@ -116,6 +181,10 @@ const MyPage = () => {
       title: "뽀송뽀송한 아기 양",
       type: "이미지",
       difficulty: "초급",
+      imageUrl: "https://via.placeholder.com/450x681",
+      prompt:
+        "A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.",
+      likes: 9,
     },
     {
       id: 10,
@@ -123,6 +192,10 @@ const MyPage = () => {
       title: "바다 옆 철길을 달리는 사실적인 기차",
       type: "영상",
       difficulty: "초급",
+      imageUrl: "https://via.placeholder.com/450x681",
+      prompt:
+        "A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.",
+      likes: 16,
     },
     {
       id: 11,
@@ -130,6 +203,10 @@ const MyPage = () => {
       title: "꿀이 흐르고 보석들이 흩어져있는 핫케이크",
       type: "이미지",
       difficulty: "중급",
+      imageUrl: "https://via.placeholder.com/450x681",
+      prompt:
+        "A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.",
+      likes: 22,
     },
     {
       id: 12,
@@ -137,6 +214,10 @@ const MyPage = () => {
       title: "숲속에서 뒤를 돌아보는 흰색 요정 소녀",
       type: "영상",
       difficulty: "고급",
+      imageUrl: "https://via.placeholder.com/450x681",
+      prompt:
+        "A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.",
+      likes: 19,
     },
   ];
 
@@ -156,8 +237,8 @@ const MyPage = () => {
               {questions.map((question) => (
                 <div key={question.id} className="question-card">
                   <div className="question-header">
-                    <h3 className="question-title">{question.question}</h3>
                     <span className="category-tag">{question.category}</span>
+                    <h3 className="question-title">{question.question}</h3>
                   </div>
                   <div className="question-stats">
                     <div className="stat-item">
@@ -190,7 +271,11 @@ const MyPage = () => {
             <div className="coding-section">
               <div className="coding-grid">
                 {codingChallenges.map((challenge) => (
-                  <MypageCodingCard key={challenge.id} {...challenge} />
+                  <MypageCodingCard
+                    key={challenge.id}
+                    {...challenge}
+                    onClick={() => handleCodingCardClick(challenge)}
+                  />
                 ))}
               </div>
             </div>
@@ -211,6 +296,7 @@ const MyPage = () => {
                     description={challenge.title}
                     type={challenge.type}
                     difficulty={challenge.difficulty}
+                    onClick={() => handleImageCardClick(challenge)}
                   />
                 ))}
               </div>
@@ -226,8 +312,8 @@ const MyPage = () => {
               {questions.map((question) => (
                 <div key={question.id} className="question-card">
                   <div className="question-header">
-                    <h3 className="question-title">{question.question}</h3>
                     <span className="category-tag">{question.category}</span>
+                    <h3 className="question-title">{question.question}</h3>
                   </div>
                   <div className="question-stats">
                     <div className="stat-item">
@@ -301,6 +387,22 @@ const MyPage = () => {
       </main>
 
       <Footer />
+
+      {isModalOpen && selectedChallenge && (
+        <CodingDetailPrompt
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          challengeData={selectedChallenge}
+        />
+      )}
+
+      {isImageModalOpen && selectedImageChallenge && (
+        <ImageDetailPrompt
+          isOpen={isImageModalOpen}
+          onClose={handleCloseImageModal}
+          imageData={selectedImageChallenge}
+        />
+      )}
     </div>
   );
 };

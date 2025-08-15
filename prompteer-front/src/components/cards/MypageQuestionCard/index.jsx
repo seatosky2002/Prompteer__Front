@@ -1,6 +1,8 @@
 import React from "react";
 import "./MypageQuestionCard.css";
 
+// mypage에 들어가는 단순화된 질문 카드 컴포넌트
+
 const MypageQuestionCard = ({
   question,
   category,

@@ -1,12 +1,15 @@
 import React from "react";
 import "./MypageImageCard.css";
 
+// mypage에 들어가는 단순화된 이미지 카드 컴포넌트
+
 const MypageImageCard = ({
   challengeId,
   title,
   description,
   type,
   difficulty,
+  onClick,
 }) => {
   const getDifficultyColor = (level) => {
     switch (level) {
@@ -33,7 +36,7 @@ const MypageImageCard = ({
   };
 
   return (
-    <div className="mypage-image-card">
+    <div className="mypage-image-card" onClick={onClick}>
       <div className="mypage-image-card-content">
         <div
           className="type-label"

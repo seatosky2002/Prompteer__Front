@@ -2,21 +2,23 @@
   background: #ffffff;
   border: 1px solid #e9ecef;
   border-radius: 12px;
-  padding: 16px 25px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
-  width: 198.67px;
-  height: 193.33px;
+  min-width: 130px;
+  min-height: 120px;
   cursor: pointer;
   transition: all 0.2s ease;
   box-sizing: border-box;
+  aspect-ratio: 1;
 }
 
 .mypage-coding-card:hover {
   transform: translateY(-2px);
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: #1971c2;
 }
 
 .mypage-coding-header {

@@ -76,7 +76,7 @@
   border-radius: 12px;
   box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.05);
   overflow: hidden;
-  min-height: 600px;
+  min-height: 796px;
 }
 
 /* 사이드바 */
@@ -148,7 +148,7 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
-  max-width: 600px;
+  width: 100%;
 }
 
 .mypage-content-section {
@@ -185,6 +185,7 @@
   align-items: center;
   gap: 24px;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .question-card:hover {
@@ -192,6 +193,9 @@
   transform: translateY(-1px);
 }
 
+.question-card:active {
+  cursor: pointer;
+}
 .question-header {
   display: flex;
   flex-direction: column;
@@ -216,6 +220,8 @@
   border-radius: 16px;
   font-size: 12px;
   font-weight: 500;
+  flex: 0 0 auto;
+  align-self: flex-start; /* stretch 방지 */
 }
 
 .question-stats {
@@ -243,29 +249,63 @@
 }
 
 /* 코딩 챌린지 그리드 */
-.coding-section {
-  margin-top: 32px;
-}
 
 .coding-grid {
   display: grid;
-  grid-template-columns: repeat(6, 198.67px);
-  grid-template-rows: repeat(3, 193.33px);
-  gap: 12px;
-  margin-top: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  max-height: 663px;
+  overflow-y: auto;
+  padding-right: 8px;
+  padding-bottom: 8px;
+}
+
+.coding-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.coding-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.coding-grid::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.coding-grid::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 /* 이미지 챌린지 그리드 */
-.image-section {
-  margin-top: 32px;
-}
 
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(6, 198.67px);
-  grid-template-rows: repeat(2, 245px);
-  gap: 12px;
-  margin-top: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  max-height: 663px;
+  overflow-y: auto;
+  padding-right: 8px;
+  padding-bottom: 8px;
+}
+
+.image-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.image-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.image-grid::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.image-grid::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 /* 반응형 디자인 */
@@ -284,14 +324,10 @@
     max-width: 100% !important;
   }
 
-  .coding-grid {
-    grid-template-columns: repeat(5, 198.67px);
-    grid-template-rows: repeat(4, 193.33px);
-  }
-
+  .coding-grid,
   .image-grid {
-    grid-template-columns: repeat(5, 198.67px);
-    grid-template-rows: repeat(3, 245px);
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
   }
 }
 
@@ -317,14 +353,10 @@
     gap: 16px;
   }
 
-  .coding-grid {
-    grid-template-columns: repeat(4, 198.67px);
-    grid-template-rows: repeat(5, 193.33px);
-  }
-
+  .coding-grid,
   .image-grid {
-    grid-template-columns: repeat(4, 198.67px);
-    grid-template-rows: repeat(3, 245px);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
   }
 }
 
@@ -348,14 +380,10 @@
     line-height: 20px;
   }
 
-  .coding-grid {
-    grid-template-columns: repeat(3, 198.67px);
-    grid-template-rows: repeat(7, 193.33px);
-  }
-
+  .coding-grid,
   .image-grid {
-    grid-template-columns: repeat(3, 198.67px);
-    grid-template-rows: repeat(4, 245px);
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
   }
 }
 
@@ -384,13 +412,9 @@
     gap: 8px;
   }
 
-  .coding-grid {
-    grid-template-columns: repeat(2, 198.67px);
-    grid-template-rows: repeat(10, 193.33px);
-  }
-
+  .coding-grid,
   .image-grid {
-    grid-template-columns: repeat(2, 198.67px);
-    grid-template-rows: repeat(6, 245px);
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 8px;
   }
 }

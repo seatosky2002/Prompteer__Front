@@ -24,7 +24,7 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-container">
-        <div className="logo" onClick={() => handleNavigation("/board")}>
+        <div className="logo" onClick={() => handleNavigation("/")}>
           <h1>Prompteer</h1>
         </div>
         <div className="nav-section">

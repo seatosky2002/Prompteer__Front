@@ -1,28 +1,28 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Board from './pages/Board/index.jsx';
-import PostDetail from './pages/PostDetail/index.jsx';
-import SharedPostDetail from './pages/SharedPostDetail/index.jsx';
-import ProblemDetail from './pages/ProblemDetail/index.jsx';
-import PostWrite from './pages/PostWrite/index.jsx';
-import CodingCategory from './pages/CodingCategory/index.jsx';
-import CodingProblem from './pages/CodingProblem/index.jsx';
-import ImageCategory from './pages/ImageCategory/index.jsx';
-import ImageLanding from './pages/ImageLanding/index.jsx';
-import ImageProblem from './pages/ImageProblem/index.jsx';
-import MyPage from './pages/MyPage/index.jsx';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Board from "./pages/Board/index.jsx";
+import PostDetail from "./pages/PostDetail/index.jsx";
+import SharedPostDetail from "./pages/SharedPostDetail/index.jsx";
+import ProblemDetail from "./pages/ProblemDetail/index.jsx";
+import PostWrite from "./pages/PostWrite/index.jsx";
+import CodingCategory from "./pages/CodingCategory/index.jsx";
+import CodingProblem from "./pages/CodingProblem/index.jsx";
+import ImageCategory from "./pages/ImageCategory/index.jsx";
+import MainPage from "./pages/MainPage/index.jsx";
+import ImageLanding from "./pages/ImageLanding/index.jsx";
+import ImageProblem from "./pages/ImageProblem/index.jsx";
+import MyPage from "./pages/MyPage/index.jsx";
 import Settings from "./pages/Settings/index.jsx";
 import Signup from "./pages/Signup/index.jsx";
 import Login from "./pages/Login/index.jsx";
-import './App.css';
-
+import "./App.css";
 
 function App() {
   return (
     <div className="App">
       <Router>
         <Routes>
-          <Route path="/" element={<ImageLanding />} />
+          <Route path="/" element={<MainPage />} />
           <Route path="/board" element={<Board />} />
           <Route path="/board/post/:id" element={<PostDetail />} />
           <Route path="/board/shared/:id" element={<SharedPostDetail />} />

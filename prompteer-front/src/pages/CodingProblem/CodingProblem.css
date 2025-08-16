@@ -3,54 +3,65 @@
   display: flex;
   flex-direction: column;
   background: #FFFFFF;
+  /* min-height 제거 - 내용에 맞는 자동 높이 */
 }
 
 .coding-problem-main {
+  flex: 1;
+  background: linear-gradient(0deg, #F8F9FA, #F8F9FA), #FFFFFF;
+  padding-bottom: 0;
 }
 
 .coding-problem-container {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  padding: 0;
+  align-items: center; /* 중앙 정렬로 변경 */
+  padding: 0 40px;
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
   background: linear-gradient(0deg, #F8F9FA, #F8F9FA), #FFFFFF;
+  min-height: auto; /* 자동 높이로 변경 */
 }
 
 /* 문제 레이아웃 - Container */
 .problem-layout {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
   padding: 0;
   width: 100%;
+  gap: 0;
+  min-height: auto; /* 자동 높이로 변경 */
 }
 
-/* Main */
+/* Main - 중앙 정렬 수정 */
 .problem-main {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: stretch;
-  padding: 0 40px;
+  padding: 0;
   width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
   gap: 0;
 }
 
-/* 왼쪽 사이드바 - Frame 34 */
+/* 왼쪽 사이드바 - Frame 34: w-96 (384px) */
 .problem-sidebar {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 24px 25px 24px 0px;
-  gap: 20px;
-  width: 360px;
-  border-right: 1px solid #E9ECEF;
+  padding: 24px 24px 24px 0px; /* pr-6 py-6 */
+  gap: 20px; /* gap-5 (20px) */
+  width: 384px; /* w-96 */
+  min-height: auto; /* 자동 높이로 변경 */
+  border-right: 1px solid #E9ECEF; /* border-r border-gray-200 */
   flex: none;
   order: 0;
   flex-grow: 0;
+  overflow: hidden; /* overflow-hidden */
 }
 
 .problem-header {
@@ -78,11 +89,18 @@
 
 .problem-tags {
   display: flex;
+  flex-direction: column;
   gap: 8px;
   width: 311px;
   margin-top: 12px;
 }
 
+.tags-row {
+  display: flex;
+  gap: 8px;
+}
+
+/* 태그 스타일 - Figma 디자인과 정확히 일치 */
 .tag {
   padding: 4px 10px;
   border-radius: 16px;
@@ -90,6 +108,19 @@
   font-weight: 500;
   font-size: 13px;
   line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #E7F5FF;
+  color: #1971C2;
+}
+
+.tag span {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #1971C2;
 }
 
 .category-tag {
@@ -98,89 +129,417 @@
 }
 
 .difficulty-tag {
+  background: #E7F5FF;
   color: #1971C2;
 }
 
-.difficulty-초급 {
+.correct-rate-tag {
   background: #E7F5FF;
+  color: #1971C2;
+  align-self: flex-start;
 }
 
-.difficulty-중급 {
-  background: #E7F5FF;
-}
-
-.difficulty-고급 {
-  background: #E7F5FF;
-}
-
-/* 문제 통계 */
+/* 문제 통계 - 제거됨 */
 .problem-stats {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 26px;
-  width: 100%;
+  display: none;
 }
 
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.stat-text {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 1.2;
-  color: #000000;
-  text-align: center;
-  margin: 0;
-  white-space: nowrap;
-}
-
-/* 문제 내용 */
+/* 문제 내용 - Frame 130: w-80 (320px) flex-1 */
 .problem-content {
-  flex: 1;
-  width: 335px;
-  min-width: 335px;
-  max-width: 335px;
+  flex: 1; /* flex-1 */
+  width: 320px; /* w-80 */
+  min-width: 320px;
+  max-width: 320px;
   overflow-y: auto;
+  overflow-x: hidden; /* overflow-hidden */
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 20px; /* gap-5 */
 }
 
 .problem-section {
   display: flex;
   flex-direction: column;
   width: 100%;
+  margin-bottom: 0;
 }
 
-.section-header {
+/* 문제 섹션 간격 조정 - Figma와 동일하게 */
+.problem-section:nth-child(1) {
+  padding-top: 9px;
+}
+
+.problem-section:nth-child(2) {
+  padding-top: 16px;
+}
+
+.problem-section:nth-child(3) {
+  padding-top: 16px;
+}
+
+.problem-section:nth-child(4) {
+  padding-top: 16px;
+}
+
+.problem-section:nth-child(5) {
+  padding-top: 0;
+}
+
+.problem-section:nth-child(6) {
+  padding-top: 0;
+}
+
+/* Figma 디자인 - 섹션 헤더에만 경계선 (이중 경계선 방지) */
+.coding-problem-page .problem-sidebar .section-header {
+  align-self: stretch !important;
+  border-bottom: 1px solid #E9ECEF !important; /* 여기에만 경계선 */
+  padding-bottom: 8px !important;
+  margin-bottom: 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  max-width: 320px !important;
+  box-sizing: border-box !important;
+}
+
+/* Figma 디자인 - 예시 헤더에만 경계선 (이중 경계선 방지) */
+.coding-problem-page .problem-sidebar .example-header { 
+  width: 320px !important;
+  border-bottom: 1px solid #E9ECEF !important; /* 여기에만 경계선 */
+  padding-bottom: 5px !important;
+  margin-bottom: 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+/* 섹션 컨테이너는 경계선 없음 - Figma에서도 없음 */
+.problem-content .problem-section {
+  border: none;
+  margin-bottom: 20px;
+}
+
+/* Figma 디자인 - 섹션 제목 (경계선 없음, 헤더에서 처리) */
+.coding-problem-page .problem-sidebar .section-title {
+  align-self: stretch !important;
+  font-family: 'Noto Sans KR', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  line-height: 1.2 !important;
+  color: #212529 !important;
+  margin: 0 !important;
+  padding: 0 !important; /* 패딩 제거 */
+  border: none !important; /* 경계선 완전 제거 */
+  text-align: left !important; /* 왼쪽 정렬 */
+  max-width: 100% !important;
+  word-wrap: break-word !important;
+}
+
+/* Figma 디자인 - 예시 제목 (경계선 없음, 헤더에서 처리) */
+.coding-problem-page .problem-sidebar .example-title {
+  font-family: 'Noto Sans KR', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  line-height: 1.2 !important;
+  color: #212529 !important;
+  margin: 0 !important;
+  padding: 0 !important; /* 패딩 제거 */
+  border: none !important; /* 경계선 완전 제거 */
+  text-align: left !important; /* 왼쪽 정렬 */
+  max-width: 100% !important;
+  word-wrap: break-word !important;
+}
+
+/* 결과 버튼들 - 투명 배경, 원래 색상 유지 */
+.result-action-buttons {
   display: flex;
-  flex-direction: column;
-  width: 100%;
-  padding-bottom: 9px;
-  border-bottom: 1px solid #E9ECEF;
-  margin-bottom: 9px;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  background: transparent !important; /* 버튼 컨테이너 배경 투명 */
 }
 
-.section-title {
+.result-btn {
+  padding: 10px 20px;
+  border: none; /* 테두리 제거 */
+  border-radius: 6px;
+  background: transparent !important; /* 투명 배경 */
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* 원래 버튼 색상으로 복원 */
+.retry-btn {
+  background: #6C757D !important; /* 회색 배경 */
+  color: white;
+}
+
+.other-btn {
+  background: #495057 !important; /* 다크 그레이 배경 */
+  color: white;
+}
+
+.share-btn {
+  background: #228BE6 !important; /* 파란색 배경 */
+  color: white;
+}
+
+/* 구경하기 섹션 - Figma 44-2876 완전 왼쪽 정렬 */
+.view-others-section {
+  width: 100%;
+  max-width: none; /* 최대 너비 제한 제거 */
+  margin: 20px 0 0 0;
+  padding: 20px 0 20px 40px; /* 왼쪽 패딩만 유지 */
+}
+
+.view-others-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px; /* Figma gap 반영 */
+}
+
+.view-others-header h3 {
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 24px;
   line-height: 1.2;
   color: #212529;
   margin: 0;
-  width: 100%;
 }
+
+.sort-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sort-btn {
+  padding: 8px 16px;
+  border: 1px solid #DEE2E6;
+  border-radius: 6px;
+  background: #FFFFFF;
+  color: #6C757D;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sort-btn.active {
+  background: #228BE6;
+  color: #FFFFFF;
+  border-color: #228BE6;
+}
+
+.sort-btn:hover:not(.active) {
+  background: #F8F9FA;
+  border-color: #ADB5BD;
+}
+
+/* 다른 사람들 작업 그리드 - 완전 왼쪽 정렬 */
+.others-work-section {
+  width: 100%;
+  max-width: none; /* 최대 너비 제한 제거 */
+  margin: 0;
+  padding: 0 0 0 40px; /* 왼쪽 패딩만 유지 */
+}
+
+.others-work-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(600px, 1fr)); /* 최소 너비 설정으로 왼쪽 정렬 */
+  gap: 25px; /* Figma gap 반영 */
+  margin-bottom: 40px;
+  justify-content: start; /* 왼쪽 정렬 */
+  width: fit-content; /* 내용에 맞는 너비 */
+}
+
+.work-card {
+  background: #FFFFFF;
+  border: 1px solid #E9ECEF;
+  border-radius: 8px;
+  padding: 30px; /* Figma padding 반영 */
+  display: flex;
+  flex-direction: row; /* 가로 레이아웃으로 변경 */
+  align-items: center;
+  gap: 32px; /* Figma gap 반영 */
+  transition: all 0.2s ease;
+  height: 132px; /* Figma 높이 */
+  box-sizing: border-box;
+  width: 100%; /* 그리드에 맞게 조정 */
+}
+
+.work-card:hover {
+  border-color: #ADB5BD;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 통계 영역 - Figma Frame 81 */
+.work-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px; /* Figma gap */
+  height: 38px; /* Figma 고정 높이 */
+  flex-shrink: 0;
+}
+
+.stat-item {
+  text-align: center;
+  min-width: 80px; /* 충분한 너비 확보 */
+  flex: 0 0 auto; /* 줄어들지 않도록 */
+}
+
+.stat-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px; /* Figma 폰트 크기 */
+  font-weight: 400; /* 일반 텍스트는 400 */
+  color: #101010; /* Figma 색상 */
+  line-height: 1.2;
+  text-align: center;
+  word-break: keep-all; /* 단어 단위로 줄바꿈 방지 */
+}
+
+.stat-text:first-line {
+  font-weight: 700; /* 첫 번째 줄(라벨)만 볼드 */
+}
+
+/* 프롬프트 영역 - Figma Frame 278 */
+.work-content {
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  flex: 1;
+  gap: 20px; /* Figma gap */
+}
+
+.work-prompt {
+  background: #F8F9FA;
+  border-radius: 8px; /* Figma border radius */
+  padding: 20px; /* Figma padding */
+  font-family: 'Noto Sans KR', sans-serif; /* Figma 폰트 */
+  font-size: 14px; /* Figma 폰트 크기 */
+  line-height: 1.2;
+  color: #000000; /* Figma 텍스트 색상 */
+  white-space: pre-wrap;
+  word-break: break-word;
+  flex: 1;
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  text-align: left;
+}
+
+.work-output {
+  background: #F8F9FA;
+  border-radius: 8px;
+  padding: 20px;
+  font-family: 'Fira Code', monospace;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #757575;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* 좋아요 영역 - Figma 하트 표시 */
+.work-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px; /* Figma gap */
+  flex-shrink: 0;
+}
+
+/* Figma 하트 아이콘 */
+.like-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.heart-icon {
+  width: 20px;
+  height: 18.35px; /* Figma 크기 */
+  color: #515151; /* Figma 색상 */
+  font-size: 18px;
+}
+
+.like-count {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #515151; /* Figma 색상 */
+  line-height: 1.2;
+}
+
+.like-button:hover .heart-icon,
+.like-button:hover .like-count {
+  color: #228BE6;
+}
+
+/* 익명 사용자 정보 제거 - Figma에 없음 */
+.author-info {
+  display: none;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1200px) {
+  .others-work-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .others-work-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .others-work-section {
+    padding: 0 20px;
+  }
+}
+
+/* 하단 안내 문구 - 박스 없음, 왼쪽 정렬 */
+.bottom-notice {
+  width: 100%;
+  max-width: none; /* 최대 너비 제한 제거 */
+  margin: 20px 0;
+  padding: 0 0 0 40px; /* 왼쪽 패딩만 유지 */
+  background: transparent; /* 배경 제거 */
+  border: none; /* 테두리 제거 */
+}
+
+.bottom-notice p {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: #6C757D;
+  line-height: 1.5;
+  margin: 4px 0;
+  text-align: left; /* 왼쪽 정렬 */
+}
+
+/* 중복 제거됨 - 위에 정의된 .section-header 사용 */
 
 .section-content {
   display: flex;
   flex-direction: column;
   width: 100%;
+  padding-bottom: 0;
+  margin-top: 0;
 }
 
 .section-text {
@@ -212,6 +571,7 @@
   flex-direction: column;
   padding-bottom: 5px;
   width: 311px;
+  /* 경계선 제거 */
 }
 
 .example-title {
@@ -223,6 +583,7 @@
   margin: 0;
 }
 
+/* 예시 입력/출력 정렬 수정 */
 .example-content {
   background: #F8F9FA;
   border: none;
@@ -237,6 +598,7 @@
   white-space: pre-wrap;
   width: 100%;
   box-sizing: border-box;
+  text-align: left;
 }
 
 .input-example {
@@ -247,7 +609,7 @@
   background: #F0FFF0;
 }
 
-/* Frame 135: 코드 워크스페이스 */
+/* 중앙: 코드 워크스페이스 */
 .code-workspace {
   box-sizing: border-box;
   display: flex;
@@ -256,22 +618,22 @@
   align-items: center;
   padding: 0px;
   width: 500px;
-  border-right: 1px solid #E9ECEF;
+  border-right: 0; /* 중복 경계선 제거 - 사이드바만 유지 */
   flex: none;
   order: 1;
   align-self: stretch;
   flex-grow: 0;
+  min-height: 400px; /* 더 작은 높이로 조정 */
 }
 
-/* Frame 134 */
+/* Frame 135: 코드 워크스페이스 - 높이 통일 */
 .workspace-section {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   padding: 16px;
   width: 500px;
-  height: auto;
-  min-height: 600px;
+  height: 900px;
   flex: none;
   order: 0;
   align-self: stretch;
@@ -283,6 +645,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: flex-start;
   padding: 0px 0px 0px 1px;
   width: 468px;
   height: 17px;
@@ -330,6 +693,7 @@
   line-height: 23px;
   display: flex;
   align-items: center;
+  justify-content: center;
   text-align: center;
   color: #FFFFFF;
   flex: none;
@@ -394,7 +758,7 @@
   color: #757575;
 }
 
-/* Frame 107 - 액션 버튼 */
+/* Frame 107 - 액션 버튼 (이중 경계선 문제 해결) */
 .action-buttons {
   box-sizing: border-box;
   display: flex;
@@ -406,9 +770,8 @@
   width: 468px;
   height: 73px;
   background: #FFFFFF;
-  border-width: 1px 1px 0px 0px;
-  border-style: solid;
-  border-color: #E9ECEF;
+  /* ⛔️ 이중 경계선의 주범이었던 border-top 제거 */
+  border: none;
   flex: none;
   order: 2;
   flex-grow: 0;
@@ -459,7 +822,7 @@
   background: #1864a8;
 }
 
-/* Frame 136: 콘솔 섹션 */
+/* 오른쪽: 콘솔 섹션 */
 .console-section {
   display: flex;
   flex-direction: column;
@@ -471,24 +834,24 @@
   order: 2;
   align-self: stretch;
   flex-grow: 0;
+  min-height: 400px; /* 더 작은 높이로 조정 */
 }
 
-/* Frame 134 */
+/* Frame 136: 콘솔 섹션 - 높이 통일 */
 .console-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 33px 16px 16px;
   width: 500px;
-  height: auto;
-  min-height: 400px;
+  height: 900px;
   flex: none;
   order: 0;
   align-self: stretch;
   flex-grow: 0;
 }
 
-/* Frame 52 */
+/* 콘솔 길이를 Prompt/Code와 동일하게 */
 .console-content-wrapper {
   box-sizing: border-box;
   display: flex;
@@ -885,6 +1248,11 @@
     height: auto;
     min-height: 600px;
     border-right: none;
+  }
+  
+  .console-section {
+    height: auto;
+    min-height: 400px;
   }
 }
 

@@ -20,7 +20,7 @@ const ImageProblem = () => {
     sections: [
       {
         title: '📝 상황 설명',
-        content: '당신은 적절한 프롬프트를 입력하여 이미지를 생성하고자 합니다.\r다음 조건에 따라 프롬프트를 작성해보세요.'
+        content: '당신은 적절한 프롬프트를 입력하여 이미지를 생성하고자 합니다. 다음 조건에 따라 프롬프트를 작성해보세요.'
       },
       {
         title: '🏞️ 장면',
@@ -32,13 +32,11 @@ const ImageProblem = () => {
       },
       {
         title: '📜 목표',
-        content: ' 주요 시각 요소와 분위기를 모두 포함한 프롬프트를 작성하세요. 단순 나열이 아닌 자연스럽고 상세한 서술형 프롬프트를 작성할 것.',
-        width: 311
+        content: '주요 시각 요소와 분위기를 모두 포함한 프롬프트를 작성하세요. 단순 나열이 아닌 자연스럽고 상세한 서술형 프롬프트를 작성할 것.'
       },
       {
         title: '🖍️ 채점방식',
-        content: '채점 방식: 커뮤니티 평가 100%',
-        width: 311
+        content: '채점 방식: 커뮤니티 평가 100%'
       }
     ]
   };
@@ -83,26 +81,29 @@ const ImageProblem = () => {
           <div className="main-layout">
             {/* Frame 34: 좌측 문제 정보 */}
             <div className="frame-34">
-              <div className="problem-header-section">
-                <h1 className="problem-title">{problemData.title}</h1>
-              </div>
-              
-              <div className="problem-tags">
-                <div className="tag category-tag">
-                  <span className="tag-text">{problemData.category}</span>
+              <div className="problem-header">
+                <div className="problem-title-section">
+                  <h1 className="problem-title">{problemData.title}</h1>
                 </div>
-                <div className="tag difficulty-tag">
-                  <span className="tag-text">{problemData.difficulty}</span>
+                <div className="problem-tags">
+                  <div className="tags-row">
+                    <div className="tag category-tag">
+                      <span>{problemData.category}</span>
+                    </div>
+                    <div className="tag difficulty-tag">
+                      <span>{problemData.difficulty}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="problem-sections">
+              <div className="problem-content">
                 {problemData.sections.map((section, index) => (
                   <div key={index} className="problem-section">
-                    <div className={`section-header ${section.width ? 'constrained' : ''}`}>
+                    <div className="section-header">
                       <h3 className="section-title">{section.title}</h3>
                     </div>
-                    <div className={`section-content ${section.width ? 'constrained' : ''}`}>
+                    <div className="section-content">
                       <p className="section-text">{section.content}</p>
                     </div>
                   </div>

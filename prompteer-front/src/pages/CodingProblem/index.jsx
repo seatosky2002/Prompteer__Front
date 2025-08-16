@@ -48,7 +48,7 @@ const CodingProblem = () => {
           situation: '그래프에서 특정 노드로부터 모든 노드까지의 최단거리를 구하는 문제입니다. BFS(너비 우선 탐색) 알고리즘을 사용하여 해결해야 합니다.',
           input: '첫째 줄에 노드의 개수 N과 간선의 개수 M이 주어진다. 다음 M개의 줄에는 간선 정보 u v가 주어진다.',
           output: '시작 노드로부터 각 노드까지의 최단거리를 출력한다.',
-          constraints: '1 ≤ N ≤ 1,000\n1 ≤ M ≤ 10,000',
+          constraints: '1 ≤ T ≤ 1,000\n1 ≤ M ≤ 10,000',
           sampleInput: '5 6\n1 2\n1 3\n2 4\n3 4\n4 5\n2 5',
           sampleOutput: '0 1 1 2 2'
         }
@@ -108,41 +108,23 @@ const CodingProblem = () => {
       <main className="coding-problem-main">
         <div className="coding-problem-container">
           <div className="problem-layout">
-            <div className="problem-main">
-              {/* 왼쪽: 문제 정보 */}
-              <div className="problem-sidebar">
+            {/* 왼쪽: 문제 정보 */}
+            <div className="problem-sidebar">
               <div className="problem-header">
                 <div className="problem-title-section">
                   <h1 className="problem-title">{problemData.title}</h1>
                 </div>
                 <div className="problem-tags">
-                  <span className="tag category-tag">{problemData.category}</span>
-                  <span className={`tag difficulty-tag difficulty-${problemData.difficulty}`}>
-                    {problemData.difficulty}
-                  </span>
-                </div>
-              </div>
-
-              <div className="problem-stats">
-                <div className="stat-item">
-                  <div className="stat-text">
-                    시간 제한
-                    <br />
-                    {problemData.timeLimit}
+                  <div className="tags-row">
+                    <div className="tag category-tag">
+                      <span>{problemData.category}</span>
+                    </div>
+                    <div className="tag difficulty-tag">
+                      <span>{problemData.difficulty}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-text">
-                    메모리 제한
-                    <br />
-                    {problemData.memoryLimit}
-                  </div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-text">
-                    정답 비율
-                    <br />
-                    {problemData.correctRate}
+                  <div className="tag correct-rate-tag">
+                    <span>정답 비율 {problemData.correctRate}</span>
                   </div>
                 </div>
               </div>
@@ -206,7 +188,7 @@ const CodingProblem = () => {
               </div>
             </div>
 
-            {/* Frame 135: 코드 입력/실행 영역 */}
+            {/* 중앙: 코드 입력/실행 영역 */}
             <div className="code-workspace">
               <div className="workspace-section">
                 <div className="code-editor-container">
@@ -255,7 +237,7 @@ const CodingProblem = () => {
               </div>
             </div>
 
-            {/* Frame 136: 콘솔 영역 */}
+            {/* 오른쪽: 콘솔 영역 */}
             <div className="console-section">
               <div className="console-container">
                 <div className="console-content-wrapper">
@@ -294,10 +276,9 @@ const CodingProblem = () => {
                 )}
               </div>
             </div>
-            </div>
           </div>
 
-          {/* 구경하기 섹션 (2열 레이아웃 아래) */}
+          {/* 구경하기 섹션 (2열 레이아웃 아래) - showResult: {showResult ? 'true' : 'false'} */}
           {showResult && (
             <>
               <div className="bottom-notice">
@@ -309,8 +290,9 @@ const CodingProblem = () => {
                 <div className="view-others-header">
                   <h3>구경하기</h3>
                   <div className="sort-buttons">
-                    <button className="sort-btn active">좋아요순</button>
-                    <button className="sort-btn">랜덤순</button>
+                    <button className="sort-btn active">좋아요 순</button>
+                    <button className="sort-btn">랜덤 순</button>
+                    <button className="sort-btn">수동 수정 횟수 순</button>
                   </div>
                 </div>
               </div>
@@ -321,34 +303,28 @@ const CodingProblem = () => {
                       <div key={item} className="work-card">
                         <div className="work-stats">
                           <div className="stat-item">
-                            <div className="stat-text">사용 메모리<br />3024KB</div>
+                            <div className="stat-text">사용 메모리<br />{3000 + item * 24}KB</div>
                           </div>
                           <div className="stat-item">
-                            <div className="stat-text">소요 시간<br />68ms</div>
+                            <div className="stat-text">소요 시간<br />{60 + item * 8}ms</div>
                           </div>
                           <div className="stat-item">
-                            <div className="stat-text">수동 수정<br />2회</div>
+                            <div className="stat-text">수동 수정<br />{item}회</div>
                           </div>
                         </div>
                         <div className="work-content">
                           <div className="work-prompt">
-                            <div className="work-section">
-                              <div className="work-label">프롬포트</div>
-                              <div className="work-text">
-                                어쩌구저쩌구나얼마얼미아날먀어리암날먀어라얼마이럼나이라ㅓㄹ미아날마이어람
-                              </div>
-                            </div>
-                            <div className="work-section">
-                              <div className="work-output">
-                                &gt; 1<br />
-                                &gt; 6
-                              </div>
-                            </div>
+                            알파벳 대문자 문자열 S가 주어질 때, {'\n'}모든 구간 (i, j)에 대해 S[i:j] 부분 문자열에서 나타나는 문자를...
                           </div>
-                          <div className="work-like">
+                          <div className="work-output">
+                            &gt; 1{'\n'}&gt; 6
+                          </div>
+                        </div>
+                        <div className="work-actions">
+                          <button className="like-button">
                             <div className="heart-icon">♥</div>
-                            <span>10</span>
-                          </div>
+                            <div className="like-count">{400 - item * 50}</div>
+                          </button>
                         </div>
                       </div>
                     ))}

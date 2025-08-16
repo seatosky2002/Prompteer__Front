@@ -27,13 +27,12 @@ const BoardPostCard = ({
     <div className="board-post-card" onClick={handleClick}>
       <div className="board-post-content">
         <h3 className="board-post-title">{title}</h3>
-        <div className="board-post-category">
-          <span className="category-text">{category}</span>
-        </div>
       </div>
       <div className="board-post-stats">
         <div className="stat-item">
-          <span className="stat-value">{category === '코딩' ? '코딩 질문' : '프롬포트 공유'}</span>
+          <div className="board-post-category">
+            <span className="category-text">{category}</span>
+          </div>
         </div>
         <div className="stat-item">
           <span className="stat-value">{problemNumber}</span>

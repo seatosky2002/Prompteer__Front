@@ -20,7 +20,6 @@
 .board-post-content {
   display: flex;
   align-items: center;
-  gap: 7px;
   flex: 1;
   min-width: 0;
 }
@@ -73,6 +72,9 @@
 
 .stat-item:nth-child(1) {
   width: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .stat-item:nth-child(2) {

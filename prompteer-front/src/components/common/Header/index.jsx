@@ -14,7 +14,7 @@ const Header = () => {
     if (path === "/board") {
       return (
         location.pathname === "/board" ||
-        location.pathname === "/" ||
+        // location.pathname === "/" || // 메인 페이지에서는 게시판에 파란불 X
         location.pathname.startsWith("/board/post")
       );
     }

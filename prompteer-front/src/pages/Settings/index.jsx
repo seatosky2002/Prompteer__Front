@@ -78,6 +78,8 @@ const Settings = () => {
 
   // 회원 탈퇴 모달 상태 및 핸들러
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  // 설정 저장 버튼 표시 여부
+  const [isSettingButtonLive, setIsSettingButtonLive] = useState(true);
   const handleOpenDeleteModal = () => setIsDeleteModalOpen(true);
   const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
   const handleConfirmDelete = () => {
@@ -91,8 +93,12 @@ const Settings = () => {
   };
 
   useEffect(() => {
-    if (activeTab === "회원 탈퇴") setIsDeleteModalOpen(true);
-    else setIsDeleteModalOpen(false);
+    if (activeTab === "회원 탈퇴") {
+      setIsDeleteModalOpen(false);
+      setIsSettingButtonLive(false); // 회원 탈퇴 탭에서는 설정 저장 버튼 숨김
+    } else {
+      setIsSettingButtonLive(true); // 다른 탭에서는 설정 저장 버튼 표시
+    }
   }, [activeTab]);
 
   const handleSave = () => {
@@ -311,11 +317,13 @@ const Settings = () => {
               <div className="settings-content-wrapper">
                 {renderActiveContent()} {/* 탭 관리하는 칸 */}
                 {/* 저장 버튼 */}
-                <div className="settings-actions">
-                  <button className="save-button" onClick={handleSave}>
-                    설정 저장
-                  </button>
-                </div>
+                {isSettingButtonLive && (
+                  <div className="settings-actions">
+                    <button className="save-button" onClick={handleSave}>
+                      설정 저장
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

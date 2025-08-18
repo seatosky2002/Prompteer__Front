@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/common/Header/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
+import { signIn } from "../../apis/api.js";
 import "./Login.css";
 
 const Login = () => {
@@ -13,18 +14,40 @@ const Login = () => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    // await 사용 위해서 async 함수로 바꿔주고.
     e.preventDefault();
+
+    // 기본 유효성 검사
     if (!form.id.trim() || !form.password.trim()) {
       alert("ID와 비밀번호를 입력해주세요.");
       return;
     }
+
     setIsSubmitting(true);
-    // TODO: API 연동
-    setTimeout(() => {
+    // 전반적으로 signUp과 매우 유사
+
+    try {
+      // API 명세서에 맞는 데이터 구조로 변환
+      const loginData = {
+        nickname: form.id, // 명세서에서는 nickname 필드 사용
+        password: form.password,
+      };
+
+      const result = await signIn(loginData);
+
+      if (result.success) {
+        // signIn 함수에서 이미 토큰 저장하고 리다이렉트 처리함
+        alert("로그인 성공!");
+      } else {
+        alert(result.error || "로그인에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("로그인 중 오류가 발생했습니다.");
+    } finally {
       setIsSubmitting(false);
-      navigate("/board");
-    }, 700);
+    }
   };
 
   return (

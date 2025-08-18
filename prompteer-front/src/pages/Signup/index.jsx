@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/common/Header/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
+import { signUp } from "../../apis/api.js";
 import "./Signup.css";
 
 const allInterests = [
@@ -66,16 +67,36 @@ const Signup = () => {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    // api 응답을 기다리기 위해 아래에서 await를 사용해야하기 때문에, async 함수로 변경
     e.preventDefault();
     if (!validate()) return;
+
     setIsSubmitting(true);
-    // TODO: API 연동
-    setTimeout(() => {
+
+    try {
+      // API 명세서에 맞는 데이터 구조로 변환
+      const signupData = {
+        nickname: form.nickname, // form은 앞에서 정의한 state이다..! 어 근데 signupData에 관심분야 선택이 없네
+        email: form.email,
+        password: form.password,
+        is_admin: false, // 기본값
+      };
+
+      const result = await signUp(signupData); // form에서 입력 중인 data를 백엔드로 post! 미리 정의한 signUp api 함수를 이용한다.
+
+      if (result.success) {
+        alert("회원가입이 완료되었습니다! 자동으로 로그인됩니다.");
+        // signUp 함수에서 이미 토큰 저장하고 리다이렉트 처리함
+      } else {
+        alert(result.error || "회원가입에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("회원가입 중 오류가 발생했습니다.");
+    } finally {
       setIsSubmitting(false);
-      alert("회원가입이 완료되었습니다. 로그인해주세요.");
-      navigate("/login");
-    }, 800);
+    }
   };
 
   return (

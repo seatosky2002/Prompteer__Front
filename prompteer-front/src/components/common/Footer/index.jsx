@@ -1,5 +1,5 @@
-import React from 'react';
-import './Footer.css';
+import React from "react";
+import "./Footer.css";
 
 const Footer = () => {
   return (
@@ -7,8 +7,10 @@ const Footer = () => {
       <div className="footer-container">
         <div className="footer-left">
           <div className="footer-brand">
-            <h2 className="footer-logo">Prompteer</h2>
-            <p className="footer-copyright">©2025 Prompteer. All rights reserved.</p>
+            <h2 className="footer-logo">PROMPTeer</h2>
+            <p className="footer-copyright">
+              ©2025 PROMPTeer. All rights reserved.
+            </p>
           </div>
           <div className="footer-links">
             <span className="footer-link">Terms of Service</span>

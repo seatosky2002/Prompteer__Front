@@ -14,7 +14,7 @@ const Header = () => {
     if (path === "/board") {
       return (
         location.pathname === "/board" ||
-        location.pathname === "/" ||
+        // location.pathname === "/" || // 메인 페이지에서는 게시판에 파란불 X
         location.pathname.startsWith("/board/post")
       );
     }
@@ -25,7 +25,7 @@ const Header = () => {
     <header className="header">
       <div className="header-container">
         <div className="logo" onClick={() => handleNavigation("/")}>
-          <h1>Prompteer</h1>
+          <h1>PROMPTeer</h1>
         </div>
         <div className="nav-section">
           <nav className="nav-menu">

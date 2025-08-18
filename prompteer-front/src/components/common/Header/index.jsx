@@ -1,13 +1,55 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getCurrentUser } from "../../../apis/api.js";
 import "./Header.css";
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 여부 확인하는 state
+
+  // 로그인 상태 체크 (실제 API 검증)
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = localStorage.getItem("access_token");
+
+      if (!token) {
+        setIsLoggedIn(false); // 토큰 없으면 login false
+        return;
+      }
+
+      try {
+        // 실제 API로 토큰 유효성 검증
+        const result = await getCurrentUser();
+
+        if (result.success) {
+          setIsLoggedIn(true);
+        } else {
+          // 토큰이 있지만 만료되었거나 무효함 (axios interceptor가 이미 토큰 삭제 처리함)
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        // API 호출 실패 (네트워크 오류 등)
+        console.error("Login status check failed:", error);
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
 
   const handleNavigation = (path) => {
     navigate(path);
+  };
+
+  const handleLogout = () => {
+    // api 연결..이 필요한가? 어차피 프론트에서만 지우는건데
+    // 로그아웃 처리
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("token_type");
+    setIsLoggedIn(false);
+    navigate("/");
+    alert("로그아웃되었습니다.");
   };
 
   const isActive = (path) => {
@@ -35,27 +77,42 @@ const Header = () => {
             >
               게시판
             </div>
-            <div
-              className={`nav-item ${isActive("/mypage") ? "active" : ""}`}
-              onClick={() => handleNavigation("/mypage")}
-            >
-              마이 페이지
-            </div>
-            <div
-              className={`nav-item ${isActive("/settings") ? "active" : ""}`}
-              onClick={() => handleNavigation("/settings")}
-            >
-              {/* 설정 페이지 추가 */}
-              설정
-            </div>
+            {isLoggedIn && (
+              <>
+                <div
+                  className={`nav-item ${isActive("/mypage") ? "active" : ""}`}
+                  onClick={() => handleNavigation("/mypage")}
+                >
+                  마이 페이지
+                </div>
+                <div
+                  className={`nav-item ${
+                    isActive("/settings") ? "active" : ""
+                  }`}
+                  onClick={() => handleNavigation("/settings")}
+                >
+                  설정
+                </div>
+              </>
+            )}
           </nav>
-          <button className="logout-btn">로그아웃</button>
-          {/*<button
-            className="logout-btn"
-            onClick={() => handleNavigation("/login")}
-          >
-            로그인
-          </button> */}
+          {isLoggedIn && <button className="logout-btn">로그아웃</button>}
+          {!isLoggedIn && (
+            <button
+              className="logout-btn"
+              onClick={() => handleNavigation("/login")}
+            >
+              로그인
+            </button>
+          )}
+          {!isLoggedIn && (
+            <button
+              className="logout-btn"
+              onClick={() => handleNavigation("/signup")}
+            >
+              회원가입
+            </button>
+          )}
         </div>
       </div>
     </header>

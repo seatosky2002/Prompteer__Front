@@ -22,7 +22,7 @@
 }
 
 .logo h1 {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 700;
   font-size: 20px;
   line-height: 1.2;
@@ -33,7 +33,7 @@
 .nav-section {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 18px;
 }
 
 .nav-menu {
@@ -43,7 +43,7 @@
 }
 
 .nav-item {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 400;
   font-size: 16px;
   line-height: 1.2;
@@ -54,21 +54,21 @@
 }
 
 .nav-item:hover {
-  color: #1971C2;
+  color: #1971c2;
 }
 
 .nav-item.active {
-  color: #1971C2;
+  color: #1971c2;
   font-weight: 500;
 }
 
 .logout-btn {
-  background: #1971C2;
+  background: #1971c2;
   color: #ffffff;
   border: none;
   border-radius: 8px;
   padding: 5px 15px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 700;
   font-size: 16px;
   line-height: 1.2;

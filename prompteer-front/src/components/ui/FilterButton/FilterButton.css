@@ -29,6 +29,11 @@
   color: #495057;
 }
 
+.filter-button.action.active {
+  background-color: #1971C2;
+  color: #ffffff;
+}
+
 .filter-button.default:hover:not(.active) {
   background-color: #d0d0d0;
 }

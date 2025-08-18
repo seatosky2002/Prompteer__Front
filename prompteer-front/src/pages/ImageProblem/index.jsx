@@ -11,6 +11,8 @@ const ImageProblem = () => {
   const [isGenerated, setIsGenerated] = useState(false);
   const [showOthersImages, setShowOthersImages] = useState(true); // 기본값을 true로 변경
   const [sortBy, setSortBy] = useState('likes'); // 'likes' or 'random'
+  const [imageLikes, setImageLikes] = useState(Array.from({ length: 8 }, () => 10)); // 각 이미지별 좋아요 수
+  const [selectedImage, setSelectedImage] = useState(null); // 선택된 이미지 모달 상태
 
   // 문제 데이터
   const problemData = {
@@ -69,6 +71,27 @@ const ImageProblem = () => {
   const handleShare = () => {
     // 프롬프트 공유 로직
     alert('프롬프트가 게시판에 공유되었습니다!');
+  };
+
+  const handleLikeClick = (index) => {
+    setImageLikes(prevLikes => {
+      const newLikes = [...prevLikes];
+      newLikes[index] += 1;
+      return newLikes;
+    });
+  };
+
+  const handleImageClick = (index) => {
+    setSelectedImage({
+      id: index,
+      image: `이미지 ${index + 1}`,
+      prompt: `A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.`,
+      likes: imageLikes[index]
+    });
+  };
+
+  const handleCloseModal = () => {
+    setSelectedImage(null);
   };
 
   // toggleOthersImages 함수 제거 - 항상 표시되므로 불필요
@@ -207,12 +230,25 @@ const ImageProblem = () => {
                 <div className="others-grid">
                   {Array.from({ length: 8 }, (_, i) => (
                     <div key={i} className="other-image-card">
-                      <div className="other-image-placeholder">
+                      <div 
+                        className="other-image-placeholder"
+                        onClick={() => handleImageClick(i)}
+                        style={{ cursor: 'pointer' }}
+                      >
                         이미지 {i + 1}
                       </div>
                       <div className="image-likes">
-                        <span className="heart">❤️</span>
-                        <span className="like-count">10</span>
+                        <span 
+                          className="heart" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLikeClick(i);
+                          }}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          ❤️
+                        </span>
+                        <span className="like-count">{imageLikes[i]}</span>
                       </div>
                     </div>
                   ))}
@@ -222,6 +258,36 @@ const ImageProblem = () => {
           </div>
         )}
       </div>
+      
+      {/* 이미지 모달 */}
+      {selectedImage && (
+        <div className="image-modal-overlay" onClick={handleCloseModal}>
+          <div className="image-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <button className="modal-close-btn" onClick={handleCloseModal}>
+                ✕
+              </button>
+            </div>
+            <div className="modal-content">
+              <div className="modal-image-section">
+                <div className="modal-image-placeholder">
+                  {selectedImage.image}
+                </div>
+              </div>
+              <div className="modal-prompt-section">
+                <div className="modal-prompt-content">
+                  <p className="modal-prompt-text">{selectedImage.prompt}</p>
+                </div>
+                <div className="modal-likes">
+                  <span className="modal-heart">❤️</span>
+                  <span className="modal-like-count">{selectedImage.likes}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <Footer />
     </div>
   );

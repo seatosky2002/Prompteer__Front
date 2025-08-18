@@ -1,3 +1,94 @@
+/* ===== 공통 그리드 스펙: 제목 + 6개 통계 ===== */
+:root {
+  --board-col-gap: 56px;
+  --board-cols: 1fr 72px 72px 50px 34px 50px 80px;
+}
+
+/* 헤더/행 모두 같은 그리드 사용 */
+.board-posts-header,
+.board-post-card {
+  display: grid !important;
+  grid-template-columns: var(--board-cols) !important;
+  align-items: center !important;
+  column-gap: var(--board-col-gap) !important;
+  box-sizing: border-box !important;
+}
+
+/* 헤더 레이아웃 정리 */
+.board-posts-header {
+  padding: 10px 35px 10px 30px !important;
+  background: #228BE6 !important;
+  border-radius: 8px 8px 0 0 !important;
+}
+
+/* 헤더 래퍼 평탄화: 자식(.header-stat)들을 부모 그리드 칸에 직접 배치 */
+.board-posts-header .header-left { 
+  grid-column: 1 !important; 
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+}
+.board-posts-header .header-right { 
+  display: contents !important; 
+}
+
+/* 텍스트 정렬 */
+.board-posts-header .header-title { 
+  text-align: left !important; 
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  line-height: 1.21 !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+}
+.board-posts-header .header-stat { 
+  text-align: center !important; 
+  justify-self: center !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  line-height: 1.21 !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+}
+
+/* 본문 행(카드) 쪽도 같은 방식으로 */
+.board-post-card .post-left { 
+  grid-column: 1 !important; 
+}
+.board-post-card .post-right { 
+  display: contents !important; 
+}
+.board-post-card .post-stat { 
+  text-align: center !important; 
+  justify-self: center !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 18px !important;
+  line-height: 1.21 !important;
+  color: #000000 !important;
+  white-space: nowrap !important;
+}
+
+/* 기존 flex 폭/갭 규칙들 무력화 (그리드가 관리하도록) */
+.header-right { 
+  width: auto !important; 
+  gap: 0 !important; 
+  display: contents !important;
+}
+.header-stat { 
+  width: auto !important; 
+}
+
+/* (선택) 반응형에서도 동일 그리드 유지하려면 아래 최소한만 유지 */
+@media (max-width: 768px) {
+  .board-posts-header, .board-post-card {
+    grid-template-columns: 1fr 60px 60px 44px 40px 50px 72px !important;
+    column-gap: 24px !important;
+  }
+}
+
 .board-page {
   display: flex;
   flex-direction: column;
@@ -104,12 +195,6 @@
 }
 
 .board-posts-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 35px 10px 30px;
-  background: #228BE6;
-  border-radius: 8px 8px 0px 0px;
   width: 1213px !important;
   max-width: 1213px !important;
   box-sizing: border-box;
@@ -131,13 +216,6 @@
   white-space: nowrap;
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 45px;
-  width: 603px;
-}
-
 .header-stat {
   font-family: 'Inter', sans-serif;
   font-weight: 700;
@@ -146,35 +224,9 @@
   color: #ffffff;
   text-align: center;
   white-space: nowrap;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.header-stat:nth-child(1) {
-  width: 72px;
-}
 
-.header-stat:nth-child(2) {
-  width: 72px;
-}
-
-.header-stat:nth-child(3) {
-  width: 50px;
-}
-
-.header-stat:nth-child(4) {
-  width: 34px;
-}
-
-.header-stat:nth-child(5) {
-  width: 50px;
-}
-
-.header-stat:nth-child(6) {
-  width: 80px;
-}
 
 .board-posts-list {
   display: flex;

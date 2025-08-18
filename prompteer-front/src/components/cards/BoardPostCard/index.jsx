@@ -25,30 +25,24 @@ const BoardPostCard = ({
 
   return (
     <div className="board-post-card" onClick={handleClick}>
-      <div className="board-post-content">
-        <h3 className="board-post-title">{title}</h3>
-      </div>
-      <div className="board-post-stats">
-        <div className="stat-item">
+      {/* 1열: 제목 */}
+      <div className="post-left">
+        <div className="board-post-content">
+          <h3 className="board-post-title">{title}</h3>
           <div className="board-post-category">
             <span className="category-text">{category}</span>
           </div>
         </div>
-        <div className="stat-item">
-          <span className="stat-value">{problemNumber}</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-value">{author}</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-value">{comments}</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-value">{likes}</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-value">{date}</span>
-        </div>
+      </div>
+
+      {/* 2~7열: 통계칸 - 헤더 순서와 정확히 동일 */}
+      <div className="post-right">
+        <span className="post-stat">{category === '코딩' ? '코딩 질문' : '프롬포트 공유'}</span>
+        <span className="post-stat">{problemNumber}</span>
+        <span className="post-stat">{author}</span>
+        <span className="post-stat">{comments}</span>
+        <span className="post-stat">{likes}</span>
+        <span className="post-stat">{date}</span>
       </div>
     </div>
   );

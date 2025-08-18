@@ -98,6 +98,7 @@
 .tags-row {
   display: flex;
   gap: 8px;
+  align-items: center;
 }
 
 /* 태그 스타일 - Figma 디자인과 정확히 일치 */
@@ -113,6 +114,10 @@
   justify-content: center;
   background: #E7F5FF;
   color: #1971C2;
+  height: 24px;
+  min-height: 24px;
+  box-sizing: border-box;
+  text-align: center;
 }
 
 .tag span {
@@ -120,6 +125,21 @@
   font-weight: 500;
   font-size: 13px;
   line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.category-tag span {
+  color: #1971C2;
+}
+
+.difficulty-tag span {
+  color: #856404;
+}
+
+.correct-rate-tag span {
   color: #1971C2;
 }
 
@@ -129,8 +149,8 @@
 }
 
 .difficulty-tag {
-  background: #E7F5FF;
-  color: #1971C2;
+  background: #FFF3CD;
+  color: #856404;
 }
 
 .correct-rate-tag {
@@ -155,6 +175,8 @@
   display: flex;
   flex-direction: column;
   gap: 20px; /* gap-5 */
+  max-height: 600px; /* 스크롤을 위한 최대 높이 설정 */
+  padding-right: 10px; /* 스크롤바 공간 */
 }
 
 .problem-section {
@@ -164,21 +186,21 @@
   margin-bottom: 0;
 }
 
-/* 문제 섹션 간격 조정 - Figma와 동일하게 */
+/* 문제 섹션 간격 조정 - 간격 줄임 */
 .problem-section:nth-child(1) {
-  padding-top: 9px;
+  padding-top: 5px;
 }
 
 .problem-section:nth-child(2) {
-  padding-top: 16px;
+  padding-top: 8px;
 }
 
 .problem-section:nth-child(3) {
-  padding-top: 16px;
+  padding-top: 8px;
 }
 
 .problem-section:nth-child(4) {
-  padding-top: 16px;
+  padding-top: 8px;
 }
 
 .problem-section:nth-child(5) {

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import FilterButton from '../../components/ui/FilterButton/index.jsx';
+import CategoryFilter from '../../components/ui/CategoryFilter/index.jsx';
 import './PostWrite.css';
 
 const PostWrite = () => {
@@ -18,8 +19,10 @@ const PostWrite = () => {
   });
 
   const [activeTab, setActiveTab] = useState('게시물 작성');
+  const [activeCategory, setActiveCategory] = useState('전체');
 
-  const tabs = ['전체', '코딩 질문', '프롬포트 공유'];
+  const tabs = ['전체', '질문', '프롬포트 공유'];
+  const categories = ['전체', '코딩', '이미지', '영상', '탈옥', '문서'];
   const boardCategories = ['질문', '프롬포트 공유'];
   const problemCategories = ['코딩', '그림', '영상', '탈옥', '문서'];
 
@@ -76,20 +79,30 @@ const PostWrite = () => {
           <div className="post-write-content">
             {/* 필터 섹션 */}
             <div className="post-write-filters">
-              <div className="tab-buttons">
-                {tabs.map((tab) => (
-                  <FilterButton
-                    key={tab}
-                    isActive={activeTab === tab}
-                    onClick={() => setActiveTab(tab)}
-                  >
-                    {tab}
-                  </FilterButton>
-                ))}
+              <div className="tab-filters">
+                <div className="tab-buttons">
+                  {tabs.map((tab) => (
+                    <FilterButton
+                      key={tab}
+                      isActive={activeTab === tab}
+                      onClick={() => setActiveTab(tab)}
+                    >
+                      {tab}
+                    </FilterButton>
+                  ))}
+                </div>
+                <FilterButton variant="action" isActive={true}>
+                  게시물 작성
+                </FilterButton>
               </div>
-              <FilterButton variant="action" isActive={true}>
-                게시물 작성
-              </FilterButton>
+
+              <div className="category-filter-section">
+                <CategoryFilter
+                  categories={categories}
+                  activeCategory={activeCategory}
+                  onCategoryChange={setActiveCategory}
+                />
+              </div>
             </div>
 
             {/* 작성 폼 */}

@@ -1,8 +1,5 @@
 .board-post-card {
   background: #ffffff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 20px 35px 20px 30px;
   width: 1213px;
   max-width: 1213px;
@@ -20,6 +17,7 @@
 .board-post-content {
   display: flex;
   align-items: center;
+  gap: 7px;
   flex: 1;
   min-width: 0;
 }
@@ -39,64 +37,44 @@
 }
 
 .board-post-category {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  width: 44px;
+  height: 24px;
   background: #E7F5FF;
   border-radius: 16px;
-  padding: 4px 10px;
-  flex-shrink: 0;
+  flex: none;
+  order: 1;
+  flex-grow: 0;
 }
 
 .category-text {
-  font-family: 'Noto Sans KR', sans-serif;
+  width: 24px;
+  height: 16px;
+  font-family: 'Noto Sans KR';
+  font-style: normal;
   font-weight: 500;
   font-size: 13px;
-  line-height: 1.2;
-  color: #1971C2;
-}
-
-.board-post-stats {
-  display: flex;
-  align-items: center;
-  gap: 45px;
-  width: 603px;
-  max-width: 603px;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.stat-item {
+  line-height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  color: #1971C2 !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  text-shadow: none !important;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
 }
 
-.stat-item:nth-child(1) {
-  width: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
-.stat-item:nth-child(2) {
-  width: 72px;
-}
 
-.stat-item:nth-child(3) {
-  width: 50px;
-}
 
-.stat-item:nth-child(4) {
-  width: 34px;
-}
-
-.stat-item:nth-child(5) {
-  width: 50px;
-}
-
-.stat-item:nth-child(6) {
-  width: 80px;
-  max-width: 80px;
-}
 
 .stat-label {
   font-family: 'Inter', sans-serif;
@@ -109,6 +87,20 @@
 }
 
 .stat-value {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.21;
+  color: #000000;
+  text-align: center;
+  white-space: nowrap;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.post-stat {
   font-family: 'Inter', sans-serif;
   font-weight: 400;
   font-size: 18px;

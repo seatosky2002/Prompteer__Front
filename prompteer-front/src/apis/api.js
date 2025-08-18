@@ -93,3 +93,30 @@ export const signUp = async (userData) => {
 };
 
 // 이제 이 signUp과 같은 함수를 const result = await signUp(userData); 이런 식으로 사용하면 result에 리턴 값을 저장할 수 있는 것이다.
+
+// 현재 로그인된 사용자 정보 조회 (토큰 검증 겸용, 현재 유효한 사용자인지 여부 판단. 굉장히 많이 쓰이게 될 api)
+export const getCurrentUser = async () => {
+  try {
+    const response = await instanceWithToken.get("users/me");
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data, // { nickname, email, is_admin, id }
+      }; // 사실상 success 여부만 이용할 예정인 느낌
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      // 토큰 만료 또는 무효
+      return {
+        success: false,
+        error: "인증이 만료되었습니다.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "사용자 정보를 가져올 수 없습니다.",
+      };
+    }
+  }
+};

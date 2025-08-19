@@ -18,74 +18,40 @@ const CodingCategory = () => {
     const fetchChallenges = async () => {
       try {
         setLoading(true);
-        const data = await getAllChallenges();
         
-        // API에서 받은 데이터를 code 카테고리로 필터링
-        const codeChallenges = filterChallengesByCategory(data, 'code');
-        setChallenges(codeChallenges);
+        // 직접 API 호출
+        const response = await fetch('http://localhost:8000/challenges/ps/');
+        console.log('API Response status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('API Response data:', data);
+        
+        // 데이터 변환
+        const transformedData = data.map(challenge => ({
+          id: challenge.id,
+          title: `Challenge #${challenge.id}\n${challenge.title || '제목 없음'}`,
+          description: challenge.content || challenge.problemDescription?.situation || challenge.description || '설명 없음',
+          challenge_type: 'CODE',
+          type: 'code',
+          difficulty: challenge.difficulty || '중급',
+          category: '코딩',
+          participants: Math.floor(Math.random() * 1500) + 300,
+          createdAt: challenge.created_at,
+          creator_id: challenge.creator_id
+        }));
+        
+        setChallenges(transformedData);
         setError(null);
       } catch (err) {
         console.error('Failed to fetch challenges:', err);
         setError('챌린지 데이터를 불러오는데 실패했습니다.');
         
-        // 에러 시 샘플 데이터 사용
-        const sampleChallenges = [
-          {
-            id: 1,
-            title: 'Challenge #12\nBFS 알고리즘',
-            description: '알고리즘은 뭐라고 해야할지 모르겠어서 그냥 아무말이나 적을게요:) 컴공과 부탁해요~',
-            difficulty: '고급',
-            participants: 1043,
-            category: '코딩',
-            type: 'code'
-          },
-          {
-            id: 2,
-            title: 'Challenge #13\n그래프 탐색',
-            description: 'DFS와 BFS를 활용한 그래프 탐색 문제입니다. 다양한 접근 방법을 시도해보세요!',
-            difficulty: '중급',
-            participants: 892,
-            category: '코딩',
-            type: 'code'
-          },
-          {
-            id: 3,
-            title: 'Challenge #14\n동적 계획법',
-            description: '메모이제이션을 활용한 최적화 문제를 해결해보세요. 효율적인 알고리즘이 핵심입니다.',
-            difficulty: '고급',
-            participants: 756,
-            category: '코딩',
-            type: 'code'
-          },
-          {
-            id: 4,
-            title: 'Challenge #15\n이진 탐색',
-            description: '정렬된 배열에서 효율적으로 원소를 찾는 이진 탐색 알고리즘을 구현해보세요.',
-            difficulty: '초급',
-            participants: 1205,
-            category: '코딩',
-            type: 'code'
-          },
-          {
-            id: 5,
-            title: 'Challenge #16\n트리 순회',
-            description: '전위, 중위, 후위 순회를 모두 구현하고 각각의 특징을 파악해보세요.',
-            difficulty: '중급',
-            participants: 623,
-            category: '코딩',
-            type: 'code'
-          },
-          {
-            id: 6,
-            title: 'Challenge #17\n정렬 알고리즘',
-            description: '다양한 정렬 알고리즘의 시간복잡도를 비교하고 최적의 방법을 선택해보세요.',
-            difficulty: '초급',
-            participants: 987,
-            category: '코딩',
-            type: 'code'
-          }
-        ];
-        setChallenges(sampleChallenges);
+        // 에러 시 빈 배열로 설정 (로딩 상태는 false로 유지)
+        setChallenges([]);
       } finally {
         setLoading(false);
       }

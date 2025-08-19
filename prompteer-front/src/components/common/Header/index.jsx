@@ -43,13 +43,11 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    // api 연결..이 필요한가? 어차피 프론트에서만 지우는건데
-    // 로그아웃 처리
     localStorage.removeItem("access_token");
     localStorage.removeItem("token_type");
-    setIsLoggedIn(false);
-    navigate("/");
-    alert("로그아웃되었습니다.");
+    alert("로그아웃 되었습니다.");
+    // 페이지를 새로고침하여 로그인 상태를 완전히 초기화합니다.
+    window.location.replace("/");
   };
 
   const isActive = (path) => {
@@ -96,7 +94,7 @@ const Header = () => {
               </>
             )}
           </nav>
-          {isLoggedIn && <button className="logout-btn">로그아웃</button>}
+          {isLoggedIn && <button className="logout-btn" onClick={handleLogout}>로그아웃</button>}
           {!isLoggedIn && (
             <button
               className="logout-btn"

@@ -96,7 +96,16 @@ const Header = () => {
               </>
             )}
           </nav>
-          {isLoggedIn && <button className="logout-btn">로그아웃</button>}
+          {isLoggedIn && (
+            <button
+              className="logout-btn"
+              onClick={
+                () => handleLogout() /*누르면 로그아웃(토큰 제거) 합니당*/
+              }
+            >
+              로그아웃
+            </button>
+          )}
           {!isLoggedIn && (
             <button
               className="logout-btn"

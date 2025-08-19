@@ -52,8 +52,8 @@ const Signup = () => {
       alert("ID는 3자 이상이어야 합니다.");
       return false;
     }
-    if (form.password.length < 6) {
-      alert("비밀번호는 6자 이상이어야 합니다.");
+    if (form.password.length < 4) {
+      alert("비밀번호는 4자 이상이어야 합니다.");
       return false;
     }
     if (form.password !== form.confirmPassword) {

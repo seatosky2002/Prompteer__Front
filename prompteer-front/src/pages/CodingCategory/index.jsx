@@ -34,7 +34,8 @@ const CodingCategory = () => {
         const transformedData = data.map(challenge => ({
           id: challenge.id,
           title: `Challenge #${challenge.id}\n${challenge.title || '제목 없음'}`,
-          description: challenge.problemDescription?.situation || challenge.description || '설명 없음',
+
+          description: challenge.content || challenge.problemDescription?.situation || challenge.description || '설명 없음',
           challenge_type: 'CODE',
           type: 'code',
           difficulty: challenge.difficulty || '중급',

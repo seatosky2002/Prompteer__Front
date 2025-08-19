@@ -92,6 +92,42 @@ export const signUp = async (userData) => {
   }
 };
 
+// 프로필 정보 업데이트 API - 한줄소개 & 관심 분야
+export const updateUserProfile = async (profileData) => {
+  try {
+    const response = await instanceWithToken.put(
+      // 로그인 여부 중에서도 '본인'만이 수정 가능해야한다. 그건 다 백에서 알아서 처리가 되어있는 느낌. (자기 user_id에 접근해서 자기의 정보를 수정하는..)
+      "users/me/profile",
+      profileData // request bdoy에 담을 data 양식. 나중에 다른 함수에서 불려서 사용된다.
+    );
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 404) {
+      return {
+        success: false,
+        error: "프로필을 찾을 수 없습니다.",
+      };
+    } else if (error.response?.status === 422) {
+      return {
+        success: false,
+        error: "프로필 정보를 확인해주세요.",
+        details: error.response.data.detail,
+      };
+    } else {
+      return {
+        success: false,
+        error: "프로필 업데이트 중 오류가 발생했습니다.",
+      };
+    }
+  }
+};
+
 // 이제 이 signUp과 같은 함수를 const result = await signUp(userData); 이런 식으로 사용하면 result에 리턴 값을 저장할 수 있는 것이다.
 
 // 현재 로그인된 사용자 정보 조회 (토큰 검증 겸용, 현재 유효한 사용자인지 여부 판단. 굉장히 많이 쓰이게 될 api)

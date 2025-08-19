@@ -39,7 +39,7 @@
 .nav-menu {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 18px;
 }
 
 .nav-item {

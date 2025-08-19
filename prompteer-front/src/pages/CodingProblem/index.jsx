@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
@@ -15,50 +17,77 @@ const CodingProblem = () => {
   const [consoleOutput, setConsoleOutput] = useState('');
   const [showResult, setShowResult] = useState(false);
   const [showOthersWork, setShowOthersWork] = useState(true); // 기본값을 true로 변경
+  const [problemData, setProblemData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // 문제 데이터 (실제로는 API에서 가져옴)
-  const getProblemData = (problemId) => {
-    const problems = {
-      '11': {
-        id: 11,
-        title: 'Challenge #11\n알파벳 문자열',
-        category: '코딩',
-        difficulty: '고급',
-        timeLimit: '1 초',
-        memoryLimit: '256 MB',
-        correctRate: '22.699%',
-        problemDescription: {
-          situation: '알파벳 대문자로만 이루어진 문자열 S가 있고, 길이는 N이다. S[i]는 S의 i번째 문자를 나타내고, S[i:j]는 S[i], S[i+1], ..., S[j-1], S[j]에 해당하는 S의 부분 문자열을 나타낸다. 이 문제에서 사용하는 문자열의 인덱스는 1부터 시작한다.\nU(i, j)는 S[i:j]에 나타나는 알파벳을 순서대로 정렬한 문자열을 의미하고, 중복해서 나타나는 알파벳은 제외한다.\n예를 들어, S = "ABCBA" 인 경우 U(1, 3) = "ABC"가 되며, U(2, 4) = "BC", U(1, 5) = "ABC"이다.\n모든 1 ≤ i ≤ j ≤ N에 대하여 U(i, j)을 구했을 때 이 문자열 중에서 서로 다른 문자열이 모두 몇 개 있는지 구해보자.',
-          input: '첫째 줄에 테스트 케이스의 개수 T가 주어진다. 각 테스트 케이스는 한 줄로 이루어져 있고, 문자열 S가 주어진다.',
-          output: '각 테스트 케이스에 대해서 U(i, j)에 서로 다른 문자열이 몇 개 있는지 출력한다.',
-          constraints: '1 ≤ T ≤ 10\n1 ≤ N ≤ 100,000',
-          sampleInput: '4\nAAA\nABCBA\nABABAB\nABCXYZABC',
-          sampleOutput: '1\n6\n3\n30'
+  // 백엔드에서 문제 데이터 가져오기
+  useEffect(() => {
+    const fetchProblemData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:8000/challenges/ps/');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-      },
-      '12': {
-        id: 12,
-        title: 'Challenge #12\nBFS 알고리즘',
-        category: '코딩',
-        difficulty: '고급',
-        timeLimit: '2 초',
-        memoryLimit: '512 MB',
-        correctRate: '18.432%',
-        problemDescription: {
-          situation: '그래프에서 특정 노드로부터 모든 노드까지의 최단거리를 구하는 문제입니다. BFS(너비 우선 탐색) 알고리즘을 사용하여 해결해야 합니다.',
-          input: '첫째 줄에 노드의 개수 N과 간선의 개수 M이 주어진다. 다음 M개의 줄에는 간선 정보 u v가 주어진다.',
-          output: '시작 노드로부터 각 노드까지의 최단거리를 출력한다.',
-          constraints: '1 ≤ T ≤ 1,000\n1 ≤ M ≤ 10,000',
-          sampleInput: '5 6\n1 2\n1 3\n2 4\n3 4\n4 5\n2 5',
-          sampleOutput: '0 1 1 2 2'
+        
+        const challenges = await response.json();
+        
+        // 현재 문제 ID에 해당하는 데이터 찾기
+        const currentProblem = challenges.find(challenge => challenge.id == id);
+        
+        if (currentProblem) {
+          console.log('Found problem data:', currentProblem);
+          setProblemData(currentProblem);
+        } else {
+          // 해당 ID가 없으면 첫 번째 문제 사용
+          setProblemData(challenges[0] || {
+            id: id,
+            title: `Challenge #${id}\n문제를 찾을 수 없습니다`,
+            category: '코딩',
+            difficulty: '중급',
+            timeLimit: '1 초',
+            memoryLimit: '256 MB',
+            correctRate: '0%',
+            problemDescription: {
+              situation: '문제 데이터를 불러올 수 없습니다.',
+              input: '',
+              output: '',
+              constraints: '',
+              sampleInput: '',
+              sampleOutput: ''
+            }
+          });
         }
+      } catch (error) {
+        console.error('문제 데이터 로딩 실패:', error);
+        setError(error.message);
+        // 에러 시 기본 데이터 설정
+        setProblemData({
+          id: id,
+          title: `Challenge #${id}\n데이터 로딩 실패`,
+          category: '코딩',
+          difficulty: '중급',
+          timeLimit: '1 초',
+          memoryLimit: '256 MB',
+          correctRate: '0%',
+          problemDescription: {
+            situation: '서버에서 데이터를 불러올 수 없습니다.',
+            input: '',
+            output: '',
+            constraints: '',
+            sampleInput: '',
+            sampleOutput: ''
+          }
+        });
+      } finally {
+        setLoading(false);
       }
     };
-    // 임시: 존재하지 않는 id로 접근 시 기본값을 Challenge #12로 매핑
-    return problems[problemId] || problems['12'];
-  };
 
-  const problemData = getProblemData(id);
+    fetchProblemData();
+  }, [id]);
 
   const handleCodeGeneration = () => {
     if (!promptCode.trim()) {
@@ -102,6 +131,42 @@ const CodingProblem = () => {
 
   // handleViewOthers 함수 제거 - 항상 표시되므로 불필요
 
+  // 로딩 중일 때 표시할 내용
+  if (loading) {
+    return (
+      <div className="coding-problem-page">
+        <Header />
+        <main className="coding-problem-main">
+          <div className="coding-problem-container">
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+              <p>문제 데이터를 불러오는 중...</p>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // 에러가 있거나 데이터가 없을 때
+  if (error || !problemData) {
+    return (
+      <div className="coding-problem-page">
+        <Header />
+        <main className="coding-problem-main">
+          <div className="coding-problem-container">
+            <div className="error-container">
+              <p>문제 데이터를 불러올 수 없습니다.</p>
+              {error && <p className="error-message">에러: {error}</p>}
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="coding-problem-page">
       <Header />
@@ -130,61 +195,75 @@ const CodingProblem = () => {
               </div>
 
               <div className="problem-content">
-                <div className="problem-section">
-                  <div className="section-header">
-                    <h3 className="section-title">📝 문제 상황</h3>
-                  </div>
-                  <div className="section-content">
-                    <p className="section-text">{problemData.problemDescription.situation}</p>
-                  </div>
-                </div>
-
-                <div className="problem-section">
-                  <div className="section-header">
-                    <h3 className="section-title">🎯 입력</h3>
-                  </div>
-                  <div className="section-content">
-                    <p className="section-text">{problemData.problemDescription.input}</p>
-                  </div>
-                </div>
-
-                <div className="problem-section">
-                  <div className="section-header">
-                    <h3 className="section-title">📤 출력</h3>
-                  </div>
-                  <div className="section-content">
-                    <p className="section-text">{problemData.problemDescription.output}</p>
-                  </div>
-                </div>
-
-                <div className="problem-section">
-                  <div className="section-header">
-                    <h3 className="section-title">📏 제한</h3>
-                  </div>
-                  <div className="section-content">
-                    <p className="section-text">{problemData.problemDescription.constraints}</p>
-                  </div>
-                </div>
-
-                <div className="problem-examples">
-                  <div className="example-section">
-                    <div className="example-header">
-                      <h4 className="example-title">📥 예시 입력</h4>
+                {problemData.content ? (
+                  <div className="problem-section">
+                    <div className="section-content">
+                      <div className="markdown-body">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {problemData.content}
+                        </ReactMarkdown>
+                      </div>
                     </div>
-                    <pre className="example-content input-example">
-                      {problemData.problemDescription.sampleInput}
-                    </pre>
                   </div>
-
-                  <div className="example-section">
-                    <div className="example-header">
-                      <h4 className="example-title">📤 예시 출력</h4>
+                ) : (
+                  <>
+                    <div className="problem-section">
+                      <div className="section-header">
+                        <h3 className="section-title">📝 문제 상황</h3>
+                      </div>
+                      <div className="section-content">
+                        <p className="section-text">{problemData.problemDescription?.situation || problemData.description || '문제 상황을 불러올 수 없습니다.'}</p>
+                      </div>
                     </div>
-                    <pre className="example-content output-example">
-                      {problemData.problemDescription.sampleOutput}
-                    </pre>
-                  </div>
-                </div>
+
+                    <div className="problem-section">
+                      <div className="section-header">
+                        <h3 className="section-title">🎯 입력</h3>
+                      </div>
+                      <div className="section-content">
+                        <p className="section-text">{problemData.problemDescription?.input || '입력 형식을 불러올 수 없습니다.'}</p>
+                      </div>
+                    </div>
+
+                    <div className="problem-section">
+                      <div className="section-header">
+                        <h3 className="section-title">📤 출력</h3>
+                      </div>
+                      <div className="section-content">
+                        <p className="section-text">{problemData.problemDescription?.output || '출력 형식을 불러올 수 없습니다.'}</p>
+                      </div>
+                    </div>
+
+                    <div className="problem-section">
+                      <div className="section-header">
+                        <h3 className="section-title">📏 제한</h3>
+                      </div>
+                      <div className="section-content">
+                        <p className="section-text">{problemData.problemDescription?.constraints || '제한 조건을 불러올 수 없습니다.'}</p>
+                      </div>
+                    </div>
+
+                    <div className="problem-examples">
+                      <div className="example-section">
+                        <div className="example-header">
+                          <h4 className="example-title">📥 예시 입력</h4>
+                        </div>
+                        <pre className="example-content input-example">
+                          {problemData.problemDescription?.sampleInput || '예시 입력을 불러올 수 없습니다.'}
+                        </pre>
+                      </div>
+
+                      <div className="example-section">
+                        <div className="example-header">
+                          <h4 className="example-title">📤 예시 출력</h4>
+                        </div>
+                        <pre className="example-content output-example">
+                          {problemData.problemDescription?.sampleOutput || '예시 출력을 불러올 수 없습니다.'}
+                        </pre>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 

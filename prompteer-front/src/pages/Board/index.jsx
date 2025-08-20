@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import FilterButton from '../../components/ui/FilterButton/index.jsx';
@@ -7,122 +8,60 @@ import BoardPostCard from '../../components/cards/BoardPostCard/index.jsx';
 import './Board.css';
 
 const Board = () => {
+  const navigate = useNavigate();
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [activeTab, setActiveTab] = useState('전체');
   const [activeCategory, setActiveCategory] = useState('전체');
 
   const tabs = ['전체', '질문', '프롬포트 공유'];
   const categories = ['전체', '코딩', '이미지', '영상', '탈옥', '문서'];
 
-  // 샘플 데이터
-  const posts = [
-    {
-      id: 1,
-      title: '왜 틀렸는지 잘 모르겠습니다.',
-      category: '코딩',
-      problemNumber: '13',
-      author: '뽀복',
-      comments: '3',
-      likes: '15',
-      date: '25/7/27',
-      type: '질문'
-    },
-    {
-      id: 2,
-      title: '왜 틀렸는지 잘 모르겠습니다.',
-      category: '코딩',
-      problemNumber: '13',
-      author: '뽀복',
-      comments: '3',
-      likes: '15',
-      date: '25/7/27',
-      type: '질문'
-    },
-    {
-      id: 3,
-      title: '왜 틀렸는지 잘 모르겠습니다.',
-      category: '코딩',
-      problemNumber: '13',
-      author: '뽀복',
-      comments: '3',
-      likes: '15',
-      date: '25/7/27',
-      type: '질문'
-    },
-    {
-      id: 4,
-      title: '왜 틀렸는지 잘 모르겠습니다.',
-      category: '코딩',
-      problemNumber: '13',
-      author: '뽀복',
-      comments: '3',
-      likes: '15',
-      date: '25/7/27',
-      type: '질문'
-    },
-    {
-      id: 5,
-      title: '왜 틀렸는지 잘 모르겠습니다.',
-      category: '코딩',
-      problemNumber: '13',
-      author: '뽀복',
-      comments: '3',
-      likes: '15',
-      date: '25/7/27',
-      type: '질문'
-    },
-    {
-      id: 6,
-      title: '코딩 프롬포트 공유하니까 참고하세영',
-      category: '코딩',
-      problemNumber: '13',
-      author: '뽀복',
-      comments: '3',
-      likes: '15',
-      date: '25/7/27',
-      type: '프롬포트 공유'
-    },
-    {
-      id: 7,
-      title: '코딩 프롬포트 공유하니까 참고하세영',
-      category: '코딩',
-      problemNumber: '13',
-      author: '뽀복',
-      comments: '3',
-      likes: '15',
-      date: '25/7/27',
-      type: '프롬포트 공유'
-    },
-    {
-      id: 8,
-      title: '코딩 프롬포트 공유하니까 참고하세영',
-      category: '코딩',
-      problemNumber: '13',
-      author: '뽀복',
-      comments: '3',
-      likes: '15',
-      date: '25/7/27',
-      type: '프롬포트 공유'
-    },
-    {
-      id: 9,
-      title: '코딩 프롬포트 공유하니까 참고하세영',
-      category: '코딩',
-      problemNumber: '13',
-      author: '뽀복',
-      comments: '3',
-      likes: '15',
-      date: '25/7/27',
-      type: '프롬포트 공유'
-    }
-  ];
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
+      setError(null);
 
-  const filteredPosts = posts.filter(post => {
-    const matchesTab = activeTab === '전체' || post.type === activeTab;
-    const matchesCategory = activeCategory === '전체' || post.category === activeCategory;
-    return matchesTab && matchesCategory;
-  });
+      const typeMapping = {
+        '질문': 'question',
+        '프롬포트 공유': 'share'
+      };
+      const tagMapping = {
+        '코딩': 'ps',
+        '이미지': 'img',
+        '영상': 'video'
+      };
 
+      const params = new URLSearchParams();
+      if (activeTab !== '전체') {
+        params.append('types', typeMapping[activeTab]);
+      }
+      if (activeCategory !== '전체' && tagMapping[activeCategory]) {
+        params.append('tags', tagMapping[activeCategory]);
+      }
 
+      try {
+        const response = await fetch(`http://localhost:8000/posts/?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error('데이터를 불러오는 데 실패했습니다.');
+        }
+        const data = await response.json();
+        setPosts(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, [activeTab, activeCategory]);
+
+  const handleWriteClick = () => {
+    navigate('/board/write');
+  };
 
   return (
     <div className="board-page">
@@ -152,7 +91,7 @@ const Board = () => {
                     </FilterButton>
                   ))}
                 </div>
-                <FilterButton variant="action">
+                <FilterButton variant="action" onClick={handleWriteClick}>
                   게시물 작성
                 </FilterButton>
               </div>
@@ -185,34 +124,31 @@ const Board = () => {
 
               {/* 게시물 목록 */}
               <div className="board-posts-list">
-                {filteredPosts.map((post) => (
-                  <BoardPostCard
-                    key={post.id}
-                    id={post.id}
-                    title={post.title}
-                    category={post.category}
-                    problemNumber={post.problemNumber}
-                    author={post.author}
-                    comments={post.comments}
-                    likes={post.likes}
-                    date={post.date}
-                  />
-                ))}
+                {loading ? (
+                  <p>게시물을 불러오는 중...</p>
+                ) : error ? (
+                  <p>에러: {error}</p>
+                ) : (
+                  posts.map((post) => (
+                    <BoardPostCard
+                      key={post.id}
+                      id={post.id}
+                      title={post.title}
+                      category={post.tag.toUpperCase()} // e.g., 'PS'
+                      problemNumber={post.challenge_id || '-'}
+                      author={post.user?.nickname || '익명'}
+                      comments={post.comments?.length || 0}
+                      likes={post.likes_count || 0}
+                      date={new Date(post.created_at).toLocaleDateString()}
+                    />
+                  ))
+                )}
               </div>
             </div>
 
             {/* 페이지네이션 */}
             <div className="board-pagination">
-              <button className="pagination-button">
-                <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-                  <path d="M8.75 6.875L14.375 12.5L8.75 18.125" stroke="#FFFFFF" strokeWidth="3"/>
-                </svg>
-              </button>
-              <button className="pagination-button">
-                <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-                  <path d="M10.625 6.875L16.25 12.5L10.625 18.125" stroke="#FFFFFF" strokeWidth="3"/>
-                </svg>
-              </button>
+              {/* 페이지네이션 로직은 추후 구현 */}
             </div>
           </div>
         </div>

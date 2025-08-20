@@ -22,11 +22,8 @@ const PostDetail = () => {
         challengeTitle: 'Challenge #13 알고리즘 문제',
         likes: 15,
         type: '질문',
-        content: `이 프롬프트를 사용해봤는데 자꾸 틀렸다고 나와요.
-
-"주어진 배열을 정렬하는 함수를 작성해줘. 배열의 원소는 숫자야."
-
-이런 식으로 프롬프트를 작성했는데 뭔가 빠진 게 있을까요?`
+        category: '코딩',
+        content: `이 프롬프트를 사용해봤는데 자꾸 틀렸다고 나와요.\n\n"주어진 배열을 정렬하는 함수를 작성해줘. 배열의 원소는 숫자야."\n\n이런 식으로 프롬프트를 작성했는데 뭔가 빠진 게 있을까요?`
       },
       '6': {
         title: '코딩 프롬포트 공유하니까 참고하세영',
@@ -35,13 +32,8 @@ const PostDetail = () => {
         challengeTitle: 'Challenge #11 알파벳 문자열',
         likes: 10,
         type: '프롬포트 공유',
-        content: `이 프롬프트 정말 잘 되는 것 같아요:
-
-"너는 알고리즘 문제 해결 전문가야. 주어진 문제를 분석하고, 시간복잡도와 공간복잡도를 고려한 최적의 해결책을 제시해줘. 단계별로 설명하고 코드도 같이 작성해줘."
-
-[프롬포트끝]
-
-이런 식으로 했더니 정답률이 훨씬 올라갔어요!`
+        category: '코딩',
+        content: `이 프롬프트 정말 잘 되는 것 같아요:\n\n"너는 알고리즘 문제 해결 전문가야. 주어진 문제를 분석하고, 시간복잡도와 공간복잡도를 고려한 최적의 해결책을 제시해줘. 단계별로 설명하고 코드도 같이 작성해줘."\n\n[프롬포트끝]\n\n이런 식으로 했더니 정답률이 훨씬 올라갔어요!`
       }
     };
     
@@ -51,10 +43,24 @@ const PostDetail = () => {
   const postData = getPostData(id);
   
   const [activeTab, setActiveTab] = useState(postData.type || '질문');
-  const [activeCategory, setActiveCategory] = useState('코딩');
+  const [activeCategory, setActiveCategory] = useState(postData.category || '코딩');
 
   const tabs = ['전체', '질문', '프롬포트 공유'];
   const categories = ['전체', '코딩', '이미지', '영상', '탈옥', '문서'];
+
+  const handleFilterNavigate = (filterType, value) => {
+    const typeMapping = { '질문': 'question', '프롬포트 공유': 'share' };
+    const tagMapping = { '코딩': 'ps', '이미지': 'img', '영상': 'video' };
+
+    const params = new URLSearchParams();
+    if (filterType === 'type' && value !== '전체') {
+      params.set('type', typeMapping[value]);
+    } else if (filterType === 'tag' && value !== '전체') {
+      params.set('tag', tagMapping[value]);
+    }
+    
+    navigate(`/board?${params.toString()}`);
+  };
 
   // 댓글 데이터 (예시)
   const comments = [
@@ -92,13 +98,13 @@ const PostDetail = () => {
                     <FilterButton
                       key={tab}
                       isActive={activeTab === tab}
-                      onClick={() => setActiveTab(tab)}
+                      onClick={() => handleFilterNavigate('type', tab)}
                     >
                       {tab}
                     </FilterButton>
                   ))}
                 </div>
-                <FilterButton variant="action">
+                <FilterButton variant="action" onClick={() => navigate('/board/write')}>
                   게시물 작성
                 </FilterButton>
               </div>
@@ -107,7 +113,7 @@ const PostDetail = () => {
                 <CategoryFilter
                   categories={categories}
                   activeCategory={activeCategory}
-                  onCategoryChange={setActiveCategory}
+                  onCategoryChange={(category) => handleFilterNavigate('tag', category)}
                 />
               </div>
             </div>

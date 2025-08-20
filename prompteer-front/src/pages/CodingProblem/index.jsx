@@ -250,11 +250,20 @@ const CodingProblem = () => {
   };
 
   const handleSharePrompt = () => {
+    const combinedContent = `### ✨ Prompt\n\n\
+${promptCode}
+\
+\n### 💻 Code\n\n\
+python
+${editorCode}
+\
+`;
+
     navigate('/board/write', {
       state: {
-        problemId: id, // The challenge ID
-        prompt: promptCode, // The user's prompt
-        category: 'coding' // The problem category
+        problemId: id,
+        initialContent: combinedContent,
+        category: 'coding'
       }
     });
   };

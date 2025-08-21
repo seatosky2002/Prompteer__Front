@@ -120,3 +120,30 @@ export const getCurrentUser = async () => {
     }
   }
 };
+
+// 회원 탈퇴 API
+export const unregisterUser = async () => {
+  try {
+    const response = await instanceWithToken.delete("users/unregister");
+
+    if (response.status === 204) {
+      // 탈퇴 성공 시 로컬 스토리지에서 해당 아이디 제거 -> 로그아웃 됨. 아이디 비번 '삭제' 자체는 백엔드 DB에서 자동으로 해줌.
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("token_type");
+
+      return { success: true };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: "인증이 만료되었습니다. 로그인을 다시 해주세요.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "회원 탈퇴 중 오류가 발생했습니다.",
+      };
+    }
+  }
+};

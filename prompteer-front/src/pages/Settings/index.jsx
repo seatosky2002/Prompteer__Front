@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../../components/common/Header/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
+import { unregisterUser } from "../../apis/api.js";
 import "./Settings.css";
 
 const Settings = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("프로필 수정");
   const [formData, setFormData] = useState({
     // 계정 설정
@@ -82,14 +85,37 @@ const Settings = () => {
   const [isSettingButtonLive, setIsSettingButtonLive] = useState(true);
   const handleOpenDeleteModal = () => setIsDeleteModalOpen(true);
   const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
+    // 비동기함수 사용 위해 async로 바꾸기
     if (!formData.deletePassword?.trim()) {
       alert("비밀번호를 입력해주세요.");
       return;
     }
-    // TODO: API 연동
-    alert("회원 탈퇴 요청이 전송되었습니다.");
-    setIsDeleteModalOpen(false);
+
+    // 서버에서 '현재 로그인된 사용자의 비밀번호' 받아오는 api가 필요함.
+    if (formData.deletePassword !== "qwer1234") {
+      // 임시 비밀번호
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    try {
+      // 회원 탈퇴 API 호출
+      const result = await unregisterUser();
+
+      if (result.success) {
+        alert("회원 탈퇴가 완료되었습니다. 이용해주셔서 감사했습니다.");
+        // 메인 페이지로 리다이렉트 (이미 로그아웃 상태)
+        navigate("/");
+      } else {
+        alert(result.error || "회원 탈퇴에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("Unregister error:", error);
+      alert("회원 탈퇴 중 오류가 발생했습니다.");
+    } finally {
+      setIsDeleteModalOpen(false); // 모달을 닫는다
+    }
   };
 
   useEffect(() => {
@@ -347,7 +373,7 @@ const Settings = () => {
             >
               ×
             </button>
-            <div className="modal-header">
+            <div className="exit-modal-header">
               <h3 id="delete-modal-title" className="modal-title">
                 회원 탈퇴
               </h3>
@@ -359,10 +385,9 @@ const Settings = () => {
                 정말 탈퇴하시겠습니까?
                 <br />
                 <br />
-                탈퇴하려면 본인의 비밀번호를 입력해주세요.
+                탈퇴하려면 본인의 <b>비밀번호</b>를 입력해주세요.
               </p>
               <div className="modal-field">
-                <label htmlFor="deletePassword">비밀번호</label>
                 <input
                   id="deletePassword"
                   type="password"

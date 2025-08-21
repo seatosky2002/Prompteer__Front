@@ -121,6 +121,32 @@ export const getCurrentUser = async () => {
   }
 };
 
+// 현재 사용자 상세 정보 조회 API. settings 같은 페이지에서 사용. 프로필 정보 조회 용도.
+export const getCurrentUserDetails = async () => {
+  try {
+    const response = await instanceWithToken.get("users/me/details");
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: "인증이 만료되었습니다.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "사용자 상세 정보를 가져올 수 없습니다.",
+      };
+    }
+  }
+};
+
 // 회원 탈퇴 API
 export const unregisterUser = async () => {
   try {

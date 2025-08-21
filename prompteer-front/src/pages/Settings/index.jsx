@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/common/Header/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
-import { unregisterUser } from "../../apis/api.js";
+import { unregisterUser, getCurrentUserDetails } from "../../apis/api.js";
 import "./Settings.css";
 
 const Settings = () => {
@@ -10,10 +10,9 @@ const Settings = () => {
   const [activeTab, setActiveTab] = useState("프로필 수정");
   const [formData, setFormData] = useState({
     // 계정 설정
-    nickname: "뽀복",
-    email: "pobokdev@example.com",
-    username: "promptinglion7520",
-    bio: "AI와 함께 성장하는 개발자입니다.",
+    nickname: "",
+    email: "",
+    bio: "",
     interests: [],
     password: "",
     newPassword: "",
@@ -45,6 +44,25 @@ const Settings = () => {
     "PS",
     "기타",
   ];
+
+  // 백엔드 API 형식 → 프론트엔드 형식으로 변환
+  // 중복 선택 가능하게끔 하는 느낌낌
+  const mapInterestsFromAPI = (apiInterests) => {
+    const interestMap = {
+      backend_developer: "백엔드 개발자",
+      frontend_developer: "프론트엔드 개발자",
+      ui_ux_designer: "UX/UI디자이너",
+      prompt_engineer: "프롬프트 엔지니어",
+      planner_pm: "기획/PM",
+      ps: "PS",
+      etc: "기타",
+    };
+
+    return Object.entries(apiInterests)
+      .filter(([key, value]) => value === true)
+      .map(([key]) => interestMap[key])
+      .filter(Boolean);
+  };
 
   const tabs = [
     { id: "프로필 수정", label: "프로필 수정", icon: "👤" },
@@ -127,6 +145,35 @@ const Settings = () => {
     }
   }, [activeTab]);
 
+  // 컴포넌트 마운트 시 사용자 데이터 가져오기
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const result = await getCurrentUserDetails();
+
+        if (result.success) {
+          const userData = result.data; // 백엔드에서 받아온 api의 프로필 데이터를 이용해서..
+          setFormData((prev) => ({
+            // state에다가 저장한다.
+            ...prev,
+            nickname: userData.nickname || "",
+            email: userData.email || "",
+            bio: userData.profile?.introduction || "",
+            interests: userData.profile?.interested_in
+              ? mapInterestsFromAPI(userData.profile.interested_in)
+              : [],
+          }));
+        } else {
+          console.error("사용자 데이터 가져오기 실패:", result.error);
+        }
+      } catch (error) {
+        console.error("사용자 데이터 가져오기 중 오류:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const handleSave = () => {
     console.log("설정 저장:", formData);
     // 저장 애니메이션 효과
@@ -157,22 +204,6 @@ const Settings = () => {
             disabled
             aria-readonly
             placeholder="likelion@snu.ac.kr"
-          />
-        </div>
-      </div>
-
-      {/* 아이디 (비활성화, 회색 배경) */}
-      <div className="form-group">
-        <div className="input-wrapper">
-          <label htmlFor="username">아이디</label>
-          <input
-            className="input-field input-gray"
-            type="text"
-            id="username"
-            value={formData.username}
-            disabled
-            aria-readonly
-            placeholder="promptinglion7520"
           />
         </div>
       </div>

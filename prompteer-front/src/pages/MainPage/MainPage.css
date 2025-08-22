@@ -46,7 +46,7 @@
   color: #ffffff;
 }
 
-.challenges-grid {
+.main-page-challenges-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 47px;
@@ -307,7 +307,7 @@
     padding: 24px 48px;
   }
 
-  .main-page .challenges-grid {
+  .main-page .main-page-challenges-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -335,7 +335,7 @@
     line-height: 20px;
   }
 
-  .main-page .challenges-grid {
+  .main-page .main-page-challenges-grid {
     grid-template-columns: 1fr;
     gap: 24px;
   }

@@ -101,7 +101,7 @@ const MainPage = () => {
             </p>
           </div>
 
-          <div className="challenges-grid">
+          <div className="main-page-challenges-grid">
             {topChallenges.map((challenge, index) => (
               <div key={index} className="challenge-wrapper">
                 {challenge.isImageChallenge ? (

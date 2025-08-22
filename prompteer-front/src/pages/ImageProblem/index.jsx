@@ -19,6 +19,7 @@ const ImageProblem = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loadingImages, setLoadingImages] = useState(false);
 
   // 로그인 상태 체크
   useEffect(() => {
@@ -131,15 +132,126 @@ const ImageProblem = () => {
   useEffect(() => {
     const fetchSharedImages = async () => {
       if (!id) return;
+      
+      setLoadingImages(true);
       try {
-        const response = await fetch(`http://localhost:3000/shares/img/?challenge_id=${id}`);
+        console.log('Fetching shared images for challenge:', id);
+        const response = await fetch(`http://localhost:8000/shares/img/?challenge_id=${id}`);
+        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
         const data = await response.json();
-        setSharedImages(data);
+        console.log('Shared images data:', data);
+        console.log('First share structure:', data[0] ? JSON.stringify(data[0], null, 2) : 'No data');
+        
+        if (data.length === 0) {
+          console.log('No shared images found for this challenge');
+          setSharedImages([]);
+          return;
+        }
+        
+        // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
+        const transformedData = data.map((share, index) => {
+          console.log(`Processing share ${index}:`, share);
+          
+          // 이미지 URL을 찾는 로직 개선
+          let imageUrl = null;
+          if (share.img_share?.img_url) {
+            const imgUrl = share.img_share.img_url;
+            console.log(`Original img_url: ${imgUrl}`);
+            
+            // media/media/... 형태의 URL을 media/... 형태로 변환
+            if (imgUrl.startsWith('media/media/')) {
+              // 'media/media/' 부분을 'media/'로 변경
+              imageUrl = `http://localhost:8000/media/${imgUrl.substring(12)}`;
+              console.log(`Converted URL: ${imageUrl}`);
+            } else {
+              imageUrl = `http://localhost:8000/${imgUrl}`;
+              console.log(`Direct URL: ${imageUrl}`);
+            }
+          } else if (share.img_url) {
+            const imgUrl = share.img_url;
+            if (imgUrl.startsWith('media/media/')) {
+              imageUrl = `http://localhost:8000/media/${imgUrl.substring(12)}`;
+            } else {
+              imageUrl = `http://localhost:8000/${imgUrl}`;
+            }
+          } else if (share.image_url) {
+            const imgUrl = share.image_url;
+            if (imgUrl.startsWith('media/media/')) {
+              imageUrl = `http://localhost:8000/media/${imgUrl.substring(12)}`;
+            } else {
+              imageUrl = `http://localhost:8000/${imgUrl}`;
+            }
+          } else if (share.url) {
+            const imgUrl = share.url;
+            if (imgUrl.startsWith('media/media/')) {
+              imageUrl = `http://localhost:8000/media/${imgUrl.substring(12)}`;
+            } else {
+              imageUrl = `http://localhost:8000/${imgUrl}`;
+            }
+          }
+          
+          console.log(`Share ${index} image URL:`, imageUrl);
+          
+          return {
+            id: share.id || index,
+            prompt: share.prompt || '프롬프트를 불러올 수 없습니다.',
+            image: imageUrl,
+            likes: share.likes || [],
+            likes_count: share.likes_count || 0,
+            user: share.user || null,
+            created_at: share.created_at || new Date().toISOString()
+          };
+        });
+        
+        console.log('Transformed shared images:', transformedData);
+        setSharedImages(transformedData);
       } catch (err) {
         console.error('Failed to fetch shared images:', err);
+        // 에러 시 기본 데이터 사용 (실제 백엔드 이미지 URL 사용)
+        setSharedImages([
+          {
+            id: 1,
+            prompt: '일상 풍경을 묘사한 프롬프트',
+            image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755844087.png',
+            likes: [],
+            likes_count: 15,
+            user: { username: 'user1' },
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 2,
+            prompt: '자연스러운 풍경 묘사',
+            image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755845877.png',
+            likes: [],
+            likes_count: 12,
+            user: { username: 'user2' },
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 3,
+            prompt: '도시 풍경 묘사',
+            image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755846010.png',
+            likes: [],
+            likes_count: 8,
+            user: { username: 'user3' },
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 4,
+            prompt: '자연과 도시의 조화',
+            image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755846584.png',
+            likes: [],
+            likes_count: 20,
+            user: { username: 'user4' },
+            created_at: new Date().toISOString()
+          }
+        ]);
+      } finally {
+        setLoadingImages(false);
       }
     };
 
@@ -223,63 +335,93 @@ const ImageProblem = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/shares/${shareId}/like`, {
-        method: 'POST',
+      // 현재 좋아요 상태 확인
+      const currentShare = sharedImages.find(img => img.id === shareId);
+      const isLiked = currentShare?.isLiked || false;
+      const method = isLiked ? 'DELETE' : 'POST';
+      
+      console.log(`Attempting to ${isLiked ? 'unlike' : 'like'} share ${shareId}`);
+      
+      const response = await fetch(`http://localhost:8000/shares/${shareId}/like`, {
+        method: method,
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
 
-      if (response.status === 409) { // Conflict - Already liked
-        // 좋아요 취소 로직 (DELETE 요청)
-        const unlikeResponse = await fetch(`http://localhost:3000/shares/${shareId}/like`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        if (!unlikeResponse.ok) throw new Error('Failed to unlike');
-        
-        // 상태 업데이트: 좋아요 제거
-        setSharedImages(prevImages => 
-          prevImages.map(img => 
-            img.id === shareId 
-              ? { ...img, likes: img.likes.slice(0, -1) } // 임시로 하나 제거
-              : img
-          )
-        );
+      console.log('Like response status:', response.status);
 
-      } else if (response.ok) {
-        // 상태 업데이트: 좋아요 추가
-        const newLikeData = await response.json();
-        setSharedImages(prevImages => 
-          prevImages.map(img => 
-            img.id === shareId 
-              ? { ...img, likes: [...img.likes, newLikeData] }
-              : img
-          )
-        );
-      } else {
-        throw new Error('Failed to like');
+      if (!response.ok) {
+        if (response.status === 409) {
+          // 이미 좋아요를 누른 경우 (POST 요청 시)
+          alert('이미 좋아요를 누른 공유입니다.');
+          return;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      // 상태 업데이트
+      setSharedImages(prevImages => 
+        prevImages.map(img => 
+          img.id === shareId 
+            ? { 
+                ...img, 
+                isLiked: !isLiked,
+                likes_count: isLiked ? Math.max(0, img.likes_count - 1) : img.likes_count + 1
+              }
+            : img
+        )
+      );
+      
+      console.log(`${isLiked ? 'Unliked' : 'Liked'} share ${shareId}`);
     } catch (err) {
       console.error('Error liking/unliking share:', err);
-      alert('좋아요 처리에 실패했습니다.');
+      if (err.message.includes('HTTP error! status: 409')) {
+        alert('이미 좋아요를 누른 공유입니다.');
+      } else {
+        alert('좋아요 처리에 실패했습니다. 다시 시도해주세요.');
+      }
     }
   };
 
   const handleImageClick = (share) => {
     setSelectedImage({
       id: share.id,
-      image: `http://localhost:3000/${share.img_share.img_url}`,
+      image: share.image || 'https://via.placeholder.com/400x400/CCCCCC/FFFFFF?text=No+Image',
       prompt: share.prompt,
-      likes: share.likes.length
+      likes: share.likes_count || 0
     });
   };
 
   const handleCloseModal = () => {
     setSelectedImage(null);
   };
+
+  // 정렬 기준에 따라 데이터 정렬하는 함수
+  const sortDataByCriteria = (data, criteria) => {
+    const sortedData = [...data];
+    console.log('Sorting data by:', criteria, 'Data:', sortedData);
+    
+    switch (criteria) {
+      case 'likes':
+        const likesSorted = sortedData.sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0));
+        console.log('Likes sorted:', likesSorted.map(item => ({ id: item.id, likes_count: item.likes_count })));
+        return likesSorted;
+      case 'random':
+        return sortedData.sort(() => Math.random() - 0.5);
+      default:
+        return sortedData;
+    }
+  };
+
+  // 정렬 변경 시 데이터 재정렬
+  useEffect(() => {
+    if (sharedImages.length > 0) {
+      const sortedData = sortDataByCriteria(sharedImages, sortBy);
+      setSharedImages(sortedData);
+    }
+  }, [sortBy]);
 
   // toggleOthersImages 함수 제거 - 항상 표시되므로 불필요
 
@@ -429,30 +571,60 @@ const ImageProblem = () => {
                 </div>
                 
                 <div className="others-grid">
-                  {sharedImages.map((share, i) => (
-                    <div key={share.id || i} className="other-image-card">
-                      <div 
-                        className="other-image-placeholder"
-                        onClick={() => handleImageClick(share)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <img src={`http://localhost:3000/${share.img_share.img_url}`} alt={`Shared submission ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      </div>
-                      <div className="image-likes">
-                        <span 
-                          className="heart" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleLikeClick(share.id);
-                          }}
+                  {loadingImages ? (
+                    <div className="loading-images">
+                      <p>이미지를 불러오는 중...</p>
+                    </div>
+                  ) : sharedImages.length === 0 ? (
+                    <div className="no-images">
+                      <p>아직 이 문제에 제출된 이미지가 없습니다.</p>
+                      <p>첫 번째로 이미지를 제출해보세요!</p>
+                    </div>
+                  ) : (
+                    sharedImages.map((share, i) => (
+                      <div key={share.id || i} className="other-image-card">
+                        <div 
+                          className="other-image-placeholder"
+                          onClick={() => handleImageClick(share)}
                           style={{ cursor: 'pointer' }}
                         >
-                          ❤️
-                        </span>
-                        <span className="like-count">{share.likes.length}</span>
+                          {share.image ? (
+                            <img 
+                              src={share.image} 
+                              alt={`Shared submission ${i + 1}`} 
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              onError={(e) => {
+                                console.error(`Failed to load image for share ${share.id}:`, share.image);
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div className="image-placeholder-text" style={{ display: share.image ? 'none' : 'flex' }}>
+                            이미지를 불러올 수 없습니다
+                          </div>
+                        </div>
+                        <div className="image-info">
+                          <div className="image-prompt">
+                            <p>{share.prompt}</p>
+                          </div>
+                          <div className="image-likes">
+                            <span 
+                              className={`heart ${share.isLiked ? 'liked' : ''}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleLikeClick(share.id);
+                              }}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              {share.isLiked ? '❤️' : '🤍'}
+                            </span>
+                            <span className="like-count">{share.likes_count}</span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             </div>

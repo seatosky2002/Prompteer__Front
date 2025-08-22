@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
@@ -10,12 +10,33 @@ import './ProblemDetail.css';
 const ProblemDetail = () => {
   const { id } = useParams();
   const [isProblemExpanded, setIsProblemExpanded] = useState(true);
+  const [shares, setShares] = useState([]);
+
+  useEffect(() => {
+    const fetchShares = async () => {
+      try {
+        const response = await fetch(`/api/shares/img/?challenge_id=${id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setShares(data);
+        } else {
+          console.error('Failed to fetch shares');
+        }
+      } catch (error) {
+        console.error('Error fetching shares:', error);
+      }
+    };
+
+    if (id) {
+      fetchShares();
+    }
+  }, [id]);
 
   // 문제 데이터 (실제로는 API에서 id로 조회)
   const getProblemData = (postId) => {
     // 샘플 데이터 - 실제로는 API 호출
     const sampleProblems = {
-      '1': {
+      '101': {
         title: '왜 틀렸는지 잘 모르겠습니다.',
         author: '뽀복',
         date: '25/7/27',
@@ -41,6 +62,7 @@ U(i, j)는 S[i:j]에 나타나는 알파벳을 순서대로 정렬한 문자열�
 
 
 
+
 [프롬포트끝]
 
 
@@ -48,7 +70,7 @@ U(i, j)는 S[i:j]에 나타나는 알파벳을 순서대로 정렬한 문자열�
       }
     };
     
-    return sampleProblems[postId] || sampleProblems['1'];
+    return sampleProblems[postId] || sampleProblems['101'];
   };
 
   const problemData = getProblemData(id);
@@ -178,6 +200,18 @@ U(i, j)는 S[i:j]에 나타나는 알파벳을 순서대로 정렬한 문자열�
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* 구경하기 섹션 */}
+              <div className="shares-section">
+                <h2 className="shares-section-title">구경하기</h2>
+                <div className="shares-grid">
+                  {shares.map((share) => (
+                    <div key={share.id} className="share-item">
+                      <img src={share.img_share.img_url} alt={`Share ${share.id}`} />
+                    </div>
+                  ))}
                 </div>
               </div>
 

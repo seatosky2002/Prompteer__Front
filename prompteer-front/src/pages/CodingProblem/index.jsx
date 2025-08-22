@@ -31,6 +31,21 @@ const CodingProblem = () => {
   const [showWorkModal, setShowWorkModal] = useState(false);
   const [likedShares, setLikedShares] = useState(new Set()); // 사용자가 좋아요를 누른 공유들
 
+  // JWT 토큰에서 사용자 ID 추출하는 함수
+  const getCurrentUserId = () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return null;
+    
+    try {
+      // JWT 토큰의 payload 부분을 디코딩
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.user_id || payload.sub;
+    } catch (error) {
+      console.error('Failed to decode JWT token:', error);
+      return null;
+    }
+  };
+
   // 로그인 상태 체크
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -153,6 +168,9 @@ const CodingProblem = () => {
       const data = await response.json();
       console.log('Others work data:', data);
       
+      // 현재 로그인한 사용자 ID 가져오기
+      const currentUserId = getCurrentUserId();
+      
       // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
       const transformedData = data.map((work, index) => ({
         id: work.id || index,
@@ -161,8 +179,15 @@ const CodingProblem = () => {
         memory: work.ps_share?.max_memory_kb || Math.floor(Math.random() * 1000) + 1000,
         time: work.ps_share?.elapsed_time ? Math.round(work.ps_share.elapsed_time * 1000) : Math.floor(Math.random() * 100) + 50,
         attempts: work.ps_share?.attempts || Math.floor(Math.random() * 5) + 1,
-        likes: work.likes_count !== undefined ? work.likes_count : 0
+        likes: work.likes_count !== undefined ? work.likes_count : 0,
+        isLiked: currentUserId ? work.likes.some(like => like.user_id === currentUserId) : false
       }));
+      
+      // 사용자가 좋아요를 누른 공유들 업데이트
+      const likedShareIds = transformedData
+        .filter(work => work.isLiked)
+        .map(work => work.id);
+      setLikedShares(new Set(likedShareIds));
       
       // 프론트엔드에서 정렬 적용
       const sortedData = sortDataByCriteria(transformedData, sortBy);
@@ -178,7 +203,8 @@ const CodingProblem = () => {
           memory: 3024,
           time: 68,
           attempts: 3,
-          likes: 350
+          likes: 350,
+          isLiked: false
         },
         {
           id: 2,
@@ -187,7 +213,8 @@ const CodingProblem = () => {
           memory: 2980,
           time: 72,
           attempts: 2,
-          likes: 320
+          likes: 320,
+          isLiked: false
         }
       ]);
     } finally {
@@ -389,15 +416,25 @@ ${editorCode}
       const isLiked = likedShares.has(shareId);
       const method = isLiked ? 'DELETE' : 'POST';
       
-      const response = await fetch(`/shares/${shareId}/like`, {
+      console.log(`Attempting to ${isLiked ? 'unlike' : 'like'} share ${shareId}`);
+      
+      const response = await fetch(`http://localhost:8000/shares/${shareId}/like`, {
         method: method,
         headers: {
           'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
         },
       });
 
+      console.log('Like response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('좋아요 처리 중 오류가 발생했습니다.');
+        if (response.status === 409) {
+          // 이미 좋아요를 누른 경우 (POST 요청 시)
+          alert('이미 좋아요를 누른 공유입니다.');
+          return;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       // 좋아요 상태 업데이트
@@ -409,18 +446,24 @@ ${editorCode}
         });
         // 좋아요 수 감소
         setOthersWork(prev => prev.map(work => 
-          work.id === shareId ? { ...work, likes: work.likes - 1 } : work
+          work.id === shareId ? { ...work, likes: Math.max(0, work.likes - 1) } : work
         ));
+        console.log(`Unliked share ${shareId}`);
       } else {
         setLikedShares(prev => new Set(prev).add(shareId));
         // 좋아요 수 증가
         setOthersWork(prev => prev.map(work => 
           work.id === shareId ? { ...work, likes: work.likes + 1 } : work
         ));
+        console.log(`Liked share ${shareId}`);
       }
     } catch (error) {
       console.error('Like toggle error:', error);
-      alert('좋아요 처리 중 오류가 발생했습니다.');
+      if (error.message.includes('HTTP error! status: 409')) {
+        alert('이미 좋아요를 누른 공유입니다.');
+      } else {
+        alert('좋아요 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
     }
   };
 

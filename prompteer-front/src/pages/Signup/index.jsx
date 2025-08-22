@@ -33,7 +33,6 @@ const Signup = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     email: "",
-    id: "",
     password: "",
     confirmPassword: "",
     nickname: "",
@@ -60,10 +59,6 @@ const Signup = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) {
       alert("올바른 이메일을 입력해주세요.");
-      return false;
-    }
-    if (form.id.trim().length < 3) {
-      alert("ID는 3자 이상이어야 합니다.");
       return false;
     }
     if (form.password.length < 4) {
@@ -151,21 +146,6 @@ const Signup = () => {
                 value={form.email}
                 onChange={(e) => handleChange("email", e.target.value)}
                 autoComplete="email"
-              />
-            </div>
-
-            <div className="input-group">
-              <label className="input-label" htmlFor="signup-id">
-                ID
-              </label>
-              <input
-                id="signup-id"
-                className="input-field"
-                type="text"
-                placeholder="아이디를 입력하세요"
-                value={form.id}
-                onChange={(e) => handleChange("id", e.target.value)}
-                autoComplete="username"
               />
             </div>
 

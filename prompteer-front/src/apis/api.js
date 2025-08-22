@@ -183,6 +183,57 @@ export const getCurrentUserDetails = async () => {
   }
 };
 
+// 비밀번호 확인 API. 회원 탈퇴 / 비밀번호 변경에서 사용
+export const checkPassword = async (password) => {
+  try {
+    const response = await instanceWithToken.post("users/check-password", {
+      password: password, // 전달받은 password만 그대로 백에게 전달
+    });
+
+    if (response.status === 200) {
+      return { success: true }; // 비밀번호 확인 성공
+    }
+  } catch (error) {
+    if (error.response?.status === 422) {
+      return {
+        success: false,
+        error: "비밀번호 형식이 올바르지 않습니다.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "비밀번호 확인 중 오류가 발생했습니다.",
+      };
+    }
+  }
+};
+
+// 사용자 계정 정보 업데이트 API (닉네임, 이메일, 비밀번호)
+export const updateUserAccount = async (accountData) => {
+  try {
+    const response = await instanceWithToken.put("users/me", accountData); // 토큰 확인 이후 각종 data 수정.
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data, // 반환되는 data들은 현재 로그인된 사용자의 정보들
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 422) {
+      return {
+        success: false,
+        error: "입력 정보를 확인해주세요.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "계정 정보 업데이트 중 오류가 발생했습니다.",
+      };
+    }
+  }
+};
+
 // 회원 탈퇴 API
 export const unregisterUser = async () => {
   try {

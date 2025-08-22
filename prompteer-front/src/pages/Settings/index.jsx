@@ -2,7 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/common/Header/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
-import { unregisterUser, getCurrentUserDetails } from "../../apis/api.js";
+import {
+  unregisterUser,
+  getCurrentUserDetails,
+  checkPassword,
+  updateUserAccount,
+  updateUserProfile,
+} from "../../apis/api.js";
 import "./Settings.css";
 
 const Settings = () => {
@@ -46,7 +52,7 @@ const Settings = () => {
   ];
 
   // 백엔드 API 형식 → 프론트엔드 형식으로 변환
-  // 중복 선택 가능하게끔 하는 느낌낌
+  // 중복 선택 가능하게끔 하는 느낌. 사용자의 DB에서 받아오는 관심 영역 data들을 프론트에서 띄워주는 함수
   const mapInterestsFromAPI = (apiInterests) => {
     const interestMap = {
       backend_developer: "백엔드 개발자",
@@ -64,6 +70,19 @@ const Settings = () => {
       .filter(Boolean);
   };
 
+  // 현재 어떤 관심 분야들이 선택되었는지 반환해주는 함수
+  const mapInterestsToAPI = (selectedInterests) => {
+    return {
+      backend_developer: selectedInterests.includes("백엔드 개발자"),
+      frontend_developer: selectedInterests.includes("프론트엔드 개발자"),
+      ui_ux_designer: selectedInterests.includes("UX/UI디자이너"),
+      prompt_engineer: selectedInterests.includes("프롬프트 엔지니어"),
+      planner_pm: selectedInterests.includes("기획/PM"),
+      ps: selectedInterests.includes("PS"),
+      etc: selectedInterests.includes("기타"),
+    };
+  };
+
   const tabs = [
     { id: "프로필 수정", label: "프로필 수정", icon: "👤" },
     { id: "비밀번호 변경", label: "비밀번호 변경", icon: "🔒" },
@@ -74,16 +93,6 @@ const Settings = () => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
-    }));
-  };
-
-  const handleNestedChange = (category, field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [category]: {
-        ...prev[category],
-        [field]: value,
-      },
     }));
   };
 
@@ -101,7 +110,13 @@ const Settings = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   // 설정 저장 버튼 표시 여부
   const [isSettingButtonLive, setIsSettingButtonLive] = useState(true);
-  const handleOpenDeleteModal = () => setIsDeleteModalOpen(true);
+  const handleOpenDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+    setFormData((prev) => ({
+      ...prev,
+      deletePassword: "",
+    })); // 모달 열릴 때 비밀번호 입력 필드 초기화
+  };
   const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
   const handleConfirmDelete = async () => {
     // 비동기함수 사용 위해 async로 바꾸기
@@ -110,15 +125,18 @@ const Settings = () => {
       return;
     }
 
-    // 서버에서 '현재 로그인된 사용자의 비밀번호' 받아오는 api가 필요함.
-    if (formData.deletePassword !== "qwer1234") {
-      // 임시 비밀번호
-      alert("비밀번호가 일치하지 않습니다.");
-      return;
-    }
-
     try {
-      // 회원 탈퇴 API 호출
+      // 1단계: 비밀번호 확인
+      const passwordCheck = await checkPassword(formData.deletePassword); // 현재 form에서 비밀번호 입력 중인 값을 백엔드에 보내서 그게 유효한지 확인하는 함수
+
+      if (!passwordCheck.success) {
+        alert(passwordCheck.error || "비밀번호가 일치하지 않습니다.");
+        return;
+      }
+
+      // 비밀번호 확인까지 완료되면 다음단계로.
+
+      // 2단계: 회원 탈퇴 API 호출
       const result = await unregisterUser();
 
       if (result.success) {
@@ -143,6 +161,9 @@ const Settings = () => {
     } else {
       setIsSettingButtonLive(true); // 다른 탭에서는 설정 저장 버튼 표시
     }
+
+    // 탭이 바뀔 때마다 저장 버튼 애니메이션 리셋
+    resetSaveButton();
   }, [activeTab]);
 
   // 컴포넌트 마운트 시 사용자 데이터 가져오기
@@ -174,8 +195,103 @@ const Settings = () => {
     fetchUserData();
   }, []);
 
-  const handleSave = () => {
-    console.log("설정 저장:", formData);
+  const handleSave = async () => {
+    // '저장' 버튼 누르면 실행되는 것들을 한번에 구현
+    if (activeTab === "프로필 수정") {
+      // 프로필 수정 저장
+      try {
+        const profileData = {
+          introduction: formData.bio,
+          interested_in: mapInterestsToAPI(formData.interests), // 현재 선택된 관심 분야들, 입력된 한줄 소개를 백엔드에 보내준다.
+        };
+
+        const result = await updateUserProfile(profileData); // 현재 선택된 것들을 put으로 날려버린다다
+        if (result.success) {
+          showSaveSuccess(); // 성공하면 저장 성공 애니메이션 띄우기
+        } else {
+          alert(result.error || "프로필 저장에 실패했습니다.");
+        }
+      } catch (error) {
+        console.error("Profile save error:", error);
+        alert("프로필 저장 중 오류가 발생했습니다.");
+      }
+    } else if (activeTab === "비밀번호 변경") {
+      // 비밀번호 변경 저장
+      if (
+        !formData.password ||
+        !formData.newPassword ||
+        !formData.confirmPassword
+      ) {
+        alert("모든 필드를 입력해주세요.");
+        return;
+      }
+
+      try {
+        // 1단계: 현재 비밀번호 확인
+        const passwordCheck = await checkPassword(formData.password);
+        if (!passwordCheck.success) {
+          alert(passwordCheck.error || "현재 비밀번호가 일치하지 않습니다.");
+          // 비밀번호 필드 초기화
+          setFormData((prev) => ({
+            ...prev,
+            password: "",
+            newPassword: "",
+            confirmPassword: "",
+          }));
+          return;
+        }
+
+        if (formData.newPassword.length < 4) {
+          alert("새 비밀번호는 4자 이상이어야 합니다.");
+          // 비밀번호 필드 초기화
+          setFormData((prev) => ({
+            ...prev,
+            password: "",
+            newPassword: "",
+            confirmPassword: "",
+          }));
+          return;
+        }
+
+        if (formData.newPassword !== formData.confirmPassword) {
+          alert("새 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
+          // 비밀번호 필드 초기화
+          setFormData((prev) => ({
+            ...prev,
+            password: "",
+            newPassword: "",
+            confirmPassword: "",
+          }));
+          return;
+        }
+
+        // 2단계: 새 비밀번호로 업데이트
+        const accountData = {
+          password: formData.newPassword, // put이라 password 필드 하나만 부분적으로 변경해도 됨
+        };
+
+        const result = await updateUserAccount(accountData); // 새 비밀번호 담아서 백엔드에 보내버리기기
+        if (result.success) {
+          alert("비밀번호가 성공적으로 변경되었습니다.");
+          // 비밀번호 필드 초기화
+          setFormData((prev) => ({
+            ...prev,
+            password: "",
+            newPassword: "",
+            confirmPassword: "",
+          }));
+          showSaveSuccess();
+        } else {
+          alert(result.error || "비밀번호 변경에 실패했습니다.");
+        }
+      } catch (error) {
+        console.error("Password change error:", error);
+        alert("비밀번호 변경 중 오류가 발생했습니다.");
+      }
+    }
+  };
+
+  const showSaveSuccess = () => {
     // 저장 애니메이션 효과
     const saveBtn = document.querySelector(".save-button");
     if (saveBtn) {
@@ -185,6 +301,15 @@ const Settings = () => {
         saveBtn.textContent = "설정 저장";
         saveBtn.style.backgroundColor = "#228BE6";
       }, 2000);
+    }
+  };
+
+  const resetSaveButton = () => {
+    // 저장 버튼을 원래 상태로 리셋. showSaveSuccess 도중 activeTab 넘어갔을 때 호출
+    const saveBtn = document.querySelector(".save-button");
+    if (saveBtn) {
+      saveBtn.textContent = "설정 저장";
+      saveBtn.style.backgroundColor = "#228BE6";
     }
   };
 

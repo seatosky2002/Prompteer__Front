@@ -357,7 +357,8 @@ ${editorCode}
       state: {
         problemId: id,
         initialContent: combinedContent,
-        category: 'coding'
+        category: 'coding',
+        boardCategory: '프롬프트 공유'
       }
     });
   };

@@ -48,6 +48,8 @@ const Board = () => {
           throw new Error('데이터를 불러오는 데 실패했습니다.');
         }
         const data = await response.json();
+        console.log('게시판 API 응답 데이터:', data);
+        console.log('첫 번째 게시물 데이터:', data[0]);
         setPosts(data);
       } catch (err) {
         setError(err.message);
@@ -135,7 +137,7 @@ const Board = () => {
                       id={post.id}
                       title={post.title}
                       category={post.tag.toUpperCase()} // e.g., 'PS'
-                      problemNumber={post.challenge_id || '-'}
+                      problemNumber={post.challenge_id || (post.type === 'share' ? '프롬포트 공유' : '-')}
                       author={post.user?.nickname || '익명'}
                       comments={post.comments?.length || 0}
                       likes={post.likes_count || 0}

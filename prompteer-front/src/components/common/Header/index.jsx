@@ -3,13 +3,25 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser } from "../../../apis/api.js";
 import "./Header.css";
 
-const Header = () => {
+const Header = ({ isLoggedIn: propIsLoggedIn }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 여부 확인하는 state
 
+  // props로 전달받은 로그인 상태가 있으면 우선 사용
+  useEffect(() => {
+    if (propIsLoggedIn !== undefined) {
+      setIsLoggedIn(propIsLoggedIn);
+    }
+  }, [propIsLoggedIn]);
+
   // 로그인 상태 체크 (실제 API 검증)
   useEffect(() => {
+    // props로 전달받은 로그인 상태가 있으면 API 호출하지 않음
+    if (propIsLoggedIn !== undefined) {
+      return;
+    }
+
     const checkLoginStatus = async () => {
       const token = localStorage.getItem("access_token");
 
@@ -36,7 +48,30 @@ const Header = () => {
     };
 
     checkLoginStatus();
-  }, []);
+  }, [location.pathname, propIsLoggedIn]); // propIsLoggedIn도 의존성에 추가
+
+  // localStorage 변경 감지
+  useEffect(() => {
+    // props로 전달받은 로그인 상태가 있으면 localStorage 감지하지 않음
+    if (propIsLoggedIn !== undefined) {
+      return;
+    }
+
+    const handleStorageChange = () => {
+      const token = localStorage.getItem("access_token");
+      setIsLoggedIn(!!token);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // 컴포넌트 마운트 시에도 체크
+    const token = localStorage.getItem("access_token");
+    setIsLoggedIn(!!token);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [propIsLoggedIn]);
 
   const handleNavigation = (path) => {
     navigate(path);

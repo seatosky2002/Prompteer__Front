@@ -23,7 +23,25 @@ const CodingProblem = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
   const [scoringResult, setScoringResult] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // 로그인 상태 체크
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const token = localStorage.getItem('access_token');
+      setIsLoggedIn(!!token);
+    };
+
+    checkLoginStatus();
+    
+    // 페이지 포커스 시 로그인 상태 재확인
+    const handleFocus = () => {
+      checkLoginStatus();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   // 백엔드에서 문제 데이터 가져오기
   useEffect(() => {
@@ -274,7 +292,7 @@ ${editorCode}
   if (loading) {
     return (
       <div className="coding-problem-page">
-        <Header />
+        <Header isLoggedIn={isLoggedIn} />
         <main className="coding-problem-main">
           <div className="coding-problem-container">
             <div className="loading-container">
@@ -292,7 +310,7 @@ ${editorCode}
   if (error || !problemData) {
     return (
       <div className="coding-problem-page">
-        <Header />
+        <Header isLoggedIn={isLoggedIn} />
         <main className="coding-problem-main">
           <div className="coding-problem-container">
             <div className="error-container">
@@ -308,7 +326,7 @@ ${editorCode}
 
   return (
     <div className="coding-problem-page">
-      <Header />
+      <Header isLoggedIn={isLoggedIn} />
       <main className="coding-problem-main">
         <div className="coding-problem-container">
           <div className="problem-layout">

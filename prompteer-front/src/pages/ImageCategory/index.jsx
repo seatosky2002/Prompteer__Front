@@ -12,6 +12,25 @@ const ImageCategory = () => {
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // 로그인 상태 체크
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const token = localStorage.getItem('access_token');
+      setIsLoggedIn(!!token);
+    };
+
+    checkLoginStatus();
+    
+    // 페이지 포커스 시 로그인 상태 재확인
+    const handleFocus = () => {
+      checkLoginStatus();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   // API에서 챌린지 데이터 가져오기
   useEffect(() => {
@@ -132,7 +151,7 @@ const ImageCategory = () => {
 
   return (
     <div className="image-category-page">
-      <Header />
+      <Header isLoggedIn={isLoggedIn} />
 
       {/* Main Content */}
       <main className="image-main">

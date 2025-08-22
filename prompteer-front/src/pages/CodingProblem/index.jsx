@@ -48,19 +48,22 @@ const CodingProblem = () => {
     const fetchProblemData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/challenges/ps/');
+        const response = await fetch(`/challenges/${id}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const challenges = await response.json();
-        
-        // 현재 문제 ID에 해당하는 데이터 찾기
-        const currentProblem = challenges.find(challenge => challenge.id == id);
+        const currentProblem = await response.json();
         
         if (currentProblem) {
           console.log('Found problem data:', currentProblem);
+          
+          const accuracyRate = currentProblem.ps_challenge?.accuracy_rate;
+          const correctRate = accuracyRate !== undefined 
+            ? `${Math.round(accuracyRate * 100)}%`
+            : '0%';
+
           // API 응답 구조에 맞게 데이터 변환
           const transformedData = {
             id: currentProblem.id,
@@ -70,7 +73,7 @@ const CodingProblem = () => {
             content: currentProblem.content,
             timeLimit: '1 초',
             memoryLimit: '256 MB',
-            correctRate: '0%',
+            correctRate: correctRate,
             problemDescription: {
               situation: currentProblem.content || '문제 상황을 불러올 수 없습니다.',
               input: '',
@@ -82,48 +85,24 @@ const CodingProblem = () => {
           };
           setProblemData(transformedData);
         } else {
-          // 해당 ID가 없으면 첫 번째 문제 사용
-          const firstProblem = challenges[0];
-          if (firstProblem) {
-            const transformedData = {
-              id: firstProblem.id,
-              title: firstProblem.title || `Challenge #${firstProblem.id}`,
-              category: firstProblem.tag || 'PS',
-              difficulty: firstProblem.level || 'Easy',
-              content: firstProblem.content,
-              timeLimit: '1 초',
-              memoryLimit: '256 MB',
-              correctRate: '0%',
-              problemDescription: {
-                situation: firstProblem.content || '문제 상황을 불러올 수 없습니다.',
-                input: '',
-                output: '',
-                constraints: '',
-                sampleInput: '',
-                sampleOutput: ''
-              }
-            };
-            setProblemData(transformedData);
-          } else {
-            setProblemData({
-              id: id,
-              title: `Challenge #${id}
+          setProblemData({
+            id: id,
+            title: `Challenge #${id}
 문제를 찾을 수 없습니다`,
-              category: 'PS',
-              difficulty: 'Easy',
-              timeLimit: '1 초',
-              memoryLimit: '256 MB',
-              correctRate: '0%',
-              problemDescription: {
-                situation: '문제 데이터를 불러올 수 없습니다.',
-                input: '',
-                output: '',
-                constraints: '',
-                sampleInput: '',
-                sampleOutput: ''
-              }
-            });
-          }
+            category: 'PS',
+            difficulty: 'Easy',
+            timeLimit: '1 초',
+            memoryLimit: '256 MB',
+            correctRate: '0%',
+            problemDescription: {
+              situation: '문제 데이터를 불러올 수 없습니다.',
+              input: '',
+              output: '',
+              constraints: '',
+              sampleInput: '',
+              sampleOutput: ''
+            }
+          });
         }
       } catch (error) {
         console.error('문제 데이터 로딩 실패:', error);

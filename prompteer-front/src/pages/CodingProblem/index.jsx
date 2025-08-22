@@ -313,6 +313,7 @@ ${editorCode}
             <div className="problem-sidebar">
               <div className="problem-header">
                 <div className="problem-title-section">
+                  <div className="challenge-id">Challenge #{id}</div>
                   <h1 className="problem-title">{problemData.title}</h1>
                 </div>
                 <div className="problem-tags">

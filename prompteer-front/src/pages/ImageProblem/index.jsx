@@ -9,10 +9,12 @@ const ImageProblem = () => {
   const [promptText, setPromptText] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState('');
   const [showOthersImages, setShowOthersImages] = useState(true);
   const [sortBy, setSortBy] = useState('likes');
   const [imageLikes, setImageLikes] = useState(Array.from({ length: 8 }, () => 10));
   const [selectedImage, setSelectedImage] = useState(null);
+  const [sharedImages, setSharedImages] = useState([]);
   const [problemData, setProblemData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -40,7 +42,7 @@ const ImageProblem = () => {
     const fetchChallengeData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8000/challenges/${id}`);
+        const response = await fetch(`http://localhost:3000/challenges/${id}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -54,7 +56,7 @@ const ImageProblem = () => {
         
         // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
         const transformedData = {
-          title: `Challenge #${data.id || data.challenge_id || data.challenge_number || id || 'N/A'}\n${data.title || '제목 없음'}`,
+          title: `Challenge #${(data.img_challenge && data.img_challenge.challenge_id) || id || 'N/A'}\n${data.title || '제목 없음'}`,
           category: data.tag === 'img' ? '이미지' : data.tag === 'video' ? '영상' : data.tag === 'ps' ? 'PS' : data.tag || '카테고리 없음',
           difficulty: data.level === 'Easy' ? '초급' : data.level === 'Medium' ? '중급' : data.level === 'Hard' ? '고급' : data.level || '중급',
           sections: [
@@ -125,18 +127,72 @@ const ImageProblem = () => {
     }
   }, [id]);
 
-  const handleGenerate = () => {
+  // 공유된 이미지 목록 가져오기
+  useEffect(() => {
+    const fetchSharedImages = async () => {
+      if (!id) return;
+      try {
+        const response = await fetch(`http://localhost:3000/shares/img/?challenge_id=${id}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setSharedImages(data);
+      } catch (err) {
+        console.error('Failed to fetch shared images:', err);
+      }
+    };
+
+    fetchSharedImages();
+  }, [id, isGenerated]); // id가 바뀌거나 새로 이미지가 생성되면 다시 불러옴
+
+  const handleGenerate = async () => {
     if (!promptText.trim()) {
       alert('프롬프트를 입력해주세요!');
       return;
     }
+
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      alert('이미지를 생성하려면 로그인이 필요합니다.');
+      return;
+    }
     
     setIsGenerating(true);
-    // 임시 생성 로직
-    setTimeout(() => {
-      setIsGenerating(false);
+    try {
+      const response = await fetch(`http://localhost:3000/challenges/img/${id}/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ prompt: promptText }),
+      });
+
+      if (response.status === 401) {
+        alert('인증에 실패했습니다. 다시 로그인해주세요.');
+        // 선택적으로 로그인 페이지로 리디렉션 할 수 있습니다.
+        // window.location.href = '/login';
+        throw new Error('Unauthorized');
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const imageUrl = await response.json();
+      // 백엔드에서 "media/..." 형태의 상대 경로를 반환하므로, "/"를 추가하여 전체 URL을 만들어줍니다.
+      const fullImageUrl = `http://localhost:3000/${imageUrl}`;
+      setGeneratedImageUrl(fullImageUrl);
       setIsGenerated(true);
-    }, 1500);
+    } catch (error) {
+      console.error('Failed to generate image:', error);
+      if (error.message !== 'Unauthorized') {
+        alert('이미지 생성에 실패했습니다.');
+      }
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleRetry = () => {
@@ -155,20 +211,65 @@ const ImageProblem = () => {
     alert('프롬프트가 게시판에 공유되었습니다!');
   };
 
-  const handleLikeClick = (index) => {
-    setImageLikes(prevLikes => {
-      const newLikes = [...prevLikes];
-      newLikes[index] += 1;
-      return newLikes;
-    });
+  const handleLikeClick = async (shareId) => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      alert('좋아요를 누르려면 로그인이 필요합니다.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/shares/${shareId}/like`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 409) { // Conflict - Already liked
+        // 좋아요 취소 로직 (DELETE 요청)
+        const unlikeResponse = await fetch(`http://localhost:3000/shares/${shareId}/like`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (!unlikeResponse.ok) throw new Error('Failed to unlike');
+        
+        // 상태 업데이트: 좋아요 제거
+        setSharedImages(prevImages => 
+          prevImages.map(img => 
+            img.id === shareId 
+              ? { ...img, likes: img.likes.slice(0, -1) } // 임시로 하나 제거
+              : img
+          )
+        );
+
+      } else if (response.ok) {
+        // 상태 업데이트: 좋아요 추가
+        const newLikeData = await response.json();
+        setSharedImages(prevImages => 
+          prevImages.map(img => 
+            img.id === shareId 
+              ? { ...img, likes: [...img.likes, newLikeData] }
+              : img
+          )
+        );
+      } else {
+        throw new Error('Failed to like');
+      }
+    } catch (err) {
+      console.error('Error liking/unliking share:', err);
+      alert('좋아요 처리에 실패했습니다.');
+    }
   };
 
-  const handleImageClick = (index) => {
+  const handleImageClick = (share) => {
     setSelectedImage({
-      id: index,
-      image: `이미지 ${index + 1}`,
-      prompt: `A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.`,
-      likes: imageLikes[index]
+      id: share.id,
+      image: `http://localhost:3000/${share.img_share.img_url}`,
+      prompt: share.prompt,
+      likes: share.likes.length
     });
   };
 
@@ -265,8 +366,11 @@ const ImageProblem = () => {
                     <>
                       <div className="generated-result">
                         <div className="generated-image-placeholder">
-                          {/* 실제로는 생성된 이미지가 표시됩니다 */}
-                          <div className="image-placeholder">생성된 이미지</div>
+                          {generatedImageUrl ? (
+                            <img src={generatedImageUrl} alt="Generated" style={{ maxWidth: '100%', maxHeight: '100%' }} />
+                          ) : (
+                            <div className="image-placeholder">생성된 이미지</div>
+                          )}
                         </div>
                       </div>
                       {/* 결과 버튼 바 - 피그마 44-2711 */}
@@ -321,27 +425,27 @@ const ImageProblem = () => {
                 </div>
                 
                 <div className="others-grid">
-                  {Array.from({ length: 8 }, (_, i) => (
-                    <div key={i} className="other-image-card">
+                  {sharedImages.map((share, i) => (
+                    <div key={share.id || i} className="other-image-card">
                       <div 
                         className="other-image-placeholder"
-                        onClick={() => handleImageClick(i)}
+                        onClick={() => handleImageClick(share)}
                         style={{ cursor: 'pointer' }}
                       >
-                        이미지 {i + 1}
+                        <img src={`http://localhost:3000/${share.img_share.img_url}`} alt={`Shared submission ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </div>
                       <div className="image-likes">
                         <span 
                           className="heart" 
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleLikeClick(i);
+                            handleLikeClick(share.id);
                           }}
                           style={{ cursor: 'pointer' }}
                         >
                           ❤️
                         </span>
-                        <span className="like-count">{imageLikes[i]}</span>
+                        <span className="like-count">{share.likes.length}</span>
                       </div>
                     </div>
                   ))}
@@ -364,7 +468,7 @@ const ImageProblem = () => {
             <div className="modal-content">
               <div className="modal-image-section">
                 <div className="modal-image-placeholder">
-                  {selectedImage.image}
+                  <img src={selectedImage.image} alt="Selected submission" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </div>
               </div>
               <div className="modal-prompt-section">

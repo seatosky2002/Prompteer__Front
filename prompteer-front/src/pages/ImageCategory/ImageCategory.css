@@ -5,6 +5,143 @@
   box-sizing: border-box;
 }
 
+/* 이미지 컴포넌트 - Figma 디자인 기반 */
+.image-component {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 384px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.image-component:hover {
+  transform: translateY(-2px);
+}
+
+/* Frame 17 - Main Card with Background Image */
+.frame-17 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  align-self: stretch;
+  padding: 18px 18px 25px 25px;
+  width: 100%;
+  height: 239px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 1px solid #E9ECEF;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Frame 21 - Category Badge (Top Right) */
+.frame-21 {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px;
+  background: #E7F5FF;
+  border-radius: 16px;
+}
+
+.category-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #1971C2;
+  text-align: left;
+}
+
+/* Frame 108 - Bottom Text Section */
+.frame-108 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  gap: 30px;
+  padding: 0px 5px;
+  width: 100%;
+}
+
+/* Frame 107 - Text Content */
+.frame-107 {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.challenge-number {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+  color: #212529;
+  margin: 0 0 4px 0;
+  text-align: left;
+}
+
+.challenge-description {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #212529;
+  margin: 0;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 250px;
+}
+
+/* Frame 27 - Difficulty Badge */
+.frame-27 {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px;
+  height: 24px;
+  border-radius: 16px;
+  justify-content: center;
+  align-items: center;
+}
+
+.difficulty-text {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+/* 난이도별 색상 */
+.difficulty-초급 {
+  background: #64BE75;
+}
+
+.difficulty-중급 {
+  background: #FF9E42;
+}
+
+.difficulty-고급 {
+  background: #FF6A6A;
+}
+
+/* 챌린지 그리드 */
+.challenges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(384px, 1fr));
+  gap: 24px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* 기존 스타일 유지 */
 .image-category-page {
   font-family: 'Noto Sans KR', sans-serif;
   background-color: #F8F9FA;
@@ -12,7 +149,6 @@
   flex-direction: column;
 }
 
-/* Main Content */
 .image-main {
   display: flex;
   flex-direction: column;
@@ -122,325 +258,93 @@
   background-color: #f8f9fa;
 }
 
-/* Body Container - Figma: body_container */
 .body-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  align-self: stretch;
-  gap: 20px;
-  padding: 24px 0px;
-  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* Search Outer Container - Figma: 검색창 외부 */
 .search-outer-container {
-  display: flex;
-  flex-direction: column;
-  align-self: stretch;
-  gap: 10px;
-  padding: 25px;
-  background-color: #FFFFFF;
-  border-radius: 12px;
-  width: 100%;
+  margin-bottom: 40px;
 }
 
-/* Search Inner Container - Figma: 검색창 내부 */
 .search-inner-container {
   display: flex;
-  justify-content: stretch;
-  align-items: stretch;
-  align-self: stretch;
-  gap: 16px;
-  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
-/* Search Box - Figma: 검색창 */
 .search-box {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  align-self: stretch;
-  gap: 10px;
-  padding: 10px 20px;
   flex: 1;
-  border: 1px solid #CED4DA;
-  border-radius: 8px;
-  background-color: #FFFFFF;
+  max-width: 400px;
+  position: relative;
 }
 
 .search-icon {
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #CED4DA;
 }
 
-/* Filter Frame - Figma: Frame 106 */
+.search-input {
+  border: 1px solid #CED4DA;
+  border-radius: 8px;
+  padding: 10px 20px 10px 40px;
+  width: 100%;
+  height: 40px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  color: #212529;
+}
+
+.search-input::placeholder {
+  color: #ADB5BD;
+  font-size: 14px;
+}
+
 .filter-frame {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .filter-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  height: 40px;
-  background-color: #F1F3F5;
-  border: none;
+  padding: 8px 16px;
+  border: 1px solid #E9ECEF;
+  background: white;
   border-radius: 8px;
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 1.2em;
-  color: #495057;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.filter-btn:hover {
-  background-color: #E9ECEF;
-}
-
 .filter-btn.active {
-  background-color: #1971C2;
-  color: #FFFFFF;
+  background: #1971C2;
+  color: white;
+  border-color: #1971C2;
 }
 
-/* Frame 283 - Challenges Grid Container */
-.frame-283 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
-  width: 100%;
-  max-width: 1248px;
-}
-
-/* Image Component - Figma: 이미지 컴포넌트 */
-.image-component {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  width: 384px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.image-component:hover {
-  transform: translateY(-2px);
-}
-
-/* Frame 17 - Main Card with Background Image */
-.frame-17 {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  align-self: stretch;
-  padding: 18px 18px 25px 25px;
-  width: 100%;
-  height: 239px;
-  background-image: url('../../../image_data/image.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  border: 1px solid #E9ECEF;
-  border-radius: 12px;
-  position: relative;
-}
-
-/* Frame 21 - Category Badge (Top Right) */
-.frame-21 {
-  display: flex;
-  flex-direction: column;
-  padding: 4px 10px;
-  background-color: #E7F5FF;
-  border-radius: 16px;
-  width: fit-content;
-  height: fit-content;
-}
-
-.category-text {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 500;
-  font-size: 13px;
-  line-height: 1.2em;
-  color: #1971C2;
-}
-
-/* Frame 108 - Bottom Text Section */
-.frame-108 {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  align-self: stretch;
-  gap: 30px;
-  padding: 0px 5px;
-  width: 100%;
-}
-
-/* Frame 107 - Text Content */
-.frame-107 {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.challenge-number {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 1.2em;
-  color: #212529;
-  margin: 0;
-}
-
-.challenge-description {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 1.2em;
-  color: #212529;
-  margin: 0;
-}
-
-/* Frame 27 - Difficulty Badge */
-.frame-27 {
-  display: flex;
-  flex-direction: column;
-  padding: 4px 10px;
-  border-radius: 16px;
-  width: fit-content;
-  height: 24px;
-  align-items: center;
-  justify-content: center;
-}
-
-.frame-27.difficulty-고급 {
-  background-color: #FF6A6A;
-}
-
-.frame-27.difficulty-중급 {
-  background-color: #FF9E42;
-}
-
-.frame-27.difficulty-초급 {
-  background-color: #64BE75;
-}
-
-.difficulty-text {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 700;
-  font-size: 13px;
-  line-height: 1.2em;
-  color: #FFFFFF;
-}
-
-/* Loading and Error States */
 .loading-container,
-.error-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 60px 40px;
+.error-container,
+.no-results {
   text-align: center;
+  padding: 60px 20px;
+  color: #6C757D;
 }
 
 .loading-container p {
-  color: #495057;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 18px;
+  margin: 0;
 }
 
 .error-container p {
   color: #DC3545;
   font-size: 16px;
-  margin: 5px 0;
+  margin: 0;
 }
 
-.error-container p:last-child {
-  color: #6C757D;
-  font-size: 14px;
-}
-
-/* No Results */
-.no-results {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
-  color: #495057;
+.no-results p {
   font-size: 16px;
-}
-
-/* Responsive Design */
-@media (max-width: 1440px) {
-  .image-main {
-    padding: 24px 48px 130px;
-  }
-}
-
-@media (max-width: 1280px) {
-  .frame-283 {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-  
-  .image-component {
-    width: 100%;
-    max-width: 350px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .frame-283 {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
-  }
-  
-  .image-component {
-    width: 100%;
-    max-width: 400px;
-  }
-  
-  .search-inner-container {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-  
-  .filter-frame {
-    justify-content: center;
-  }
-}
-
-@media (max-width: 768px) {
-  .image-main {
-    padding: 20px;
-  }
-  
-  .featured-content {
-    padding: 24px;
-  }
-  
-  .featured-title {
-    font-size: 28px;
-  }
-  
-  .frame-283 {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .image-component {
-    width: 100%;
-    max-width: 100%;
-  }
+  margin: 0;
 }

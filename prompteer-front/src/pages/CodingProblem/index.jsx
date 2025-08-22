@@ -23,6 +23,46 @@ const CodingProblem = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
   const [scoringResult, setScoringResult] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [othersWork, setOthersWork] = useState([]);
+  const [loadingOthers, setLoadingOthers] = useState(false);
+  const [sortBy, setSortBy] = useState('likes'); // 'likes', 'random', 'attempts'
+  const [selectedWork, setSelectedWork] = useState(null);
+  const [showWorkModal, setShowWorkModal] = useState(false);
+  const [likedShares, setLikedShares] = useState(new Set()); // 사용자가 좋아요를 누른 공유들
+
+  // JWT 토큰에서 사용자 ID 추출하는 함수
+  const getCurrentUserId = () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return null;
+    
+    try {
+      // JWT 토큰의 payload 부분을 디코딩
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.user_id || payload.sub;
+    } catch (error) {
+      console.error('Failed to decode JWT token:', error);
+      return null;
+    }
+  };
+
+  // 로그인 상태 체크
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const token = localStorage.getItem('access_token');
+      setIsLoggedIn(!!token);
+    };
+
+    checkLoginStatus();
+    
+    // 페이지 포커스 시 로그인 상태 재확인
+    const handleFocus = () => {
+      checkLoginStatus();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
 
   // 백엔드에서 문제 데이터 가져오기
@@ -30,19 +70,24 @@ const CodingProblem = () => {
     const fetchProblemData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/challenges/ps/');
+        const response = await fetch(`/challenges/${id}`);
+
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const challenges = await response.json();
-        
-        // 현재 문제 ID에 해당하는 데이터 찾기
-        const currentProblem = challenges.find(challenge => challenge.id == id);
+        const currentProblem = await response.json();
         
         if (currentProblem) {
           console.log('Found problem data:', currentProblem);
+          
+          const accuracyRate = currentProblem.ps_challenge?.accuracy_rate;
+          const correctRate = accuracyRate !== undefined 
+            ? `${Math.round(accuracyRate * 100)}%`
+            : '0%';
+
+
           // API 응답 구조에 맞게 데이터 변환
           const transformedData = {
             id: currentProblem.id,
@@ -50,6 +95,28 @@ const CodingProblem = () => {
             category: currentProblem.tag || 'PS', // tag 필드 사용
             difficulty: currentProblem.level || 'Easy', // level 필드 사용
             content: currentProblem.content,
+
+            timeLimit: '1 초',
+            memoryLimit: '256 MB',
+            correctRate: correctRate,
+            problemDescription: {
+              situation: currentProblem.content || '문제 상황을 불러올 수 없습니다.',
+              input: '',
+              output: '',
+              constraints: '',
+              sampleInput: '',
+              sampleOutput: ''
+            }
+          };
+          setProblemData(transformedData);
+        } else {
+          setProblemData({
+            id: id,
+            title: `Challenge #${id}
+문제를 찾을 수 없습니다`,
+            category: 'PS',
+            difficulty: 'Easy',
+
             timeLimit: '1 초',
             memoryLimit: '256 MB',
             correctRate: '0%',
@@ -136,6 +203,110 @@ const CodingProblem = () => {
 
     fetchProblemData();
   }, [id]);
+
+  // 백엔드에서 다른 사람들의 제출물 가져오기
+  const fetchOthersWork = async () => {
+    try {
+      setLoadingOthers(true);
+      const response = await fetch(`http://localhost:8000/shares/ps/?challenge_id=${id}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Others work data:', data);
+      
+      // 현재 로그인한 사용자 ID 가져오기
+      const currentUserId = getCurrentUserId();
+      
+      // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
+      const transformedData = data.map((work, index) => ({
+        id: work.id || index,
+        prompt: work.prompt || '프롬프트를 불러올 수 없습니다.',
+        code: work.ps_share?.code || '코드를 불러올 수 없습니다.',
+        memory: work.ps_share?.max_memory_kb || Math.floor(Math.random() * 1000) + 1000,
+        time: work.ps_share?.elapsed_time ? Math.round(work.ps_share.elapsed_time * 1000) : Math.floor(Math.random() * 100) + 50,
+        attempts: work.ps_share?.attempts || Math.floor(Math.random() * 5) + 1,
+        likes: work.likes_count !== undefined ? work.likes_count : 0,
+        isLiked: currentUserId ? work.likes.some(like => like.user_id === currentUserId) : false
+      }));
+      
+      // 사용자가 좋아요를 누른 공유들 업데이트
+      const likedShareIds = transformedData
+        .filter(work => work.isLiked)
+        .map(work => work.id);
+      setLikedShares(new Set(likedShareIds));
+      
+      // 프론트엔드에서 정렬 적용
+      const sortedData = sortDataByCriteria(transformedData, sortBy);
+      setOthersWork(sortedData);
+    } catch (err) {
+      console.error('Failed to fetch others work:', err);
+      // 에러 시 기본 데이터 사용
+      setOthersWork([
+        {
+          id: 1,
+          prompt: '알파벳 대문자 문자열 S가 주어질 때, 모든 구간 (i, j)에 대해 S[i:j] 부분 문자열에서 나타나는 문자를...',
+          code: '> 1\n> 6',
+          memory: 3024,
+          time: 68,
+          attempts: 3,
+          likes: 350,
+          isLiked: false
+        },
+        {
+          id: 2,
+          prompt: '문자열 처리 알고리즘으로 구간별 고유 문자 개수를 계산하는 문제입니다...',
+          code: '> 1\n> 6',
+          memory: 2980,
+          time: 72,
+          attempts: 2,
+          likes: 320,
+          isLiked: false
+        }
+      ]);
+    } finally {
+      setLoadingOthers(false);
+    }
+  };
+
+  // 정렬 기준에 따라 데이터 정렬하는 함수
+  const sortDataByCriteria = (data, criteria) => {
+    const sortedData = [...data];
+    console.log('Sorting data by:', criteria, 'Data:', sortedData);
+    
+    switch (criteria) {
+      case 'likes':
+        const likesSorted = sortedData.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+        console.log('Likes sorted:', likesSorted.map(item => ({ id: item.id, likes: item.likes })));
+        return likesSorted;
+      case 'attempts':
+        const attemptsSorted = sortedData.sort((a, b) => (b.attempts || 0) - (a.attempts || 0));
+        console.log('Attempts sorted:', attemptsSorted.map(item => ({ id: item.id, attempts: item.attempts })));
+        return attemptsSorted;
+      case 'random':
+        return sortedData.sort(() => Math.random() - 0.5);
+      default:
+        return sortedData;
+    }
+  };
+
+  // 정렬 변경 시 데이터 재정렬
+  useEffect(() => {
+    if (othersWork.length > 0) {
+      const sortedData = sortDataByCriteria(othersWork, sortBy);
+      setOthersWork(sortedData);
+    }
+  }, [sortBy]);
+
+  // showResult가 변경될 때 데이터 가져오기
+  useEffect(() => {
+    if (showResult) {
+      fetchOthersWork();
+    }
+  }, [showResult]);
+
 
   const handleCodeGeneration = async () => {
     if (!promptCode.trim()) {
@@ -263,18 +434,95 @@ ${editorCode}
       state: {
         problemId: id,
         initialContent: combinedContent,
-        category: 'coding'
+        category: 'coding',
+        boardCategory: '프롬프트 공유'
+
       }
     });
   };
 
   // handleViewOthers 함수 제거 - 항상 표시되므로 불필요
 
+  const handleWorkClick = (work) => {
+    setSelectedWork(work);
+    setShowWorkModal(true);
+  };
+
+  const handleCloseWorkModal = () => {
+    setShowWorkModal(false);
+    setSelectedWork(null);
+  };
+
+  // 좋아요 추가/취소 함수
+  const handleLikeToggle = async (shareId, e) => {
+    e.stopPropagation(); // 카드 클릭 이벤트 방지
+    
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    try {
+      const isLiked = likedShares.has(shareId);
+      const method = isLiked ? 'DELETE' : 'POST';
+      
+      console.log(`Attempting to ${isLiked ? 'unlike' : 'like'} share ${shareId}`);
+      
+      const response = await fetch(`http://localhost:8000/shares/${shareId}/like`, {
+        method: method,
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('Like response status:', response.status);
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          // 이미 좋아요를 누른 경우 (POST 요청 시)
+          alert('이미 좋아요를 누른 공유입니다.');
+          return;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // 좋아요 상태 업데이트
+      if (isLiked) {
+        setLikedShares(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(shareId);
+          return newSet;
+        });
+        // 좋아요 수 감소
+        setOthersWork(prev => prev.map(work => 
+          work.id === shareId ? { ...work, likes: Math.max(0, work.likes - 1) } : work
+        ));
+        console.log(`Unliked share ${shareId}`);
+      } else {
+        setLikedShares(prev => new Set(prev).add(shareId));
+        // 좋아요 수 증가
+        setOthersWork(prev => prev.map(work => 
+          work.id === shareId ? { ...work, likes: work.likes + 1 } : work
+        ));
+        console.log(`Liked share ${shareId}`);
+      }
+    } catch (error) {
+      console.error('Like toggle error:', error);
+      if (error.message.includes('HTTP error! status: 409')) {
+        alert('이미 좋아요를 누른 공유입니다.');
+      } else {
+        alert('좋아요 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
+
   // 로딩 중일 때 표시할 내용
   if (loading) {
     return (
       <div className="coding-problem-page">
-        <Header />
+        <Header isLoggedIn={isLoggedIn} />
         <main className="coding-problem-main">
           <div className="coding-problem-container">
             <div className="loading-container">
@@ -292,7 +540,7 @@ ${editorCode}
   if (error || !problemData) {
     return (
       <div className="coding-problem-page">
-        <Header />
+        <Header isLoggedIn={isLoggedIn} />
         <main className="coding-problem-main">
           <div className="coding-problem-container">
             <div className="error-container">
@@ -308,7 +556,7 @@ ${editorCode}
 
   return (
     <div className="coding-problem-page">
-      <Header />
+      <Header isLoggedIn={isLoggedIn} />
       <main className="coding-problem-main">
         <div className="coding-problem-container">
           <div className="problem-layout">
@@ -316,6 +564,7 @@ ${editorCode}
             <div className="problem-sidebar">
               <div className="problem-header">
                 <div className="problem-title-section">
+                  <div className="challenge-id">Challenge #{id}</div>
                   <h1 className="problem-title">{problemData.title}</h1>
                 </div>
                 <div className="problem-tags">
@@ -551,47 +800,104 @@ ${editorCode}
                 <div className="view-others-header">
                   <h3>구경하기</h3>
                   <div className="sort-buttons">
-                    <button className="sort-btn active">좋아요 순</button>
-                    <button className="sort-btn">랜덤 순</button>
-                    <button className="sort-btn">수동 수정 횟수 순</button>
+                    <button 
+                      className={`sort-btn ${sortBy === 'likes' ? 'active' : ''}`}
+                      onClick={() => setSortBy('likes')}
+                    >
+                      좋아요 순
+                    </button>
+                    <button 
+                      className={`sort-btn ${sortBy === 'random' ? 'active' : ''}`}
+                      onClick={() => setSortBy('random')}
+                    >
+                      랜덤 순
+                    </button>
+                    <button 
+                      className={`sort-btn ${sortBy === 'attempts' ? 'active' : ''}`}
+                      onClick={() => setSortBy('attempts')}
+                    >
+                      수동 수정 횟수 순
+                    </button>
                   </div>
                 </div>
               </div>
 
               <div className="others-work-section">
                 <div className="others-work-grid">
-                    {[1, 2, 3, 4, 5, 6].map((item) => (
-                      <div key={item} className="work-card">
-                        <div className="work-stats">
-                          <div className="stat-item">
-                            <div className="stat-text">사용 메모리<br />{3000 + item * 24}KB</div>
-                          </div>
-                          <div className="stat-item">
-                            <div className="stat-text">소요 시간<br />{60 + item * 8}ms</div>
-                          </div>
-                          <div className="stat-item">
-                            <div className="stat-text">수동 수정<br />{item}회</div>
-                          </div>
-                        </div>
-                        <div className="work-content">
-                          <div className="work-prompt">
-                            알파벳 대문자 문자열 S가 주어질 때, {'\n'}모든 구간 (i, j)에 대해 S[i:j] 부분 문자열에서 나타나는 문자를...
-                          </div>
-                          <div className="work-output">
-                            &gt; 1{'\n'}&gt; 6
-                          </div>
-                        </div>
-                        <div className="work-actions">
-                          <button className="like-button">
-                            <div className="heart-icon">♥</div>
-                            <div className="like-count">{400 - item * 50}</div>
-                          </button>
-                        </div>
+                    {loadingOthers ? (
+                      <div className="loading-container">
+                        <div className="loading-spinner"></div>
+                        <p>다른 사람들의 제출물을 불러오는 중...</p>
                       </div>
-                    ))}
+                    ) : othersWork.length === 0 ? (
+                      <div className="no-others-work-container">
+                        <p>아직 다른 사람들의 제출물이 없습니다.</p>
+                        <p>첫 번째 제출물을 작성해보세요!</p>
+                      </div>
+                    ) : (
+                      othersWork.map((work) => (
+                        <div key={work.id} className="work-card" onClick={() => handleWorkClick(work)}>
+                          <div className="work-stats">
+                            <div className="stat-item">
+                              <div className="stat-text">사용 메모리<br />{work.memory}KB</div>
+                            </div>
+                            <div className="stat-item">
+                              <div className="stat-text">소요 시간<br />{work.time}ms</div>
+                            </div>
+                            <div className="stat-item">
+                              <div className="stat-text">수동 수정<br />{work.attempts}회</div>
+                            </div>
+                          </div>
+                          <div className="work-content">
+                            <div className="work-prompt truncate-text">
+                              {work.prompt}
+                            </div>
+                            <div className="work-output truncate-text">
+                              <pre>{work.code}</pre>
+                            </div>
+                          </div>
+                          <div className="work-actions">
+                            <button 
+                              className={`like-button ${likedShares.has(work.id) ? 'liked' : ''}`}
+                              onClick={(e) => handleLikeToggle(work.id, e)}
+                            >
+                              <div className="heart-icon">♥</div>
+                              <div className="like-count">{work.likes || 0}</div>
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
             </>
+          )}
+
+          {/* 제출물 상세 모달 */}
+          {showWorkModal && selectedWork && (
+            <div className="work-modal-overlay" onClick={handleCloseWorkModal}>
+              <div className="work-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                  <button className="modal-close-btn" onClick={handleCloseWorkModal}>
+                    ×
+                  </button>
+                </div>
+                <div className="modal-content">
+                  <div className="modal-section">
+                    <div className="section-title">프롬프트</div>
+                    <div className="modal-prompt">
+                      <pre>{selectedWork.prompt}</pre>
+                    </div>
+                  </div>
+                  <div className="modal-section">
+                    <div className="section-title">코드</div>
+                    <div className="modal-code">
+                      <pre>{selectedWork.code}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </main>

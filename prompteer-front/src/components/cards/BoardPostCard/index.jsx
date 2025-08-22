@@ -14,6 +14,9 @@ const BoardPostCard = ({
 }) => {
   const navigate = useNavigate();
 
+  // 데이터 확인용 로그
+  console.log('BoardPostCard props:', { id, title, category, problemNumber, author, comments, likes, date });
+
   const handleClick = () => {
     // 프롬포트 공유 게시물인 경우 다른 페이지로 이동
     if (category === '프롬포트' || title.includes('프롬포트') || title.includes('공유')) {
@@ -37,8 +40,10 @@ const BoardPostCard = ({
 
       {/* 2~7열: 통계칸 - 헤더 순서와 정확히 동일 */}
       <div className="post-right">
-        <span className="post-stat">{category === '코딩' ? '코딩 질문' : '프롬포트 공유'}</span>
-        <span className="post-stat">{problemNumber}</span>
+        <span className="post-stat">{category === 'PS' ? '코딩 질문' : '프롬포트 공유'}</span>
+        <span className="post-stat">
+          {problemNumber === '프롬포트 공유' ? '프롬포트 공유' : (problemNumber || '-')}
+        </span>
         <span className="post-stat">{author}</span>
         <span className="post-stat">{comments}</span>
         <span className="post-stat">{likes}</span>

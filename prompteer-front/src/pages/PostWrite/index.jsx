@@ -22,12 +22,15 @@ const PostWrite = () => {
   // useEffect를 사용하여 페이지 이동 시 전달받은 state로 폼 데이터 초기화
   useEffect(() => {
     if (location.state) {
-      const { problemId, initialContent, category } = location.state;
+      const { problemId, initialContent, category, boardCategory } = location.state;
+
       setFormData(prev => ({
         ...prev,
         problemNumber: problemId || prev.problemNumber,
         content: initialContent || prev.content, // 'prompt'를 'initialContent'로 변경
         problemCategory: category === 'coding' ? '코딩' : prev.problemCategory,
+        boardCategory: boardCategory || prev.boardCategory,
+
       }));
     }
   }, [location.state]);

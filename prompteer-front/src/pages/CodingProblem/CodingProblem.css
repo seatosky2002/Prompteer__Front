@@ -76,6 +76,20 @@
   width: 100%;
 }
 
+.challenge-id {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.2;
+  color: #212529;
+  margin-bottom: 8px;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  width: 100%;
+  display: block;
+}
+
 .problem-title {
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 700;
@@ -378,6 +392,8 @@
   margin-bottom: 40px;
   justify-content: start; /* 왼쪽 정렬 */
   width: fit-content; /* 내용에 맞는 너비 */
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .work-card {
@@ -393,6 +409,8 @@
   height: 132px; /* Figma 높이 */
   box-sizing: border-box;
   width: 100%; /* 그리드에 맞게 조정 */
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .work-card:hover {
@@ -437,6 +455,8 @@
   align-items: stretch;
   flex: 1;
   gap: 20px; /* Figma gap */
+  min-width: 0; /* flex 아이템이 줄어들 수 있도록 */
+  overflow: hidden;
 }
 
 .work-prompt {
@@ -447,13 +467,21 @@
   font-size: 14px; /* Figma 폰트 크기 */
   line-height: 1.2;
   color: #000000; /* Figma 텍스트 색상 */
-  white-space: pre-wrap;
-  word-break: break-word;
+  white-space: nowrap;
+  word-break: keep-all;
   flex: 1;
-  display: flex;
-  justify-content: stretch;
-  align-items: stretch;
-  text-align: left;
+  min-width: 0; /* flex 아이템이 줄어들 수 있도록 */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.work-prompt.truncate-text {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
 }
 
 .work-output {
@@ -465,8 +493,19 @@
   line-height: 1.7;
   color: #757575;
   flex: 1;
-  display: flex;
-  align-items: flex-start;
+  min-width: 0; /* flex 아이템이 줄어들 수 있도록 */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.work-output.truncate-text {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
 }
 
 /* 좋아요 영역 - Figma 하트 표시 */
@@ -489,6 +528,21 @@
   flex-direction: column;
   align-items: center;
   gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.like-button:hover {
+  transform: scale(1.1);
+}
+
+.like-button.liked .heart-icon {
+  color: #FF6B6B;
+  animation: heartBeat 0.3s ease;
+}
+
+.like-button.liked .like-count {
+  color: #FF6B6B;
+  font-weight: 600;
 }
 
 .heart-icon {
@@ -496,6 +550,7 @@
   height: 18.35px; /* Figma 크기 */
   color: #515151; /* Figma 색상 */
   font-size: 18px;
+  transition: color 0.2s ease;
 }
 
 .like-count {
@@ -504,6 +559,7 @@
   font-weight: 500;
   color: #515151; /* Figma 색상 */
   line-height: 1.2;
+  transition: color 0.2s ease;
 }
 
 .like-button:hover .heart-icon,
@@ -1359,4 +1415,249 @@
 .error-message {
   color: #dc3545;
   font-size: 14px;
+}
+
+/* 구경하기 섹션 추가 스타일 */
+.no-others-work-container {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6C757D;
+}
+
+.no-others-work-container p {
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+.no-others-work-container p:first-child {
+  font-weight: 600;
+  color: #495057;
+}
+
+.work-output pre {
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  max-width: 100%;
+  display: block;
+}
+
+.sort-btn {
+  padding: 8px 16px;
+  border: 1px solid #E9ECEF;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  color: #495057;
+}
+
+.sort-btn:hover {
+  background: #F8F9FA;
+}
+
+.sort-btn.active {
+  background: #1971C2;
+  color: white;
+  border-color: #1971C2;
+}
+
+/* 제출물 상세 모달 스타일 */
+.work-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.work-modal {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 1000px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #E9ECEF;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #6C757D;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background: #F8F9FA;
+  color: #495057;
+}
+
+.modal-content {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+  justify-items: center;
+}
+
+.modal-section {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.section-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #212529;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #E9ECEF;
+  text-align: center;
+  width: 100%;
+}
+
+.modal-prompt,
+.modal-code {
+  background: #F8F9FA;
+  border: 1px solid #E9ECEF;
+  border-radius: 8px;
+  padding: 16px;
+  height: 400px;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 350px;
+}
+
+.modal-prompt pre,
+.modal-code pre {
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: #212529;
+}
+
+.modal-code pre {
+  color: #1971C2;
+}
+
+/* 카드 클릭 가능 스타일 */
+.work-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.work-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  max-width: 100%;
+  display: block;
+}
+
+.work-prompt {
+  background: #F8F9FA;
+  border-radius: 8px; /* Figma border radius */
+  padding: 20px; /* Figma padding */
+  font-family: 'Noto Sans KR', sans-serif; /* Figma 폰트 */
+  font-size: 14px; /* Figma 폰트 크기 */
+  line-height: 1.2;
+  color: #000000; /* Figma 텍스트 색상 */
+  white-space: nowrap;
+  word-break: keep-all;
+  flex: 1;
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0; /* flex 아이템이 줄어들 수 있도록 */
+  max-width: 100%;
+  width: 0; /* 강제로 너비 제한 */
+  flex-shrink: 1; /* 필요시 줄어들 수 있도록 */
+}
+
+.work-prompt.truncate-text {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+
+.work-output {
+  background: #F8F9FA;
+  border-radius: 8px;
+  padding: 20px;
+  font-family: 'Fira Code', monospace;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #757575;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0; /* flex 아이템이 줄어들 수 있도록 */
+  max-width: 100%;
+  width: 0; /* 강제로 너비 제한 */
+  flex-shrink: 1; /* 필요시 줄어들 수 있도록 */
+}
+
+.work-output.truncate-text {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+
+/* 좋아요 애니메이션 */
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
-import { getAllChallenges, filterChallengesByCategory, searchChallenges } from '../../services/challengeApi.js';
+import { searchChallenges } from '../../services/challengeApi.js';
 import './ImageCategory.css';
 
 const ImageCategory = () => {
@@ -12,80 +12,61 @@ const ImageCategory = () => {
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // 로그인 상태 체크
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const token = localStorage.getItem('access_token');
+      setIsLoggedIn(!!token);
+    };
+
+    checkLoginStatus();
+    
+    // 페이지 포커스 시 로그인 상태 재확인
+    const handleFocus = () => {
+      checkLoginStatus();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   // API에서 챌린지 데이터 가져오기
   useEffect(() => {
     const fetchChallenges = async () => {
       try {
         setLoading(true);
-        const data = await getAllChallenges();
         
-        // API에서 받은 데이터를 image 카테고리로 필터링
-        const imageChallenges = filterChallengesByCategory(data, 'image');
-        setChallenges(imageChallenges);
+        // /challenges/img/ 엔드포인트에서 직접 이미지 챌린지 데이터 가져오기
+        const response = await fetch('http://localhost:8000/challenges/img/');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Image challenges API response:', data);
+        
+        // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
+        const transformedData = data.map(challenge => ({
+          id: challenge.id,
+          title: `Challenge #${challenge.id}\n${challenge.title || '제목 없음'}`,
+          description: challenge.content || challenge.description || '설명 없음',
+          category: challenge.tag || '이미지',
+          difficulty: challenge.level || '중급',
+          participants: Math.floor(Math.random() * 1500) + 300, // 임시 참가자 수
+          type: 'image'
+        }));
+        
+        setChallenges(transformedData);
         setError(null);
       } catch (err) {
-        console.error('Failed to fetch challenges:', err);
-        setError('챌린지 데이터를 불러오는데 실패했습니다.');
+        console.error('Failed to fetch image challenges:', err);
+        setError('이미지 챌린지 데이터를 불러오는데 실패했습니다.');
         
-        // 에러 시 샘플 데이터 사용
-        const sampleChallenges = [
-          {
-            id: 11,
-            title: 'Challenge #11',
-            description: '일상 풍경 묘사 프롬프트 만들기',
-            category: '이미지',
-            difficulty: '초급',
-            participants: 856,
-            type: 'image'
-          },
-          {
-            id: 12,
-            title: 'Challenge #12',
-            description: '사실적인 물거품',
-            category: '이미지',
-            difficulty: '고급',
-            participants: 645,
-            type: 'image'
-          },
-          {
-            id: 13,
-            title: 'Challenge #13',
-            description: '뽀송뽀송한 아기 양',
-            category: '이미지',
-            difficulty: '초급',
-            participants: 923,
-            type: 'image'
-          },
-          {
-            id: 14,
-            title: 'Challenge #14',
-            description: '바다 옆 철길을 달리는 사실적인 기차',
-            category: '영상',
-            difficulty: '초급',
-            participants: 778,
-            type: 'video'
-          },
-          {
-            id: 15,
-            title: 'Challenge #15',
-            description: '꿀이 흐르고 보석들이 흩어져있는 핫케이크',
-            category: '이미지',
-            difficulty: '중급',
-            participants: 534,
-            type: 'image'
-          },
-          {
-            id: 16,
-            title: 'Challenge #16',
-            description: '숲속에서 뒤를 돌아보는 흰색 요정 소녀',
-            category: '영상',
-            difficulty: '고급',
-            participants: 412,
-            type: 'video'
-          }
-        ];
-        setChallenges(sampleChallenges);
+        // 에러 시 빈 배열로 설정
+        setChallenges([]);
       } finally {
         setLoading(false);
       }
@@ -132,7 +113,7 @@ const ImageCategory = () => {
 
   return (
     <div className="image-category-page">
-      <Header />
+      <Header isLoggedIn={isLoggedIn} />
 
       {/* Main Content */}
       <main className="image-main">
@@ -153,13 +134,12 @@ const ImageCategory = () => {
           </div>
         </div>
 
-        {/* Body Container - Figma: body_container */}
+        {/* Body Container */}
         <div className="body-container">
-          {/* Search Container - Figma: 검색창 외부 */}
+          {/* Search Container */}
           <div className="search-outer-container">
-            {/* Search Inner - Figma: 검색창 내부 */}
             <div className="search-inner-container">
-              {/* Search Box - Figma: 검색창 */}
+              {/* Search Box */}
               <div className="search-box">
                 <div className="search-icon">
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -172,8 +152,15 @@ const ImageCategory = () => {
                     />
                   </svg>
                 </div>
+                <input
+                  type="text"
+                  placeholder="문제 제목으로 검색..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
               </div>
-              {/* Filter Frame - Figma: Frame 106 */}
+              {/* Filter Frame */}
               <div className="filter-frame">
                 <button
                   className={`filter-btn ${sortBy === 'image' ? 'active' : ''}`}
@@ -191,7 +178,7 @@ const ImageCategory = () => {
             </div>
           </div>
 
-          {/* Challenges Grid Container - Figma: Frame 283 */}
+          {/* Challenges Grid Container */}
           {loading ? (
             <div className="loading-container">
               <p>챌린지를 불러오는 중...</p>
@@ -199,10 +186,9 @@ const ImageCategory = () => {
           ) : error ? (
             <div className="error-container">
               <p>{error}</p>
-              <p>임시 데이터로 표시합니다.</p>
             </div>
           ) : (
-            <div className="frame-283">
+            <div className="challenges-grid">
               {getFilteredAndSortedChallenges().map((challenge) => (
                 <div
                   key={challenge.id}

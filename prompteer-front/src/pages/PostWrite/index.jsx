@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import FilterButton from '../../components/ui/FilterButton/index.jsx';
@@ -8,15 +8,29 @@ import './PostWrite.css';
 
 const PostWrite = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   
   // 폼 상태 관리
   const [formData, setFormData] = useState({
     title: '',
-    boardCategory: '질문', // 질문 또는 프롬포트 공유
+    boardCategory: '프롬포트 공유', // 질문 또는 프롬포트 공유
     problemCategory: '코딩', // 코딩, 그림, 영상, 탈옥, 문서
     problemNumber: '',
     content: ''
   });
+
+  // useEffect를 사용하여 페이지 이동 시 전달받은 state로 폼 데이터 초기화
+  useEffect(() => {
+    if (location.state) {
+      const { problemId, initialContent, category } = location.state;
+      setFormData(prev => ({
+        ...prev,
+        problemNumber: problemId || prev.problemNumber,
+        content: initialContent || prev.content, // 'prompt'를 'initialContent'로 변경
+        problemCategory: category === 'coding' ? '코딩' : prev.problemCategory,
+      }));
+    }
+  }, [location.state]);
 
   const [activeTab, setActiveTab] = useState('게시물 작성');
   const [activeCategory, setActiveCategory] = useState('전체');
@@ -42,8 +56,22 @@ const PostWrite = () => {
     }));
   };
 
+  const handleFilterNavigate = (filterType, value) => {
+    const typeMapping = { '질문': 'question', '프롬포트 공유': 'share' };
+    const tagMapping = { '코딩': 'ps', '이미지': 'img', '영상': 'video' };
+
+    const params = new URLSearchParams();
+    if (filterType === 'type' && value !== '전체') {
+      params.set('type', typeMapping[value]);
+    } else if (filterType === 'tag' && value !== '전체') {
+      params.set('tag', tagMapping[value]);
+    }
+    
+    navigate(`/board?${params.toString()}`);
+  };
+
   // 게시글 작성 제출
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // 유효성 검사
     if (!formData.title.trim()) {
       alert('제목을 입력해주세요.');
@@ -55,12 +83,61 @@ const PostWrite = () => {
       return;
     }
 
-    // 실제로는 API 호출
-    console.log('게시글 작성 데이터:', formData);
-    
-    // 성공 후 게시판으로 이동
-    alert('게시글이 작성되었습니다!');
-    navigate('/board');
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    // Frontend-to-Backend Enum Mapping
+    const typeMapping = {
+      '질문': 'question',
+      '프롬포트 공유': 'share'
+    };
+
+    const tagMapping = {
+      '코딩': 'ps',
+      '그림': 'img',
+      '영상': 'video'
+      // '탈옥', '문서'는 현재 백엔드 PostTag Enum에 없으므로 제외
+    };
+
+    const payload = {
+      type: typeMapping[formData.boardCategory],
+      tag: tagMapping[formData.problemCategory],
+      title: formData.title,
+      content: formData.content,
+      attachment_urls: [] // 현재 첨부파일 기능은 없으므로 빈 배열
+    };
+
+    // tag가 유효하지 않은 경우, 요청을 보내지 않음
+    if (!payload.tag) {
+        alert(`'${formData.problemCategory}' 카테고리는 현재 게시글 작성을 지원하지 않습니다.`);
+        return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8000/posts/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || '게시글 작성에 실패했습니다.');
+      }
+
+      alert('게시글이 성공적으로 작성되었습니다!');
+      navigate('/board'); // 성공 후 게시판으로 이동
+
+    } catch (error) {
+      console.error("Post creation error:", error);
+      alert(error.message);
+    }
   };
 
   return (
@@ -147,6 +224,7 @@ const PostWrite = () => {
                           key={category}
                           className={`category-btn ${formData.problemCategory === category ? 'active' : ''}`}
                           onClick={() => handleCategorySelect('problemCategory', category)}
+                          disabled={!!location.state?.category}
                         >
                           {category}
                         </button>
@@ -163,6 +241,7 @@ const PostWrite = () => {
                       value={formData.problemNumber}
                       onChange={(e) => handleInputChange('problemNumber', e.target.value)}
                       placeholder="예: 13"
+                      disabled={!!location.state?.problemId}
                     />
                   </div>
 

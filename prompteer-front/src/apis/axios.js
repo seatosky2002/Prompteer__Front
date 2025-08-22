@@ -3,8 +3,8 @@
 
 import axios from "axios";
 
-// FastAPI 백엔드 baseURL 설정
-axios.defaults.baseURL = "http://localhost:8000/";
+// FastAPI 백엔드 baseURL 설정 (프록시 사용을 위해 제거)
+// axios.defaults.baseURL = "http://localhost:8000/";
 
 // 누구나 접근 가능한 API들
 export const instance = axios.create();

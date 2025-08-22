@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useParams, useNavigate } from 'react-router-dom';
+import Editor from '@monaco-editor/react';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import './CodingProblem.css';
@@ -16,17 +17,20 @@ const CodingProblem = () => {
   const [editorCode, setEditorCode] = useState('');
   const [consoleOutput, setConsoleOutput] = useState('');
   const [showResult, setShowResult] = useState(false);
-  const [showOthersWork, setShowOthersWork] = useState(true); // 기본값을 true로 변경
   const [problemData, setProblemData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [scoringResult, setScoringResult] = useState(null);
+
 
   // 백엔드에서 문제 데이터 가져오기
   useEffect(() => {
     const fetchProblemData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:8000/challenges/ps/');
+        const response = await fetch('/challenges/ps/');
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -39,26 +43,69 @@ const CodingProblem = () => {
         
         if (currentProblem) {
           console.log('Found problem data:', currentProblem);
-          setProblemData(currentProblem);
-        } else {
-          // 해당 ID가 없으면 첫 번째 문제 사용
-          setProblemData(challenges[0] || {
-            id: id,
-            title: `Challenge #${id}\n문제를 찾을 수 없습니다`,
-            category: '코딩',
-            difficulty: '중급',
+          // API 응답 구조에 맞게 데이터 변환
+          const transformedData = {
+            id: currentProblem.id,
+            title: currentProblem.title || `Challenge #${currentProblem.id}`,
+            category: currentProblem.tag || 'PS', // tag 필드 사용
+            difficulty: currentProblem.level || 'Easy', // level 필드 사용
+            content: currentProblem.content,
             timeLimit: '1 초',
             memoryLimit: '256 MB',
             correctRate: '0%',
             problemDescription: {
-              situation: '문제 데이터를 불러올 수 없습니다.',
+              situation: currentProblem.content || '문제 상황을 불러올 수 없습니다.',
               input: '',
               output: '',
               constraints: '',
               sampleInput: '',
               sampleOutput: ''
             }
-          });
+          };
+          setProblemData(transformedData);
+        } else {
+          // 해당 ID가 없으면 첫 번째 문제 사용
+          const firstProblem = challenges[0];
+          if (firstProblem) {
+            const transformedData = {
+              id: firstProblem.id,
+              title: firstProblem.title || `Challenge #${firstProblem.id}`,
+              category: firstProblem.tag || 'PS',
+              difficulty: firstProblem.level || 'Easy',
+              content: firstProblem.content,
+              timeLimit: '1 초',
+              memoryLimit: '256 MB',
+              correctRate: '0%',
+              problemDescription: {
+                situation: firstProblem.content || '문제 상황을 불러올 수 없습니다.',
+                input: '',
+                output: '',
+                constraints: '',
+                sampleInput: '',
+                sampleOutput: ''
+              }
+            };
+            setProblemData(transformedData);
+          } else {
+            setProblemData({
+              id: id,
+              title: `Challenge #${id}
+문제를 찾을 수 없습니다`,
+              category: 'PS',
+              difficulty: 'Easy',
+              timeLimit: '1 초',
+              memoryLimit: '256 MB',
+              correctRate: '0%',
+              problemDescription: {
+                situation: '문제 데이터를 불러올 수 없습니다.',
+                input: '',
+                output: '',
+                constraints: '',
+                sampleInput: '',
+                sampleOutput: ''
+              }
+            });
+          }
         }
       } catch (error) {
         console.error('문제 데이터 로딩 실패:', error);
@@ -66,9 +113,10 @@ const CodingProblem = () => {
         // 에러 시 기본 데이터 설정
         setProblemData({
           id: id,
-          title: `Challenge #${id}\n데이터 로딩 실패`,
-          category: '코딩',
-          difficulty: '중급',
+          title: `Challenge #${id}
+데이터 로딩 실패`,
+          category: 'PS',
+          difficulty: 'Easy',
           timeLimit: '1 초',
           memoryLimit: '256 MB',
           correctRate: '0%',
@@ -89,35 +137,111 @@ const CodingProblem = () => {
     fetchProblemData();
   }, [id]);
 
-  const handleCodeGeneration = () => {
+  const handleCodeGeneration = async () => {
     if (!promptCode.trim()) {
       setConsoleOutput('프롬프트를 입력해주세요.');
       return;
     }
 
-    const exampleCode = `// 생성된 코드 예시\nfunction solveProblem() {\n  // 여기에 AI가 생성한 코드가 표시됩니다\n  console.log("Hello, World!");\n}\n\nsolveProblem();`;
+    setIsGenerating(true);
+    setConsoleOutput('코드를 생성하는 중...');
 
-    setGeneratedCode(exampleCode);
-    setEditorCode(exampleCode);
-    setConsoleOutput('코드를 생성했습니다. 우측 탭에서 code를 확인하세요.');
-    setActiveTab('code');
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      setConsoleOutput('로그인이 필요합니다.');
+      setIsGenerating(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/challenges/ps/${id}/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ prompt: promptCode }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const generated = data.content;
+
+      setGeneratedCode(generated);
+      setEditorCode(generated);
+      setConsoleOutput('코드를 생성했습니다. 우측 탭에서 code를 확인하세요.');
+      setActiveTab('code');
+    } catch (error) {
+      console.error('Code generation error:', error);
+      setConsoleOutput(`코드 생성 중 오류가 발생했습니다: ${error.message}`);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
-  const handleCodeExecution = () => {
-    // 피그마 디자인에 맞는 실행 결과 출력
-    const executionResult = `> 1
-> 6
-> 3
-> 30`;
-    
-    setConsoleOutput(executionResult);
-    setShowResult(true);
+  const handleCodeExecution = async () => {
+    if (!editorCode.trim()) {
+      setConsoleOutput('실행할 코드를 입력하거나 생성해주세요.');
+      return;
+    }
+
+    setIsExecuting(true);
+    setConsoleOutput('코드를 채점하는 중...');
+    setScoringResult(null);
+
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      setConsoleOutput('로그인이 필요합니다.');
+      setIsExecuting(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/challenges/ps/${id}/score`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ code: editorCode }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      }
+
+      const results = await response.json();
+      setScoringResult(results);
+
+      const consoleLog = results.map((res, index) => {
+        let output = `[테스트케이스 ${index + 1}]\n- 상태: ${res.status}\n- 시간: ${res.elapsed_time.toFixed(2)}s\n- 메모리: ${res.max_memory_kb || 0}KB\n- 코드 출력(stdout):\n${res.stdout || '(없음)'}`;
+        if (res.stderr) {
+          output += `\n- 에러 출력(stderr):\n${res.stderr}`;
+        }
+        return output;
+      }).join('\n\n');
+
+      setConsoleOutput(consoleLog);
+      setShowResult(true);
+
+    } catch (error) {
+      console.error('Code execution error:', error);
+      setConsoleOutput(`코드 실행 중 오류가 발생했습니다: ${error.message}`);
+    } finally {
+      setIsExecuting(false);
+    }
   };
 
   const handleRetry = () => {
     setShowResult(false);
     // showOthersWork는 항상 true 유지
     setConsoleOutput('');
+    setScoringResult(null);
     setActiveTab('Prompt');
   };
 
@@ -126,7 +250,22 @@ const CodingProblem = () => {
   };
 
   const handleSharePrompt = () => {
-    navigate('/board/write');
+    const combinedContent = `### ✨ Prompt\n\n\
+${promptCode}
+\
+\n### 💻 Code\n\n\
+python
+${editorCode}
+\
+`;
+
+    navigate('/board/write', {
+      state: {
+        problemId: id,
+        initialContent: combinedContent,
+        category: 'coding'
+      }
+    });
   };
 
   // handleViewOthers 함수 제거 - 항상 표시되므로 불필요
@@ -284,6 +423,7 @@ const CodingProblem = () => {
                     >
                       <span>code</span>
                     </button>
+
                   </div>
                   <div className="code-editor">
                     {activeTab === 'Prompt' ? (
@@ -294,21 +434,51 @@ const CodingProblem = () => {
                         onChange={(e) => setPromptCode(e.target.value)}
                       />
                     ) : (
-                      <textarea
-                        className="code-textarea"
-                        placeholder="여기에 코드를 작성하거나 수정하세요..."
+                      <Editor
+                        height="100%"
+                        language="python"
                         value={editorCode}
-                        onChange={(e) => setEditorCode(e.target.value)}
+                        onChange={(value) => setEditorCode(value || '')}
+                        options={{
+                          minimap: { enabled: false },
+                          fontSize: 14,
+                          lineNumbers: 'on',
+                          roundedSelection: false,
+                          scrollBeyondLastLine: false,
+                          automaticLayout: true,
+                          wordWrap: 'on',
+                          theme: 'vs',
+                          suggestOnTriggerCharacters: true,
+                          quickSuggestions: true,
+                          parameterHints: { enabled: true },
+                          hover: { enabled: true },
+                          folding: true,
+                          bracketPairColorization: { enabled: true },
+                          autoIndent: 'full',
+                          formatOnPaste: true,
+                          formatOnType: true,
+                          tabSize: 2,
+                          insertSpaces: true,
+                          detectIndentation: true,
+                          glyphMargin: true,
+                          lineNumbersMinChars: 4
+                        }}
+                        placeholder="여기에 코드를 작성하거나 수정하세요..."
+                        loading={<div className="editor-loading">에디터를 로딩 중...</div>}
+                        onMount={(editor, monaco) => {
+                          // 에디터가 마운트된 후 추가 설정
+                          editor.focus();
+                        }}
                       />
                     )}
                   </div>
                   {!showResult && (
                     <div className="action-buttons">
-                      <button className="action-btn generate-btn" onClick={handleCodeGeneration}>
-                        <span>코드 생성</span>
+                      <button className="action-btn generate-btn" onClick={handleCodeGeneration} disabled={isGenerating}>
+                        <span>{isGenerating ? '생성 중...' : '코드 생성'}</span>
                       </button>
-                      <button className="action-btn execute-btn" onClick={handleCodeExecution}>
-                        <span>코드 실행</span>
+                      <button className="action-btn execute-btn" onClick={handleCodeExecution} disabled={isExecuting}>
+                        <span>{isExecuting ? '채점 중...' : '코드 실행'}</span>
                       </button>
                     </div>
                   )}
@@ -321,7 +491,6 @@ const CodingProblem = () => {
               <div className="console-container">
                 <div className="console-content-wrapper">
                   <div className="console-content">
-                    <div className="console-title">Console</div>
                     <pre className="console-output">{consoleOutput}</pre>
                   </div>
                 </div>
@@ -332,11 +501,24 @@ const CodingProblem = () => {
                         <div className="result-title">채점결과</div>
                       </div>
                       <div className="result-box">
-                        <div className="result-status">정답입니다!</div>
+                        <div className={`result-status ${scoringResult && scoringResult.every(r => r.status === 'Accepted') ? 'success' : ''}`}>
+                          {scoringResult && scoringResult.every(r => r.status === 'Accepted') ? '정답입니다!' : '오답입니다.'}
+                        </div>
                         <div className="result-details">
-                          메모리: 34024 KB<br />
-                          시간: 68 ms<br />
-                          수동 수정: 3회
+                          {scoringResult ? (
+                            scoringResult.map((res, index) => (
+                              <div key={index}>
+                                테스트케이스 {index + 1}: {res.status}
+                                {res.status !== 'Accepted' && `(시간: ${res.elapsed_time.toFixed(2)}s, 메모리: ${res.max_memory_kb}KB)`}
+                              </div>
+                            ))
+                          ) : (
+                            <>
+                              메모리: 34024 KB<br />
+                              시간: 68 ms<br />
+                              수동 수정: 3회
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>

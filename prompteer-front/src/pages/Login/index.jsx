@@ -7,7 +7,8 @@ import "./Login.css";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ id: "", password: "" });
+  // state 'id'를 'email'로 변경
+  const [form, setForm] = useState({ email: "", password: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (field, value) => {
@@ -15,29 +16,26 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-    // await 사용 위해서 async 함수로 바꿔주고.
     e.preventDefault();
 
-    // 기본 유효성 검사
-    if (!form.id.trim() || !form.password.trim()) {
-      alert("ID와 비밀번호를 입력해주세요.");
+    // 유효성 검사 메시지 및 필드 변경
+    if (!form.email.trim() || !form.password.trim()) {
+      alert("이메일과 비밀번호를 입력해주세요.");
       return;
     }
 
     setIsSubmitting(true);
-    // 전반적으로 signUp과 매우 유사
 
     try {
-      // API 명세서에 맞는 데이터 구조로 변환
+      // API 명세서에 맞게 데이터 구조 변경 (nickname -> email)
       const loginData = {
-        nickname: form.id, // 명세서에서는 nickname 필드 사용
+        email: form.email,
         password: form.password,
       };
 
       const result = await signIn(loginData);
 
       if (result.success) {
-        // signIn 함수에서 이미 토큰 저장하고 리다이렉트 처리함
         alert("로그인 성공!");
       } else {
         alert(result.error || "로그인에 실패했습니다.");
@@ -58,18 +56,19 @@ const Login = () => {
           <h1 className="login-title">로그인</h1>
 
           <form className="login-form" onSubmit={handleSubmit}>
+            {/* ID 입력 필드를 Email 입력 필드로 변경 */}
             <div className="input-group">
-              <label className="input-label" htmlFor="login-id">
-                ID
+              <label className="input-label" htmlFor="login-email">
+                Email
               </label>
               <input
-                id="login-id"
+                id="login-email"
                 className="input-field"
-                type="text"
-                placeholder="아이디를 입력하세요"
-                value={form.id}
-                onChange={(e) => handleChange("id", e.target.value)}
-                autoComplete="username"
+                type="email"
+                placeholder="이메일을 입력하세요"
+                value={form.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                autoComplete="email"
               />
             </div>
 

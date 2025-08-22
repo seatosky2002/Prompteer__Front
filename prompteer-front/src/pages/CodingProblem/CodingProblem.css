@@ -28,7 +28,7 @@
 .problem-layout {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: stretch;
   padding: 0;
   width: 100%;
   gap: 0;
@@ -655,11 +655,9 @@
   align-items: stretch;
   padding: 16px;
   width: 500px;
-  height: 900px;
-  flex: none;
+  flex: 1;
   order: 0;
   align-self: stretch;
-  flex-grow: 0;
 }
 
 /* Frame 133 - 탭 바 */
@@ -735,6 +733,8 @@
   text-align: center;
 }
 
+
+
 /* Frame 52 - 코드 에디터 */
 .code-editor-container {
   display: flex;
@@ -747,17 +747,27 @@
 .code-editor {
   box-sizing: border-box;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: stretch;
   align-items: stretch;
-  padding: 16px 17px;
   width: 468px;
   flex: 1;
-  overflow: auto;
+  overflow: hidden;
   background: #FFFFFF;
   border: 1px solid #E9ECEF;
   border-radius: 0px 8px 8px 8px;
   order: 1;
+}
+
+/* 에디터 로딩 상태 스타일 */
+.editor-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #222222;
+  font-size: 14px;
+  background-color: #f0f0f0;
 }
 
 .code-textarea {
@@ -767,7 +777,7 @@
   border: none;
   outline: none;
   resize: none;
-  background: transparent;
+  background: #FFFFFF;
   font-family: 'Fira Code';
   font-style: normal;
   font-weight: 400;
@@ -1034,7 +1044,7 @@
   padding: 0px 40px;
   width: 100%;
   max-width: 1440px;
-  margin: 20px auto 0;
+  margin: 40px auto 0;
 }
 
 .bottom-notice p {

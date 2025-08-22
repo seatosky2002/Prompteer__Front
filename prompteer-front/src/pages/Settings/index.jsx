@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../../components/common/Header/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
+import { unregisterUser, getCurrentUserDetails } from "../../apis/api.js";
 import "./Settings.css";
 
 const Settings = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("프로필 수정");
   const [formData, setFormData] = useState({
     // 계정 설정
-    nickname: "뽀복",
-    email: "pobokdev@example.com",
-    username: "promptinglion7520",
-    bio: "AI와 함께 성장하는 개발자입니다.",
+    nickname: "",
+    email: "",
+    bio: "",
     interests: [],
     password: "",
     newPassword: "",
@@ -42,6 +44,25 @@ const Settings = () => {
     "PS",
     "기타",
   ];
+
+  // 백엔드 API 형식 → 프론트엔드 형식으로 변환
+  // 중복 선택 가능하게끔 하는 느낌낌
+  const mapInterestsFromAPI = (apiInterests) => {
+    const interestMap = {
+      backend_developer: "백엔드 개발자",
+      frontend_developer: "프론트엔드 개발자",
+      ui_ux_designer: "UX/UI디자이너",
+      prompt_engineer: "프롬프트 엔지니어",
+      planner_pm: "기획/PM",
+      ps: "PS",
+      etc: "기타",
+    };
+
+    return Object.entries(apiInterests)
+      .filter(([key, value]) => value === true)
+      .map(([key]) => interestMap[key])
+      .filter(Boolean);
+  };
 
   const tabs = [
     { id: "프로필 수정", label: "프로필 수정", icon: "👤" },
@@ -82,14 +103,37 @@ const Settings = () => {
   const [isSettingButtonLive, setIsSettingButtonLive] = useState(true);
   const handleOpenDeleteModal = () => setIsDeleteModalOpen(true);
   const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
+    // 비동기함수 사용 위해 async로 바꾸기
     if (!formData.deletePassword?.trim()) {
       alert("비밀번호를 입력해주세요.");
       return;
     }
-    // TODO: API 연동
-    alert("회원 탈퇴 요청이 전송되었습니다.");
-    setIsDeleteModalOpen(false);
+
+    // 서버에서 '현재 로그인된 사용자의 비밀번호' 받아오는 api가 필요함.
+    if (formData.deletePassword !== "qwer1234") {
+      // 임시 비밀번호
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    try {
+      // 회원 탈퇴 API 호출
+      const result = await unregisterUser();
+
+      if (result.success) {
+        alert("회원 탈퇴가 완료되었습니다. 이용해주셔서 감사했습니다.");
+        // 메인 페이지로 리다이렉트 (이미 로그아웃 상태)
+        navigate("/");
+      } else {
+        alert(result.error || "회원 탈퇴에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("Unregister error:", error);
+      alert("회원 탈퇴 중 오류가 발생했습니다.");
+    } finally {
+      setIsDeleteModalOpen(false); // 모달을 닫는다
+    }
   };
 
   useEffect(() => {
@@ -100,6 +144,35 @@ const Settings = () => {
       setIsSettingButtonLive(true); // 다른 탭에서는 설정 저장 버튼 표시
     }
   }, [activeTab]);
+
+  // 컴포넌트 마운트 시 사용자 데이터 가져오기
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const result = await getCurrentUserDetails();
+
+        if (result.success) {
+          const userData = result.data; // 백엔드에서 받아온 api의 프로필 데이터를 이용해서..
+          setFormData((prev) => ({
+            // state에다가 저장한다.
+            ...prev,
+            nickname: userData.nickname || "",
+            email: userData.email || "",
+            bio: userData.profile?.introduction || "",
+            interests: userData.profile?.interested_in
+              ? mapInterestsFromAPI(userData.profile.interested_in)
+              : [],
+          }));
+        } else {
+          console.error("사용자 데이터 가져오기 실패:", result.error);
+        }
+      } catch (error) {
+        console.error("사용자 데이터 가져오기 중 오류:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleSave = () => {
     console.log("설정 저장:", formData);
@@ -131,22 +204,6 @@ const Settings = () => {
             disabled
             aria-readonly
             placeholder="likelion@snu.ac.kr"
-          />
-        </div>
-      </div>
-
-      {/* 아이디 (비활성화, 회색 배경) */}
-      <div className="form-group">
-        <div className="input-wrapper">
-          <label htmlFor="username">아이디</label>
-          <input
-            className="input-field input-gray"
-            type="text"
-            id="username"
-            value={formData.username}
-            disabled
-            aria-readonly
-            placeholder="promptinglion7520"
           />
         </div>
       </div>
@@ -347,7 +404,7 @@ const Settings = () => {
             >
               ×
             </button>
-            <div className="modal-header">
+            <div className="exit-modal-header">
               <h3 id="delete-modal-title" className="modal-title">
                 회원 탈퇴
               </h3>
@@ -359,10 +416,9 @@ const Settings = () => {
                 정말 탈퇴하시겠습니까?
                 <br />
                 <br />
-                탈퇴하려면 본인의 비밀번호를 입력해주세요.
+                탈퇴하려면 본인의 <b>비밀번호</b>를 입력해주세요.
               </p>
               <div className="modal-field">
-                <label htmlFor="deletePassword">비밀번호</label>
                 <input
                   id="deletePassword"
                   type="password"

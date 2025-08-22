@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
-import { getAllChallenges, filterChallengesByCategory, searchChallenges } from '../../services/challengeApi.js';
+import { getAllChallenges, filterChallengesByCategory } from '../../services/challengeApi.js';
 import './CodingCategory.css';
 
 const CodingCategory = () => {
@@ -32,6 +32,23 @@ const CodingCategory = () => {
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
+  // 난이도 텍스트 변환 함수
+  const getDifficultyText = (level) => {
+    if (!level) return '중급'; // 기본값
+    
+    const levelLower = level.toLowerCase();
+    switch (levelLower) {
+      case 'easy':
+        return '초급';
+      case 'medium':
+        return '중급';
+      case 'hard':
+        return '고급';
+      default:
+        return '중급'; // 기본값
+    }
+  };
+
   // API에서 챌린지 데이터 가져오기
   useEffect(() => {
     const fetchChallenges = async () => {
@@ -53,11 +70,10 @@ const CodingCategory = () => {
         const transformedData = data.map(challenge => ({
           id: challenge.id,
           title: `Challenge #${challenge.id}\n${challenge.title || '제목 없음'}`,
-
           description: challenge.content || challenge.problemDescription?.situation || challenge.description || '설명 없음',
           challenge_type: 'CODE',
           type: 'code',
-          difficulty: challenge.difficulty || '중급',
+          difficulty: getDifficultyText(challenge.level || challenge.difficulty),
           category: '코딩',
           participants: Math.floor(Math.random() * 1500) + 300,
           createdAt: challenge.created_at,
@@ -84,9 +100,13 @@ const CodingCategory = () => {
   const getFilteredAndSortedChallenges = () => {
     let filtered = challenges;
 
-    // 검색어 필터링
-    if (searchTerm) {
-      filtered = searchChallenges(filtered, searchTerm);
+    // 검색어 필터링 - 제목으로 검색
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(challenge => {
+        const title = challenge.title.toLowerCase();
+        const searchLower = searchTerm.toLowerCase();
+        return title.includes(searchLower);
+      });
     }
 
     // 정렬
@@ -105,8 +125,13 @@ const CodingCategory = () => {
   };
 
   const handleChallengeNow = () => {
-    // Featured 챌린지 #12로 이동
-    navigate('/coding/problem/12');
+    // 첫 번째 챌린지로 이동
+    if (challenges.length > 0) {
+      navigate(`/coding/problem/${challenges[0].id}`);
+    } else {
+      // 챌린지가 없으면 기본 페이지로 이동
+      navigate('/coding/problem/1');
+    }
   };
 
   return (
@@ -122,8 +147,19 @@ const CodingCategory = () => {
             <div className="featured-details">
               <div className="status-badge">doing</div>
               <div className="featured-info">
-                <h3 className="challenge-number">Challenge #12</h3>
-                <p className="challenge-name">BFS 알골리즘</p>
+                {challenges.length > 0 ? (
+                  <>
+                    <h3 className="challenge-number">Challenge #{challenges[0].id}</h3>
+                    <p className="challenge-name">
+                      {challenges[0].title.split('\n')[1] || '제목 없음'}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="challenge-number">Challenge #-</h3>
+                    <p className="challenge-name">로딩 중...</p>
+                  </>
+                )}
               </div>
               <button className="challenge-now-btn" onClick={handleChallengeNow}>
                 지금 도전하기 →
@@ -151,6 +187,13 @@ const CodingCategory = () => {
                     />
                   </svg>
                 </div>
+                <input
+                  type="text"
+                  placeholder="문제 제목으로 검색..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
               </div>
               {/* Filter Frame - Figma: Frame 106 */}
               <div className="filter-frame">

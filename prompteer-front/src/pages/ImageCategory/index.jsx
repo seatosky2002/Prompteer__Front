@@ -152,6 +152,13 @@ const ImageCategory = () => {
                     />
                   </svg>
                 </div>
+                <input
+                  type="text"
+                  placeholder="문제 제목으로 검색..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
               </div>
               {/* Filter Frame */}
               <div className="filter-frame">

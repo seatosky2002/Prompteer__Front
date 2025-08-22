@@ -181,8 +181,12 @@ const ImageProblem = () => {
       }
 
       const imageUrl = await response.json();
+      let imagePath = imageUrl;
+      if (imagePath.startsWith('media/')) {
+        imagePath = imagePath.substring(6);
+      }
       // 백엔드에서 "media/..." 형태의 상대 경로를 반환하므로, "/"를 추가하여 전체 URL을 만들어줍니다.
-      const fullImageUrl = `http://localhost:3000/${imageUrl}`;
+      const fullImageUrl = `http://localhost:3000/${imagePath}`;
       setGeneratedImageUrl(fullImageUrl);
       setIsGenerated(true);
     } catch (error) {

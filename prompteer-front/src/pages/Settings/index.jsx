@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/common/Header/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
-import { unregisterUser, getCurrentUserDetails } from "../../apis/api.js";
+import {
+  unregisterUser,
+  getCurrentUserDetails,
+  checkPassword,
+} from "../../apis/api.js";
 import "./Settings.css";
 
 const Settings = () => {
@@ -77,16 +81,6 @@ const Settings = () => {
     }));
   };
 
-  const handleNestedChange = (category, field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [category]: {
-        ...prev[category],
-        [field]: value,
-      },
-    }));
-  };
-
   const handleToggleInterest = (tag) => {
     setFormData((prev) => {
       const isSelected = prev.interests.includes(tag);
@@ -101,7 +95,13 @@ const Settings = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   // 설정 저장 버튼 표시 여부
   const [isSettingButtonLive, setIsSettingButtonLive] = useState(true);
-  const handleOpenDeleteModal = () => setIsDeleteModalOpen(true);
+  const handleOpenDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+    setFormData((prev) => ({
+      ...prev,
+      deletePassword: "",
+    })); // 모달 열릴 때 비밀번호 입력 필드 초기화
+  };
   const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
   const handleConfirmDelete = async () => {
     // 비동기함수 사용 위해 async로 바꾸기
@@ -110,15 +110,18 @@ const Settings = () => {
       return;
     }
 
-    // 서버에서 '현재 로그인된 사용자의 비밀번호' 받아오는 api가 필요함.
-    if (formData.deletePassword !== "qwer1234") {
-      // 임시 비밀번호
-      alert("비밀번호가 일치하지 않습니다.");
-      return;
-    }
-
     try {
-      // 회원 탈퇴 API 호출
+      // 1단계: 비밀번호 확인
+      const passwordCheck = await checkPassword(formData.deletePassword); // 현재 form에서 비밀번호 입력 중인 값을 백엔드에 보내서 그게 유효한지 확인하는 함수
+
+      if (!passwordCheck.success) {
+        alert(passwordCheck.error || "비밀번호가 일치하지 않습니다.");
+        return;
+      }
+
+      // 비밀번호 확인까지 완료되면 다음단계로.
+
+      // 2단계: 회원 탈퇴 API 호출
       const result = await unregisterUser();
 
       if (result.success) {

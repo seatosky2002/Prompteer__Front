@@ -183,6 +183,31 @@ export const getCurrentUserDetails = async () => {
   }
 };
 
+// 비밀번호 확인 API. 회원 탈퇴 / 비밀번호 변경에서 사용
+export const checkPassword = async (password) => {
+  try {
+    const response = await instanceWithToken.post("users/check-password", {
+      password: password, // 전달받은 password만 그대로 백에게 전달
+    });
+
+    if (response.status === 200) {
+      return { success: true }; // 비밀번호 확인 성공
+    }
+  } catch (error) {
+    if (error.response?.status === 422) {
+      return {
+        success: false,
+        error: "비밀번호 형식이 올바르지 않습니다.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "비밀번호 확인 중 오류가 발생했습니다.",
+      };
+    }
+  }
+};
+
 // 회원 탈퇴 API
 export const unregisterUser = async () => {
   try {

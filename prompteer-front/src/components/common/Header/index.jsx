@@ -94,6 +94,7 @@ const Header = () => {
               </>
             )}
           </nav>
+
           {isLoggedIn && <button className="logout-btn" onClick={handleLogout}>로그아웃</button>}
           {!isLoggedIn && (
             <button

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/common/Header/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
-import { signUp } from "../../apis/api.js";
+import { signUp, updateUserProfile } from "../../apis/api.js";
 import "./Signup.css";
 
 const allInterests = [
@@ -14,6 +14,20 @@ const allInterests = [
   "PS",
   "기타",
 ];
+
+// 어려운 함수 아님. 그냥 form.interest에 있는 요소들을 T, F로 변환해주는 함수.
+// 프론트엔드 관심 분야 → 백엔드 API 형식으로 변환
+const mapInterestsToAPI = (selectedInterests) => {
+  return {
+    backend_developer: selectedInterests.includes("백엔드 개발자"),
+    frontend_developer: selectedInterests.includes("프론트엔드 개발자"),
+    ui_ux_designer: selectedInterests.includes("UX/UI디자이너"),
+    prompt_engineer: selectedInterests.includes("프롬프트 엔지니어"),
+    planner_pm: selectedInterests.includes("기획/PM"),
+    ps: selectedInterests.includes("PS"),
+    etc: selectedInterests.includes("기타"),
+  };
+};
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -38,7 +52,7 @@ const Signup = () => {
       const next = selected
         ? prev.interests.filter((t) => t !== tag)
         : [...prev.interests, tag];
-      return { ...prev, interests: next };
+      return { ...prev, interests: next }; // form.interest에 클릭한 tag가 추가되는 느낌
     });
   };
 
@@ -52,8 +66,8 @@ const Signup = () => {
       alert("ID는 3자 이상이어야 합니다.");
       return false;
     }
-    if (form.password.length < 6) {
-      alert("비밀번호는 6자 이상이어야 합니다.");
+    if (form.password.length < 4) {
+      alert("비밀번호는 4자 이상이어야 합니다.");
       return false;
     }
     if (form.password !== form.confirmPassword) {
@@ -83,13 +97,31 @@ const Signup = () => {
         is_admin: false, // 기본값
       };
 
-      const result = await signUp(signupData); // form에서 입력 중인 data를 백엔드로 post! 미리 정의한 signUp api 함수를 이용한다.
+      // 1단계: 기본 회원가입. form에서 입력 중인 data를 백엔드로 post! 미리 정의한 signUp api 함수를 이용한다.
+      const signupResult = await signUp(signupData);
 
-      if (result.success) {
-        alert("회원가입이 완료되었습니다! 자동으로 로그인됩니다.");
+      if (!signupResult.success) {
+        alert(signupResult.error || "회원가입에 실패했습니다.");
+        return;
+      }
+
+      // 2단계: 회원가입에 성공했으니, 프로필 정보 저장 (관심 분야, 한줄 소개)
+      const profileData = {
+        introduction: form.bio || "", // 한줄 소개
+        interested_in: mapInterestsToAPI(form.interests), // 관심 분야 변환
+      };
+
+      const profileResult = await updateUserProfile(profileData); // api로 쏠 data 생성성
+
+      if (profileResult.success) {
+        alert("회원가입이 완료되었습니다! 자동으로 로그인됩니다."); // 프로필 수정까지는 완료되어야 진짜 회원가입 끝끝
         // signUp 함수에서 이미 토큰 저장하고 리다이렉트 처리함
       } else {
-        alert(result.error || "회원가입에 실패했습니다.");
+        // 기본 회원가입은 성공했지만 프로필 저장 실패. 이런일은 거의 없겠지지
+        alert(
+          "회원가입은 완료되었지만 프로필 저장에 실패했습니다. 설정에서 다시 입력해주세요."
+        );
+        // 그래도 로그인 상태로 메인 페이지로 이동 (signUp에서 처리됨)
       }
     } catch (error) {
       console.error("Signup error:", error);
@@ -188,13 +220,13 @@ const Signup = () => {
               <label className="input-label">관심 분야</label>
               <div className="tag-group">
                 {allInterests.map((tag) => {
-                  const selected = form.interests.includes(tag);
+                  const selected = form.interests.includes(tag); // selected는 true or false
                   return (
                     <button
                       key={tag}
                       type="button"
-                      className={`tag ${selected ? "selected" : ""}`}
-                      onClick={() => toggleInterest(tag)}
+                      className={`tag ${selected ? "selected" : ""}`} // 클릭하면 tag selected로로
+                      onClick={() => toggleInterest(tag)} // 관심분야 태그 중복 선택 가능하도록 하는..
                       aria-pressed={selected}
                     >
                       {tag}

@@ -104,7 +104,7 @@
   font-size: 13px;
 }
 .tag.selected {
-  background: var(--color-primary);
+  background: var(--color-primary) !important;
   border-color: var(--color-primary);
   color: #fff;
 }

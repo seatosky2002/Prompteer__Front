@@ -7,7 +7,17 @@ import { instance, instanceWithToken } from "./axios";
 // Account 관련 API들
 export const signIn = async (loginData) => {
   try {
-    const response = await instance.post("/users/login/", loginData);
+    // OAuth2 형식으로 데이터 변환 (application/x-www-form-urlencoded)
+    const formData = new URLSearchParams();
+    formData.append("grant_type", "password");
+    formData.append("username", loginData.email); // username 필드 사용
+    formData.append("password", loginData.password);
+
+    const response = await instance.post("/users/login", formData, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
 
     if (response.status === 200) {
       // 로그인 성공 시 토큰 발급됨
@@ -25,13 +35,12 @@ export const signIn = async (loginData) => {
   } catch (error) {
     // 에러 처리
     if (error.response?.status === 401) {
-      // 인증 실패 (닉네임 또는 비밀번호 틀림)
+      // 인증 실패 (이메일 또는 비밀번호 틀림)
       return {
         success: false,
-        error: "닉네임 또는 비밀번호가 틀렸습니다.",
+        error: "이메일 또는 비밀번호가 틀렸습니다.",
       };
     } else if (error.response?.status === 422) {
-      // 아마 401과의 차이점은 비밀번호 양식이 틀린 느낌일듯
       // 유효성 검사 실패
       return {
         success: false,
@@ -190,14 +199,14 @@ export const checkPassword = async (password) => {
       password: password, // 전달받은 password만 그대로 백에게 전달
     });
 
-    if (response.status === 200) {
-      return { success: true }; // 비밀번호 확인 성공
+    if (response.status === 204) {
+      return { success: true }; // 비밀번호 확인 성공 (204 No Content)
     }
   } catch (error) {
     if (error.response?.status === 422) {
       return {
         success: false,
-        error: "비밀번호 형식이 올바르지 않습니다.",
+        error: "비밀번호가 일치하지 않습니다.",
       };
     } else {
       return {

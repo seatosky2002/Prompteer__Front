@@ -110,69 +110,24 @@ const CodingProblem = () => {
           };
           setProblemData(transformedData);
         } else {
+          // 해당 ID가 없으면 기본 에러 데이터 설정
           setProblemData({
             id: id,
-            title: `Challenge #${id}
-문제를 찾을 수 없습니다`,
+            title: `Challenge #${id} - 문제를 찾을 수 없습니다`,
             category: 'PS',
             difficulty: 'Easy',
-
             timeLimit: '1 초',
             memoryLimit: '256 MB',
             correctRate: '0%',
             problemDescription: {
-              situation: currentProblem.content || '문제 상황을 불러올 수 없습니다.',
+              situation: '문제 데이터를 불러올 수 없습니다.',
               input: '',
               output: '',
               constraints: '',
               sampleInput: '',
               sampleOutput: ''
             }
-          };
-          setProblemData(transformedData);
-        } else {
-          // 해당 ID가 없으면 첫 번째 문제 사용
-          const firstProblem = challenges[0];
-          if (firstProblem) {
-            const transformedData = {
-              id: firstProblem.id,
-              title: firstProblem.title || `Challenge #${firstProblem.id}`,
-              category: firstProblem.tag || 'PS',
-              difficulty: firstProblem.level || 'Easy',
-              content: firstProblem.content,
-              timeLimit: '1 초',
-              memoryLimit: '256 MB',
-              correctRate: '0%',
-              problemDescription: {
-                situation: firstProblem.content || '문제 상황을 불러올 수 없습니다.',
-                input: '',
-                output: '',
-                constraints: '',
-                sampleInput: '',
-                sampleOutput: ''
-              }
-            };
-            setProblemData(transformedData);
-          } else {
-            setProblemData({
-              id: id,
-              title: `Challenge #${id}
-문제를 찾을 수 없습니다`,
-              category: 'PS',
-              difficulty: 'Easy',
-              timeLimit: '1 초',
-              memoryLimit: '256 MB',
-              correctRate: '0%',
-              problemDescription: {
-                situation: '문제 데이터를 불러올 수 없습니다.',
-                input: '',
-                output: '',
-                constraints: '',
-                sampleInput: '',
-                sampleOutput: ''
-              }
-            });
-          }
+          });
         }
       } catch (error) {
         console.error('문제 데이터 로딩 실패:', error);
@@ -180,8 +135,7 @@ const CodingProblem = () => {
         // 에러 시 기본 데이터 설정
         setProblemData({
           id: id,
-          title: `Challenge #${id}
-데이터 로딩 실패`,
+          title: `Challenge #${id} - 데이터 로딩 실패`,
           category: 'PS',
           difficulty: 'Easy',
           timeLimit: '1 초',

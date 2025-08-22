@@ -208,6 +208,32 @@ export const checkPassword = async (password) => {
   }
 };
 
+// 사용자 계정 정보 업데이트 API (닉네임, 이메일, 비밀번호)
+export const updateUserAccount = async (accountData) => {
+  try {
+    const response = await instanceWithToken.put("users/me", accountData); // 토큰 확인 이후 각종 data 수정.
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data, // 반환되는 data들은 현재 로그인된 사용자의 정보들
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 422) {
+      return {
+        success: false,
+        error: "입력 정보를 확인해주세요.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "계정 정보 업데이트 중 오류가 발생했습니다.",
+      };
+    }
+  }
+};
+
 // 회원 탈퇴 API
 export const unregisterUser = async () => {
   try {

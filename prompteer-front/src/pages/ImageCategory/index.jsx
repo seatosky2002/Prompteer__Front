@@ -134,33 +134,39 @@ const ImageCategory = () => {
           </div>
         </div>
 
-        {/* Body Container */}
+        {/* Body Container - Figma: body_container */}
         <div className="body-container">
-          {/* Search Container */}
-          <div className="search-outer-container">
-            <div className="search-inner-container">
-              {/* Search Box */}
-              <div className="search-box">
-                <div className="search-icon">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path
-                      d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35"
-                      stroke="#CED4DA"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
+          {/* Search Container - Figma: 검색창 외부 */}
+          <div className="image-category-search-outer-container">
+            {/* Search Inner - Figma: 검색창 내부 */}
+            <div className="image-category-search-inner-container">
+              {/* Search Box - Figma: 검색창 */}
+              <div className="image-category-search-box">
+                <svg
+                  className="image-category-search-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M19 19L13 13M15 8C15 11.866 11.866 15 8 15C4.13401 15 1 11.866 1 8C1 4.13401 1 8 1 8C1 4.13401 4.13401 1 8 1C11.866 1 15 4.13401 15 8Z"
+                    stroke="#CED4DA"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
                 <input
                   type="text"
                   placeholder="문제 제목으로 검색..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
+                  className="image-category-search-input"
                 />
               </div>
-              {/* Filter Frame */}
+              {/* Filter Frame - Figma: Frame 106 */}
               <div className="filter-frame">
                 <button
                   className={`filter-btn ${sortBy === 'image' ? 'active' : ''}`}

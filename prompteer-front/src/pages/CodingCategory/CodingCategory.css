@@ -1,13 +1,9 @@
-
-
 .coding-category-page {
-  font-family: 'Noto Sans KR', sans-serif;
-  background-color: #F8F9FA;
+  font-family: "Noto Sans KR", sans-serif;
+  background-color: #f8f9fa;
   display: flex;
   flex-direction: column;
 }
-
-
 
 /* Main Content */
 .coding-main {
@@ -29,7 +25,7 @@
 }
 
 .featured-content {
-  background: linear-gradient(90deg, #228BE6 0%, #228BE6 100%);
+  background: linear-gradient(90deg, #228be6 0%, #228be6 100%);
   border-radius: 12px;
   padding: 48px;
   display: flex;
@@ -39,11 +35,11 @@
 }
 
 .featured-title {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 700;
   font-size: 40px;
   line-height: 1.2em;
-  color: #FFFFFF;
+  color: #ffffff;
   margin: 0;
 }
 
@@ -56,11 +52,11 @@
 }
 
 .status-badge {
-  background-color: #FFFFFF;
-  color: #228BE6;
+  background-color: #ffffff;
+  color: #228be6;
   padding: 4px 10px;
   border-radius: 16px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 700;
   font-size: 13px;
   line-height: 1.2em;
@@ -78,11 +74,11 @@
 }
 
 .coding-category-page .featured-content .challenge-number {
-  font-family: 'Noto Sans KR', sans-serif !important;
+  font-family: "Noto Sans KR", sans-serif !important;
   font-weight: 800 !important;
   font-size: 32px !important;
   line-height: 1.2em !important;
-  color: #FFFFFF !important;
+  color: #ffffff !important;
   background: none !important;
   margin: 0 !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
@@ -92,21 +88,21 @@
 }
 
 .challenge-name {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 400;
   font-size: 20px;
   line-height: 1.2em;
-  color: #FFFFFF;
+  color: #ffffff;
   margin: 0;
 }
 
 .challenge-now-btn {
-  background-color: #FFFFFF;
-  color: #1971C2;
+  background-color: #ffffff;
+  color: #1971c2;
   border: none;
   border-radius: 8px;
   padding: 12px 24px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 700;
   font-size: 16px;
   line-height: 1.2em;
@@ -132,22 +128,22 @@
 }
 
 /* Search Outer Container - Figma: 검색창 외부 */
-.search-outer-container {
+.coding-category-search-outer-container {
   display: flex;
   flex-direction: column;
   align-self: stretch;
   gap: 10px;
   padding: 25px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border-radius: 12px;
   width: 100%;
   max-width: 1248px;
-  border: 1px solid #E9ECEF;
+  border: 1px solid #e9ecef;
   margin: 0 auto;
 }
 
 /* Search Inner Container - Figma: 검색창 내부 */
-.search-inner-container {
+.coding-category-search-inner-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -158,11 +154,11 @@
 }
 
 /* Search Box - Figma: 검색창 */
-.search-box {
+.coding-category-search-box {
   display: flex;
   align-items: center;
-  background: #FFFFFF;
-  border: 1px solid #CED4DA;
+  background: #ffffff;
+  border: 1px solid #ced4da;
   border-radius: 8px;
   padding: 10px 20px;
   flex: 1;
@@ -171,15 +167,15 @@
   gap: 10px;
 }
 
-.search-icon {
+.coding-category-search-icon {
   flex-shrink: 0;
 }
 
-.search-input {
+.coding-category-search-input {
   border: none;
   outline: none;
   background: transparent;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-size: 14px;
   color: #212529;
   width: 100%;
@@ -188,7 +184,7 @@
 }
 
 .search-input::placeholder {
-  color: #ADB5BD;
+  color: #adb5bd;
   font-size: 14px;
 }
 
@@ -208,10 +204,10 @@
   gap: 10px;
   padding: 10px 16px;
   height: 40px;
-  background-color: #F1F3F5;
+  background-color: #f1f3f5;
   border: none;
   border-radius: 8px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 1.2em;
@@ -221,12 +217,12 @@
 }
 
 .filter-btn:hover {
-  background-color: #E9ECEF;
+  background-color: #e9ecef;
 }
 
 .filter-btn.active {
-  background-color: #1971C2;
-  color: #FFFFFF;
+  background-color: #1971c2;
+  color: #ffffff;
 }
 
 /* Frame 283 - Challenges Grid Container */
@@ -249,8 +245,8 @@
   flex-direction: column;
   align-self: stretch;
   padding: 25px;
-  background-color: #FFFFFF;
-  border: 1px solid #E9ECEF;
+  background-color: #ffffff;
+  border: 1px solid #e9ecef;
   border-radius: 12px;
   cursor: pointer;
   transition: box-shadow 0.2s ease;
@@ -295,7 +291,7 @@
 }
 
 .challenge-title {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 700;
   font-size: 24px;
   line-height: 1.2em;
@@ -312,18 +308,18 @@
   display: flex;
   flex-direction: column;
   padding: 4px 10px;
-  background-color: #E7F5FF;
+  background-color: #e7f5ff;
   border-radius: 16px;
   width: fit-content;
   height: fit-content;
 }
 
 .category-text {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 500;
   font-size: 13px;
   line-height: 1.2em;
-  color: #1971C2;
+  color: #1971c2;
 }
 
 /* Frame 23 - Description Container */
@@ -349,7 +345,7 @@
 }
 
 .challenge-description-text {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 350;
   font-size: 14px;
   line-height: 1.5em;
@@ -392,23 +388,23 @@
 }
 
 .frame-28.difficulty-고급 {
-  background-color: #FF4E4E;
+  background-color: #ff4e4e;
 }
 
 .frame-28.difficulty-중급 {
-  background-color: #FFA94D;
+  background-color: #ffa94d;
 }
 
 .frame-28.difficulty-초급 {
-  background-color: #64BE75;
+  background-color: #64be75;
 }
 
 .difficulty-text {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 700;
   font-size: 13px;
   line-height: 1.2em;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 /* Frame 29 - Participants Container */
@@ -417,7 +413,7 @@
   align-self: stretch;
   gap: 16px;
   padding: 17px 0px 0px;
-  border-top: 1px solid #E9ECEF;
+  border-top: 1px solid #e9ecef;
 }
 
 /* Frame 33 - Participants Text Container */
@@ -428,7 +424,7 @@
 }
 
 .participants-text {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-weight: 350;
   font-size: 14px;
   line-height: 1.2em;
@@ -453,13 +449,13 @@
 }
 
 .error-container p {
-  color: #DC3545;
+  color: #dc3545;
   font-size: 16px;
   margin: 5px 0;
 }
 
 .error-container p:last-child {
-  color: #6C757D;
+  color: #6c757d;
   font-size: 14px;
 }
 
@@ -473,14 +469,12 @@
   font-size: 16px;
 }
 
-
-
 /* Responsive Design */
 @media (max-width: 1440px) {
   .coding-main {
     padding: 24px 48px 130px;
   }
-  
+
   .frame-283 {
     width: 100%;
     max-width: 1248px;
@@ -493,13 +487,13 @@
     height: auto;
     width: 100%;
   }
-  
+
   .search-inner-container {
     flex-direction: column;
     gap: 16px;
     align-items: stretch;
   }
-  
+
   .filter-frame {
     justify-content: center;
   }
@@ -509,15 +503,15 @@
   .coding-main {
     padding: 20px;
   }
-  
+
   .featured-content {
     padding: 24px;
   }
-  
+
   .featured-title {
     font-size: 28px;
   }
-  
+
   .frame-283 {
     grid-template-columns: 1fr;
     gap: 16px;

@@ -64,12 +64,14 @@ const CodingProblem = () => {
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
+
   // 백엔드에서 문제 데이터 가져오기
   useEffect(() => {
     const fetchProblemData = async () => {
       try {
         setLoading(true);
         const response = await fetch(`/challenges/${id}`);
+
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -85,6 +87,7 @@ const CodingProblem = () => {
             ? `${Math.round(accuracyRate * 100)}%`
             : '0%';
 
+
           // API 응답 구조에 맞게 데이터 변환
           const transformedData = {
             id: currentProblem.id,
@@ -92,6 +95,7 @@ const CodingProblem = () => {
             category: currentProblem.tag || 'PS', // tag 필드 사용
             difficulty: currentProblem.level || 'Easy', // level 필드 사용
             content: currentProblem.content,
+
             timeLimit: '1 초',
             memoryLimit: '256 MB',
             correctRate: correctRate,
@@ -112,18 +116,63 @@ const CodingProblem = () => {
 문제를 찾을 수 없습니다`,
             category: 'PS',
             difficulty: 'Easy',
+
             timeLimit: '1 초',
             memoryLimit: '256 MB',
             correctRate: '0%',
             problemDescription: {
-              situation: '문제 데이터를 불러올 수 없습니다.',
+              situation: currentProblem.content || '문제 상황을 불러올 수 없습니다.',
               input: '',
               output: '',
               constraints: '',
               sampleInput: '',
               sampleOutput: ''
             }
-          });
+          };
+          setProblemData(transformedData);
+        } else {
+          // 해당 ID가 없으면 첫 번째 문제 사용
+          const firstProblem = challenges[0];
+          if (firstProblem) {
+            const transformedData = {
+              id: firstProblem.id,
+              title: firstProblem.title || `Challenge #${firstProblem.id}`,
+              category: firstProblem.tag || 'PS',
+              difficulty: firstProblem.level || 'Easy',
+              content: firstProblem.content,
+              timeLimit: '1 초',
+              memoryLimit: '256 MB',
+              correctRate: '0%',
+              problemDescription: {
+                situation: firstProblem.content || '문제 상황을 불러올 수 없습니다.',
+                input: '',
+                output: '',
+                constraints: '',
+                sampleInput: '',
+                sampleOutput: ''
+              }
+            };
+            setProblemData(transformedData);
+          } else {
+            setProblemData({
+              id: id,
+              title: `Challenge #${id}
+문제를 찾을 수 없습니다`,
+              category: 'PS',
+              difficulty: 'Easy',
+              timeLimit: '1 초',
+              memoryLimit: '256 MB',
+              correctRate: '0%',
+              problemDescription: {
+                situation: '문제 데이터를 불러올 수 없습니다.',
+                input: '',
+                output: '',
+                constraints: '',
+                sampleInput: '',
+                sampleOutput: ''
+              }
+            });
+          }
         }
       } catch (error) {
         console.error('문제 데이터 로딩 실패:', error);
@@ -258,6 +307,7 @@ const CodingProblem = () => {
     }
   }, [showResult]);
 
+
   const handleCodeGeneration = async () => {
     if (!promptCode.trim()) {
       setConsoleOutput('프롬프트를 입력해주세요.');
@@ -386,6 +436,7 @@ ${editorCode}
         initialContent: combinedContent,
         category: 'coding',
         boardCategory: '프롬프트 공유'
+
       }
     });
   };

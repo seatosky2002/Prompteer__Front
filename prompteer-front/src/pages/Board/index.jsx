@@ -16,8 +16,8 @@ const Board = () => {
   const [activeTab, setActiveTab] = useState('전체');
   const [activeCategory, setActiveCategory] = useState('전체');
 
-  const tabs = ['전체', '질문', '프롬포트 공유'];
-  const categories = ['전체', '코딩', '이미지', '영상', '탈옥', '문서'];
+  const tabs = ['전체', '질문', '프롬프트 공유'];
+  const categories = ['전체', '코딩', '이미지', '영상'];
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -26,7 +26,7 @@ const Board = () => {
 
       const typeMapping = {
         '질문': 'question',
-        '프롬포트 공유': 'share'
+        '프롬프트 공유': 'share'
       };
       const tagMapping = {
         '코딩': 'ps',
@@ -139,8 +139,7 @@ const Board = () => {
                       id={post.id}
                       title={post.title}
                       category={post.tag.toUpperCase()} // e.g., 'PS'
-                      problemNumber={post.challenge_id || (post.type === 'share' ? '프롬포트 공유' : '-')}
-                      problemNumber={post.challenge_id || '-'}
+                      problemNumber={post.challenge_id || (post.type === 'share' ? '프롬프트 공유' : '-')}
                       author={post.user?.nickname || '익명'}
                       comments={post.comments?.length || 0}
                       likes={post.likes_count || 0}

@@ -18,8 +18,10 @@ const BoardPostCard = ({
   console.log('BoardPostCard props:', { id, title, category, problemNumber, author, comments, likes, date });
 
   const handleClick = () => {
-    // 프롬포트 공유 게시물인 경우 다른 페이지로 이동
-    if (category === '프롬포트' || title.includes('프롬포트') || title.includes('공유')) {
+    // PS 카테고리의 프롬프트 공유 게시물인 경우 PS 공유 페이지로 이동
+    if (category === 'PS' && (title.includes('프롬프트') || title.includes('공유'))) {
+      navigate(`/board/ps/share`);
+    } else if (category === '프롬포트' || title.includes('프롬포트') || title.includes('공유')) {
       navigate(`/board/shared/${id}`);
     } else {
       navigate(`/board/post/${id}`);
@@ -40,9 +42,9 @@ const BoardPostCard = ({
 
       {/* 2~7열: 통계칸 - 헤더 순서와 정확히 동일 */}
       <div className="post-right">
-        <span className="post-stat">{category === 'PS' ? '코딩 질문' : '프롬포트 공유'}</span>
+        <span className="post-stat">{category === 'PS' ? '코딩 질문' : '프롬프트 공유'}</span>
         <span className="post-stat">
-          {problemNumber === '프롬포트 공유' ? '프롬포트 공유' : (problemNumber || '-')}
+                      {problemNumber === '프롬프트 공유' ? '프롬프트 공유' : (problemNumber || '-')}
         </span>
         <span className="post-stat">{author}</span>
         <span className="post-stat">{comments}</span>

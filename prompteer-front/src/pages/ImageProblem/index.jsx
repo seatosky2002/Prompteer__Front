@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import './ImageProblem.css';
 
 const ImageProblem = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [promptText, setPromptText] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
@@ -323,8 +324,16 @@ const ImageProblem = () => {
   };
 
   const handleShare = () => {
-    // 프롬프트 공유 로직
-    alert('프롬프트가 게시판에 공유되었습니다!');
+    console.log('handleShare 호출됨, id:', id, 'type:', typeof id);
+    navigate('/board/write', {
+      state: {
+        problemId: id,
+        category: 'image',
+        boardCategory: '프롬프트 공유',
+        promptText: promptText,
+        generatedImageUrl: generatedImageUrl
+      }
+    });
   };
 
   const handleLikeClick = async (shareId) => {

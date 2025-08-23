@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
@@ -11,57 +11,66 @@ const SharedPostDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isProblemExpanded, setIsProblemExpanded] = useState(false);
+  const [shareData, setShareData] = useState(null);
+  const [challengeData, setChallengeData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // 프롬프트 공유 게시물 데이터 (실제로는 API에서 id로 조회)
-  const getSharedPostData = (postId) => {
-    // 샘플 데이터 - 실제로는 API 호출
-    const samplePosts = {
-      '6': {
-        title: '코알라 프롬포트 공유합니다~',
-        author: '뽀복',
-        date: '25/7/27',
-        challengeTitle: 'Challenge #11 코알라 만들기',
-        likes: 10,
-        type: '프롬포트 공유',
-        imageUrl: '/images/koala-example.jpg', // 샘플 이미지 경로
-        problemDescription: {
-          constraints: {
-            time: '1초',
-            memory: '256MB'
-          },
-          situation: `이미지 생성 AI를 사용하여 귀여운 코알라 캐릭터를 만드는 문제입니다.
-
-다음 조건을 만족하는 코알라 이미지를 생성해야 합니다:
-- 귀여운 표정의 코알라
-- 밝은 배경
-- 만화 스타일
-- 고화질 이미지
-
-프롬프트 엔지니어링 기법을 활용하여 최적의 결과물을 만들어보세요.`
-        },
-        content: `프롬포트 어쩌구 저쩌구 이렇게 저렇게.....
-[생략]
-
-
-
-
-[프롬포트끝]
-
-
-내가 생각해도 너무 잘 짰어용..`
+  // API로부터 share 데이터 가져오기
+  useEffect(() => {
+    const fetchShareData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`http://localhost:8000/shares/${id}`);
+        
+        if (!response.ok) {
+          throw new Error('공유 데이터를 불러오는데 실패했습니다.');
+        }
+        
+        const share = await response.json();
+        console.log('Share data:', share);
+        setShareData(share);
+        
+        // 챌린지 데이터도 가져오기
+        if (share.challenge_id) {
+          await fetchChallengeData(share.challenge_id);
+        }
+      } catch (err) {
+        console.error('Error fetching share:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
-    
-    return samplePosts[postId] || samplePosts['6'];
+
+    fetchShareData();
+  }, [id]);
+
+  // 챌린지 데이터 가져오기
+  const fetchChallengeData = async (challengeId) => {
+    try {
+      const response = await fetch(`http://localhost:8000/challenges/${challengeId}`);
+      
+      if (!response.ok) {
+        console.warn('챌린지 데이터를 불러올 수 없습니다.');
+        return;
+      }
+      
+      const challenge = await response.json();
+      console.log('Challenge data:', challenge);
+      setChallengeData(challenge);
+    } catch (err) {
+      console.error('Error fetching challenge:', err);
+    }
   };
 
-  const postData = getSharedPostData(id);
+
   
-  const [activeTab, setActiveTab] = useState('프롬포트 공유');
+  const [activeTab, setActiveTab] = useState('프롬프트 공유');
   const [activeCategory, setActiveCategory] = useState('이미지');
 
-  const tabs = ['전체', '질문', '프롬포트 공유'];
-  const categories = ['전체', '코딩', '이미지', '영상', '탈옥', '문서'];
+  const tabs = ['전체', '질문', '프롬프트 공유'];
+  const categories = ['전체', '코딩', '이미지', '영상'];
 
   // 댓글 데이터 (예시)
   const comments = [
@@ -76,6 +85,71 @@ const SharedPostDetail = () => {
   const handleCommentSubmit = () => {
     console.log('댓글 작성 버튼 클릭됨');
   };
+
+  // 탭 클릭 핸들러
+  const handleTabClick = (tab) => {
+    if (tab === '전체') {
+      navigate('/board');
+    } else if (tab === '질문') {
+      navigate('/board?type=question');
+    } else if (tab === '프롬프트 공유') {
+      navigate('/board?type=share');
+    }
+    setActiveTab(tab);
+  };
+
+  // 카테고리 클릭 핸들러  
+  const handleCategoryClick = (category) => {
+    if (category === '코딩') {
+      navigate('/board?tag=ps');
+    } else if (category === '이미지') {
+      navigate('/board?tag=img');
+    } else if (category === '영상') {
+      navigate('/board?tag=video');
+    }
+    setActiveCategory(category);
+  };
+
+  // 게시물 작성 버튼 클릭 핸들러
+  const handlePostWriteClick = () => {
+    navigate('/board/write');
+  };
+
+  if (loading) {
+    return (
+      <div className="shared-post-detail-page">
+        <Header />
+        <main className="shared-post-detail-main">
+          <div className="loading-message">데이터를 불러오는 중...</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="shared-post-detail-page">
+        <Header />
+        <main className="shared-post-detail-main">
+          <div className="error-message">오류: {error}</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!shareData) {
+    return (
+      <div className="shared-post-detail-page">
+        <Header />
+        <main className="shared-post-detail-main">
+          <div className="error-message">공유 데이터를 찾을 수 없습니다.</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="shared-post-detail-page">
@@ -99,13 +173,13 @@ const SharedPostDetail = () => {
                     <FilterButton
                       key={tab}
                       isActive={activeTab === tab}
-                      onClick={() => setActiveTab(tab)}
+                      onClick={() => handleTabClick(tab)}
                     >
                       {tab}
                     </FilterButton>
                   ))}
                 </div>
-                <FilterButton variant="action">
+                <FilterButton variant="action" onClick={handlePostWriteClick}>
                   게시물 작성
                 </FilterButton>
               </div>
@@ -114,7 +188,7 @@ const SharedPostDetail = () => {
                 <CategoryFilter
                   categories={categories}
                   activeCategory={activeCategory}
-                  onCategoryChange={setActiveCategory}
+                  onCategoryChange={handleCategoryClick}
                 />
               </div>
             </div>
@@ -127,10 +201,14 @@ const SharedPostDetail = () => {
                   <div className="shared-post-card-main">
                     <div className="shared-post-card-header">
                       <div className="shared-post-card-title-section">
-                        <h2 className="shared-post-card-title">{postData.title}</h2>
+                        <h2 className="shared-post-card-title">
+                          {challengeData?.title || '이미지 프롬프트 공유'}
+                        </h2>
                         <div className="shared-post-card-meta">
-                          <span className="shared-post-card-author">작성자: {postData.author}</span>
-                          <span className="shared-post-card-date">{postData.date}</span>
+                          <span className="shared-post-card-author">작성자: {shareData.user?.nickname || '익명'}</span>
+                          <span className="shared-post-card-date">
+                            {new Date(shareData.created_at).toLocaleDateString()}
+                          </span>
                         </div>
                       </div>
                       <hr className="shared-post-card-divider" />
@@ -138,12 +216,14 @@ const SharedPostDetail = () => {
 
                     <div className="shared-post-card-challenge">
                       <div className="challenge-header">
-                        <h3 className="challenge-title">{postData.challengeTitle}</h3>
+                        <h3 className="challenge-title">
+                          {challengeData?.title || `Challenge #${shareData.challenge_id}`}
+                        </h3>
                         <div className="challenge-likes">
                           <svg width="20" height="18" viewBox="0 0 20 18" fill="none">
                             <path d="M10 17.5L8.55 16.2C3.4 11.74 0 8.74 0 5.5C0 3.42 1.42 2 3.5 2C4.64 2 5.88 2.59 6.5 3.5C7.12 2.59 8.36 2 9.5 2C11.58 2 13 3.42 13 5.5C13 8.74 9.6 11.74 4.45 16.2L10 17.5Z" fill="#515151"/>
                           </svg>
-                          <span>{postData.likes}</span>
+                          <span>{shareData.likes_count || 0}</span>
                         </div>
                       </div>
                       
@@ -154,15 +234,15 @@ const SharedPostDetail = () => {
                               <div className="problem-section">
                                 <h4 className="section-title">[제한]</h4>
                                 <div className="section-content">
-                                  시간 : {postData.problemDescription.constraints.time}<br/>
-                                  메모리 : {postData.problemDescription.constraints.memory}
+                                  시간 : {challengeData?.time_limit || '제한없음'}<br/>
+                                  메모리 : {challengeData?.memory_limit || '제한없음'}
                                 </div>
                               </div>
                               
                               <div className="problem-section">
-                                <h4 className="section-title">[문제 상황]</h4>
+                                <h4 className="section-title">[문제 설명]</h4>
                                 <div className="section-content">
-                                  {postData.problemDescription.situation}
+                                  {challengeData?.content || '이미지 생성 프롬프트 공유입니다.'}
                                 </div>
                               </div>
                             </div>
@@ -187,18 +267,82 @@ const SharedPostDetail = () => {
                         </div>
                       </div>
                       
-                      <div className="shared-post-content-section">
-                        {postData.content}
+                      {/* 사용한 프롬프트 섹션 */}
+                      <div className="user-prompt-section">
+                        <h4 className="section-title">사용한 프롬프트</h4>
+                        <div className="prompt-content">
+                          {shareData.prompt || '프롬프트 정보가 없습니다.'}
+                        </div>
                       </div>
 
-                      {/* 이미지 섹션 */}
+                      {/* 생성된 이미지 섹션 */}
                       <div className="shared-post-image-section">
-                        <div className="shared-post-image-placeholder">
-                          <div className="image-placeholder-content">
-                            <span>이미지 영역</span>
-                            <p>476 × 548px</p>
+                        <h4 className="section-title">생성된 이미지</h4>
+                        {shareData.img_share?.img_url ? (
+                          <div className="generated-image-container">
+                            <img 
+                              src={(() => {
+                                const url = shareData.img_share.img_url;
+                                console.log('Raw image URL from API:', url);
+                                
+                                if (url.startsWith('http')) {
+                                  return url;
+                                }
+                                
+                                // URL 정리: media/media/ 중복 제거
+                                let cleanUrl = url;
+                                
+                                // media/media/로 시작하는 경우 첫 번째 media/ 제거
+                                if (url.startsWith('media/media/')) {
+                                  cleanUrl = url.substring(6); // 'media/' 제거
+                                  cleanUrl = `/${cleanUrl}`;
+                                } else if (url.startsWith('media/')) {
+                                  cleanUrl = `/${url}`;
+                                } else if (!url.startsWith('/')) {
+                                  cleanUrl = `/${url}`;
+                                }
+                                
+                                const finalUrl = `http://localhost:8000${cleanUrl}`;
+                                console.log('Final image URL:', finalUrl);
+                                return finalUrl;
+                              })()}
+                              alt="생성된 이미지"
+                              className="generated-image"
+                              onLoad={(e) => {
+                                console.log('✅ Image loaded successfully:', e.target.src);
+                              }}
+                              onError={(e) => {
+                                console.error('❌ Image failed to load:', e.target.src);
+                                console.log('Original URL from API:', shareData.img_share.img_url);
+                                
+                                // 여러 URL 시도
+                                const originalUrl = shareData.img_share.img_url;
+                                const alternativeUrls = [
+                                  `http://localhost:8000/media${originalUrl}`,
+                                  `http://localhost:8000/static${originalUrl}`,
+                                  `http://localhost:8000${originalUrl}`,
+                                  originalUrl
+                                ];
+                                
+                                console.log('Trying alternative URLs:', alternativeUrls);
+                                
+                                e.target.parentElement.innerHTML = `
+                                  <div class="image-error-fallback">
+                                    <span>이미지를 불러올 수 없습니다</span>
+                                    <p>시도한 경로: ${e.target.src}</p>
+                                    <p>원본 URL: ${originalUrl}</p>
+                                  </div>
+                                `;
+                              }}
+                            />
                           </div>
-                        </div>
+                        ) : (
+                          <div className="generated-image-container">
+                            <div className="image-error-fallback">
+                              <span>이미지가 없습니다</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

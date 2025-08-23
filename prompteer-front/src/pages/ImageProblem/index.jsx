@@ -522,7 +522,7 @@ const ImageProblem = () => {
                       <div className="generated-result">
                         <div className="generated-image-placeholder">
                           {generatedImageUrl ? (
-                            <img src={generatedImageUrl} alt="Generated" style={{ maxWidth: '100%', maxHeight: '100%' }} />
+                            <img src={generatedImageUrl} alt="Generated" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           ) : (
                             <div className="image-placeholder">생성된 이미지</div>
                           )}

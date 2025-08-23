@@ -32,6 +32,23 @@ const VideoCategory = () => {
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
+  // 난이도 텍스트 변환 함수
+  const getDifficultyText = (level) => {
+    if (!level) return "중급"; // 기본값
+
+    const levelLower = level.toLowerCase();
+    switch (levelLower) {
+      case "easy":
+        return "초급";
+      case "medium":
+        return "중급";
+      case "hard":
+        return "고급";
+      default:
+        return "중급"; // 기본값
+    }
+  };
+
   // API에서 챌린지 데이터 가져오기
   useEffect(() => {
     const fetchChallenges = async () => {
@@ -54,7 +71,7 @@ const VideoCategory = () => {
           title: challenge.title || '제목 없음',
           description: challenge.content || challenge.description || '설명 없음',
           category: challenge.tag || '영상',
-          difficulty: challenge.level || '중급',
+          difficulty: getDifficultyText(challenge.level),
           participants: Math.floor(Math.random() * 1500) + 300, // 임시 참가자 수
           type: 'video'
         }));
@@ -174,7 +191,7 @@ const VideoCategory = () => {
               <div className="filter-frame">
                 <button
                   className={`filter-btn ${sortBy === 'image' ? 'active' : ''}`}
-                  onClick={() => setSortBy('image')}
+                  onClick={() => navigate('/category/image')}
                 >
                   이미지
                 </button>

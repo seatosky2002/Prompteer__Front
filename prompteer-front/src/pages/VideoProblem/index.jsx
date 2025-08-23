@@ -145,10 +145,14 @@ const VideoProblem = () => {
         
         const transformedData = data.map((share, index) => {
           let videoUrl = null;
-          if (share.video_share?.video_url) {
-            videoUrl = `http://localhost:8000/${share.video_share.video_url}`;
-          } else if (share.video_url) {
-            videoUrl = `http://localhost:8000/${share.video_url}`;
+          let rawUrl = share.video_share?.video_url || share.video_url || share.url;
+
+          if (rawUrl) {
+            if (rawUrl.startsWith('media/media/')) {
+              videoUrl = `http://localhost:8000/media/${rawUrl.substring(12)}`;
+            } else {
+              videoUrl = `http://localhost:8000/${rawUrl}`;
+            }
           }
           
           return {
@@ -207,7 +211,11 @@ const VideoProblem = () => {
       }
 
       const videoUrl = await response.json();
-      const fullVideoUrl = `http://localhost:8000/${videoUrl}`;
+      let videoPath = videoUrl;
+      if (videoPath.startsWith('media/')) {
+        videoPath = videoPath.substring(6);
+      }
+      const fullVideoUrl = `http://localhost:3000/${videoPath}`;
       setGeneratedVideoUrl(fullVideoUrl);
       setIsGenerated(true);
     } catch (error) {

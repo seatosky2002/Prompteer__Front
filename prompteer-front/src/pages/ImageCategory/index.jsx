@@ -193,7 +193,7 @@ const ImageCategory = () => {
                 </button>
                 <button
                   className={`filter-btn ${sortBy === 'video' ? 'active' : ''}`}
-                  onClick={() => setSortBy('video')}
+                  onClick={() => navigate('/category/video')}
                 >
                   영상
                 </button>

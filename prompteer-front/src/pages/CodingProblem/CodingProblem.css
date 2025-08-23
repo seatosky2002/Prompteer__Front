@@ -28,11 +28,11 @@
 .problem-layout {
   display: flex;
   flex-direction: row;
-  align-items: stretch;
+  align-items: flex-start; /* stretch에서 flex-start로 변경 */
   padding: 0;
   width: 100%;
   gap: 0;
-  min-height: auto; /* 자동 높이로 변경 */
+  min-height: calc(100vh - 200px); /* 최소 높이 설정으로 스크롤 영역 확보 */
 }
 
 /* Main - 중앙 정렬 수정 */
@@ -56,7 +56,7 @@
   padding: 24px 24px 24px 0px; /* pr-6 py-6 */
   gap: 20px; /* gap-5 (20px) */
   width: 384px; /* w-96 */
-  min-height: auto; /* 자동 높이로 변경 */
+  height: calc(100vh - 200px); /* 고정 높이로 변경 */
   border-right: 1px solid #E9ECEF; /* border-r border-gray-200 */
   flex: none;
   order: 0;
@@ -189,8 +189,29 @@
   display: flex;
   flex-direction: column;
   gap: 20px; /* gap-5 */
-  max-height: 600px; /* 스크롤을 위한 최대 높이 설정 */
+  height: calc(100vh - 400px); /* 헤더와 문제 제목 영역을 제외한 높이 */
   padding-right: 10px; /* 스크롤바 공간 */
+  scrollbar-width: thin; /* Firefox 스크롤바 스타일 */
+  scrollbar-color: #ADB5BD #F8F9FA; /* Firefox 스크롤바 색상 */
+}
+
+/* Webkit 브라우저 스크롤바 스타일 */
+.problem-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.problem-content::-webkit-scrollbar-track {
+  background: #F8F9FA;
+  border-radius: 4px;
+}
+
+.problem-content::-webkit-scrollbar-thumb {
+  background: #ADB5BD;
+  border-radius: 4px;
+}
+
+.problem-content::-webkit-scrollbar-thumb:hover {
+  background: #6C757D;
 }
 
 .problem-section {
@@ -715,7 +736,7 @@
   order: 1;
   align-self: stretch;
   flex-grow: 0;
-  min-height: 400px; /* 더 작은 높이로 조정 */
+  height: calc(100vh - 200px); /* 사이드바와 동일한 높이 */
 }
 
 /* Frame 135: 코드 워크스페이스 - 높이 통일 */
@@ -936,7 +957,7 @@
   order: 2;
   align-self: stretch;
   flex-grow: 0;
-  min-height: 400px; /* 더 작은 높이로 조정 */
+  height: calc(100vh - 200px); /* 사이드바와 동일한 높이 */
 }
 
 /* Frame 136: 콘솔 섹션 - 높이 통일 */
@@ -946,7 +967,7 @@
   align-items: center;
   padding: 33px 16px 16px;
   width: 500px;
-  height: 900px;
+  height: 100%; /* 부모 높이에 맞춤 */
   flex: none;
   order: 0;
   align-self: stretch;
@@ -962,7 +983,7 @@
   align-items: stretch;
   padding: 16px 17px 0px;
   width: 468px;
-  height: 600px;
+  height: 100%; /* 부모 높이에 맞춤 */
   overflow: auto;
   background: #FFFFFF;
   border: 1px solid #E9ECEF;

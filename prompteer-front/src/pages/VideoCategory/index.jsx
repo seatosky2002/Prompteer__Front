@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { searchChallenges } from '../../services/challengeApi.js';
-import './ImageCategory.css';
+import './VideoCategory.css';
 
-const ImageCategory = () => {
+const VideoCategory = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('image'); // 'image' or 'video'
+  const [sortBy, setSortBy] = useState('video'); // 'image' or 'video'
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,55 +32,38 @@ const ImageCategory = () => {
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
-  // 난이도 텍스트 변환 함수
-  const getDifficultyText = (level) => {
-    if (!level) return "중급"; // 기본값
-
-    const levelLower = level.toLowerCase();
-    switch (levelLower) {
-      case "easy":
-        return "초급";
-      case "medium":
-        return "중급";
-      case "hard":
-        return "고급";
-      default:
-        return "중급"; // 기본값
-    }
-  };
-
   // API에서 챌린지 데이터 가져오기
   useEffect(() => {
     const fetchChallenges = async () => {
       try {
         setLoading(true);
         
-        // /challenges/img/ 엔드포인트에서 직접 이미지 챌린지 데이터 가져오기
-        const response = await fetch('http://localhost:8000/challenges/img/');
+        // /challenges/video/ 엔드포인트에서 직접 비디오 챌린지 데이터 가져오기
+        const response = await fetch('http://localhost:8000/challenges/video/');
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('Image challenges API response:', data);
+        console.log('Video challenges API response:', data);
         
         // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
         const transformedData = data.map(challenge => ({
           id: challenge.id,
           title: challenge.title || '제목 없음',
           description: challenge.content || challenge.description || '설명 없음',
-          category: challenge.tag || '이미지',
-          difficulty: getDifficultyText(challenge.level),
+          category: challenge.tag || '영상',
+          difficulty: challenge.level || '중급',
           participants: Math.floor(Math.random() * 1500) + 300, // 임시 참가자 수
-          type: 'image'
+          type: 'video'
         }));
         
         setChallenges(transformedData);
         setError(null);
       } catch (err) {
-        console.error('Failed to fetch image challenges:', err);
-        setError('이미지 챌린지 데이터를 불러오는데 실패했습니다.');
+        console.error('Failed to fetch video challenges:', err);
+        setError('비디오 챌린지 데이터를 불러오는데 실패했습니다.');
         
         // 에러 시 빈 배열로 설정
         setChallenges([]);
@@ -120,20 +103,24 @@ const ImageCategory = () => {
   };
 
   const handleChallengeClick = (challengeId) => {
-    navigate(`/image/challenge/${challengeId}`);
+    navigate(`/video/challenge/${challengeId}`);
   };
 
   const handleChallengeNow = () => {
-    // Featured 챌린지 #11로 이동
-    navigate('/image/challenge/11');
+    // Featured 챌린지 #11로 이동 (임시)
+    if (challenges.length > 0) {
+      navigate(`/video/challenge/${challenges[0].id}`);
+    } else {
+      navigate('/video/challenge/1');
+    }
   };
 
   return (
-    <div className="image-category-page">
+    <div className="video-category-page">
       <Header isLoggedIn={isLoggedIn} />
 
       {/* Main Content */}
-      <main className="image-main">
+      <main className="video-main">
         {/* Featured Section */}
         <div className="featured-section">
           <div className="featured-content">
@@ -141,8 +128,8 @@ const ImageCategory = () => {
             <div className="featured-details">
               <div className="status-badge">추천</div>
               <div className="featured-info">
-                <h3 className="challenge-number">Challenge #11</h3>
-                <p className="challenge-name">일상 풍경 묘사 프롬프트 만들기</p>
+                <h3 className="challenge-number">Challenge #12</h3>
+                <p className="challenge-name">멋진 영상 프롬프트 만들기</p>
               </div>
               <button className="challenge-now-btn" onClick={handleChallengeNow}>
                 지금 도전하기 →
@@ -154,13 +141,13 @@ const ImageCategory = () => {
         {/* Body Container - Figma: body_container */}
         <div className="body-container">
           {/* Search Container - Figma: 검색창 외부 */}
-          <div className="image-category-search-outer-container">
+          <div className="video-category-search-outer-container">
             {/* Search Inner - Figma: 검색창 내부 */}
-            <div className="image-category-search-inner-container">
+            <div className="video-category-search-inner-container">
               {/* Search Box - Figma: 검색창 */}
-              <div className="image-category-search-box">
+              <div className="video-category-search-box">
                 <svg
-                  className="image-category-search-icon"
+                  className="video-category-search-icon"
                   width="20"
                   height="20"
                   viewBox="0 0 20 20"
@@ -180,7 +167,7 @@ const ImageCategory = () => {
                   placeholder="문제 제목으로 검색..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="image-category-search-input"
+                  className="video-category-search-input"
                 />
               </div>
               {/* Filter Frame - Figma: Frame 106 */}
@@ -215,7 +202,7 @@ const ImageCategory = () => {
               {getFilteredAndSortedChallenges().map((challenge) => (
                 <div
                   key={challenge.id}
-                  className="image-component"
+                  className="video-component"
                   onClick={() => handleChallengeClick(challenge.id)}
                 >
                   {/* Frame 17 - Main Card with Background Image */}
@@ -259,4 +246,4 @@ const ImageCategory = () => {
   );
 };
 
-export default ImageCategory;
+export default VideoCategory;

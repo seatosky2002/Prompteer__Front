@@ -72,14 +72,14 @@ const CodingCategory = () => {
         // 데이터 변환
         const transformedData = data.map((challenge) => ({
           id: challenge.id,
-          title: `Challenge #${challenge.id}\n${
-            challenge.title || "제목 없음"
-          }`,
+          title: challenge.title || "제목 없음",
           description:
-            challenge.content ||
-            challenge.problemDescription?.situation ||
-            challenge.description ||
-            "설명 없음",
+            (
+              challenge.content ||
+              challenge.problemDescription?.situation ||
+              challenge.description ||
+              "설명 없음"
+            ).replace(/\n/g, " "),
           challenge_type: "CODE",
           type: "code",
           difficulty: getDifficultyText(
@@ -138,13 +138,8 @@ const CodingCategory = () => {
   };
 
   const handleChallengeNow = () => {
-    // 첫 번째 챌린지로 이동
-    if (challenges.length > 0) {
-      navigate(`/coding/problem/${challenges[0].id}`);
-    } else {
-      // 챌린지가 없으면 기본 페이지로 이동
-      navigate("/coding/problem/1");
-    }
+    // 추천 챌린지 #3으로 고정 이동
+    navigate("/coding/problem/3");
   };
 
   return (
@@ -158,23 +153,10 @@ const CodingCategory = () => {
           <div className="featured-content">
             <h2 className="featured-title">코딩 카테고리</h2>
             <div className="featured-details">
-              <div className="status-badge">doing</div>
+              <div className="status-badge">추천</div>
               <div className="featured-info">
-                {challenges.length > 0 ? (
-                  <>
-                    <h3 className="challenge-number">
-                      Challenge #{challenges[0].id}
-                    </h3>
-                    <p className="challenge-name">
-                      {challenges[0].title.split("\n")[1] || "제목 없음"}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <h3 className="challenge-number">Challenge #-</h3>
-                    <p className="challenge-name">로딩 중...</p>
-                  </>
-                )}
+                <h3 className="challenge-number">Challenge #3</h3>
+                <p className="challenge-name">Longest Substring Without Repeating Characters</p>
               </div>
               <button
                 className="challenge-now-btn"
@@ -262,6 +244,7 @@ const CodingCategory = () => {
                   <div className="frame-127">
                     {/* Frame 22 */}
                     <div className="frame-22">
+                      <div className="challenge-number">Challenge #{challenge.id}</div>
                       <h3 className="challenge-title">{challenge.title}</h3>
                     </div>
                     {/* Frame 21 - Category Badge */}
@@ -294,14 +277,7 @@ const CodingCategory = () => {
                     </div>
                   </div>
 
-                  {/* Frame 29 - Participants */}
-                  <div className="frame-29">
-                    <div className="frame-33">
-                      <span className="participants-text">
-                        🧑 {challenge.participants}명 참가 중
-                      </span>
-                    </div>
-                  </div>
+
                 </div>
               ))}
             </div>

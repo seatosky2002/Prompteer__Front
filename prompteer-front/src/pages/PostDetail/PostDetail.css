@@ -192,9 +192,9 @@
   width: 100%;
 }
 
-.challenge-title,
-.post-card-challenge .challenge-title,
-.challenge-header .challenge-title {
+.post-detail-page .challenge-title,
+.post-detail-page .post-card-challenge .challenge-title,
+.post-detail-page .challenge-header .challenge-title {
   font-family: 'Inter', sans-serif !important;
   font-weight: 700 !important;
   font-style: normal;
@@ -384,9 +384,9 @@
     font-size: 28px;
   }
   
-  .challenge-title,
-  .post-card-challenge .challenge-title,
-  .challenge-header .challenge-title {
+  .post-detail-page .challenge-title,
+  .post-detail-page .post-card-challenge .challenge-title,
+  .post-detail-page .challenge-header .challenge-title {
     font-size: 36px !important;
   }
   

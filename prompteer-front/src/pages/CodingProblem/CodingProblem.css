@@ -436,7 +436,7 @@
 
 .stat-text {
   font-family: 'Noto Sans KR', sans-serif;
-  font-size: 16px; /* Figma 폰트 크기 */
+  font-size: 12px; /* 줄어든 폰트 크기 */
   font-weight: 400; /* 일반 텍스트는 400 */
   color: #101010; /* Figma 색상 */
   line-height: 1.2;
@@ -464,7 +464,7 @@
   border-radius: 8px; /* Figma border radius */
   padding: 20px; /* Figma padding */
   font-family: 'Noto Sans KR', sans-serif; /* Figma 폰트 */
-  font-size: 14px; /* Figma 폰트 크기 */
+  font-size: 11px; /* 줄어든 폰트 크기 */
   line-height: 1.2;
   color: #000000; /* Figma 텍스트 색상 */
   white-space: nowrap;
@@ -489,7 +489,7 @@
   border-radius: 8px;
   padding: 20px;
   font-family: 'Fira Code', monospace;
-  font-size: 15px;
+  font-size: 11px;
   line-height: 1.7;
   color: #757575;
   flex: 1;
@@ -516,6 +516,8 @@
   align-items: center;
   gap: 5px; /* Figma gap */
   flex-shrink: 0;
+  width: auto;
+  min-width: 40px;
 }
 
 /* Figma 하트 아이콘 */
@@ -524,11 +526,14 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
   transition: all 0.2s ease;
+  width: 40px;
+  text-align: center;
 }
 
 .like-button:hover {
@@ -551,6 +556,11 @@
   color: #515151; /* Figma 색상 */
   font-size: 18px;
   transition: color 0.2s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  margin: 0 auto !important;
 }
 
 .like-count {
@@ -560,6 +570,10 @@
   color: #515151; /* Figma 색상 */
   line-height: 1.2;
   transition: color 0.2s ease;
+  display: block !important;
+  text-align: center !important;
+  margin: 0 auto !important;
+  width: 100% !important;
 }
 
 .like-button:hover .heart-icon,
@@ -1292,28 +1306,7 @@
   color: #757575;
 }
 
-.work-like {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-}
-
-.heart-icon {
-  width: 20px;
-  height: 18px;
-  color: #515151;
-  font-size: 16px;
-}
-
-.work-like span {
-  font-family: 'Noto Sans KR';
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 1.2;
-  color: #515151;
-}
+/* 중복된 스타일 제거됨 - 위의 .work-actions와 .like-button 사용 */
 
 /* 반응형 디자인 */
 @media (max-width: 1200px) {
@@ -1599,7 +1592,7 @@
   border-radius: 8px; /* Figma border radius */
   padding: 20px; /* Figma padding */
   font-family: 'Noto Sans KR', sans-serif; /* Figma 폰트 */
-  font-size: 14px; /* Figma 폰트 크기 */
+  font-size: 11px; /* 줄어든 폰트 크기 */
   line-height: 1.2;
   color: #000000; /* Figma 텍스트 색상 */
   white-space: nowrap;
@@ -1631,7 +1624,7 @@
   border-radius: 8px;
   padding: 20px;
   font-family: 'Fira Code', monospace;
-  font-size: 15px;
+  font-size: 11px;
   line-height: 1.7;
   color: #757575;
   flex: 1;

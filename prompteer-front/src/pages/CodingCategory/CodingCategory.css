@@ -76,7 +76,7 @@
 .coding-category-page .featured-content .challenge-number {
   font-family: "Noto Sans KR", sans-serif !important;
   font-weight: 800 !important;
-  font-size: 32px !important;
+  font-size: 20px !important;
   line-height: 1.2em !important;
   color: #ffffff !important;
   background: none !important;
@@ -229,13 +229,11 @@
 .frame-283 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
   justify-content: center;
   align-items: stretch;
   width: 100%;
   max-width: 1248px;
-  height: 778px;
-  gap: 0;
+  gap: 16px;
   margin: 0 auto;
 }
 
@@ -283,17 +281,29 @@
 .frame-22 {
   display: flex;
   flex-direction: column;
-  gap: -39px;
+  gap: 4px;
   align-items: flex-start;
   text-align: left;
   width: 100%;
   justify-content: flex-start;
 }
 
-.challenge-title {
+.coding-category-page .challenge-number {
   font-family: "Noto Sans KR", sans-serif;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 20px;
+  line-height: 1.2em;
+  color: #212529;
+  margin: 0 0 4px 0;
+  text-align: left;
+  align-self: flex-start;
+  width: 100%;
+}
+
+.coding-category-page .challenge-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 18px;
   line-height: 1.2em;
   color: #212529;
   white-space: pre-line;
@@ -314,7 +324,7 @@
   height: fit-content;
 }
 
-.category-text {
+.coding-category-page .category-text {
   font-family: "Noto Sans KR", sans-serif;
   font-weight: 500;
   font-size: 13px;
@@ -344,7 +354,7 @@
   justify-content: flex-start;
 }
 
-.challenge-description-text {
+.coding-category-page .challenge-description-text {
   font-family: "Noto Sans KR", sans-serif;
   font-weight: 350;
   font-size: 14px;
@@ -353,6 +363,7 @@
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;

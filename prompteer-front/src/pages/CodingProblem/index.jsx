@@ -135,7 +135,7 @@ const CodingProblem = () => {
         // 에러 시 기본 데이터 설정
         setProblemData({
           id: id,
-          title: `Challenge #${id} - 데이터 로딩 실패`,
+          title: `데이터 로딩 실패 (ID: ${id})`,
           category: 'PS',
           difficulty: 'Easy',
           timeLimit: '1 초',
@@ -294,7 +294,17 @@ const CodingProblem = () => {
       }
 
       const data = await response.json();
-      const generated = data.content;
+      let generated = data.content;
+
+      // 마크다운 코드 블록 제거
+      if (generated) {
+        // ```python으로 시작하고 ```로 끝나는 경우 제거
+        generated = generated.replace(/^```python\s*\n/, '').replace(/\n```\s*$/, '');
+        // ```로 시작하고 ```로 끝나는 경우 제거
+        generated = generated.replace(/^```\s*\n/, '').replace(/\n```\s*$/, '');
+        // 앞뒤 공백 제거
+        generated = generated.trim();
+      }
 
       setGeneratedCode(generated);
       setEditorCode(generated);

@@ -90,7 +90,8 @@ const Header = ({ isLoggedIn: propIsLoggedIn }) => {
       return (
         location.pathname === "/board" ||
         // location.pathname === "/" || // 메인 페이지에서는 게시판에 파란불 X
-        location.pathname.startsWith("/board/post")
+        location.pathname.startsWith("/board/post") ||
+        location.pathname.startsWith("/board/shared")
       );
     }
     return location.pathname === path;

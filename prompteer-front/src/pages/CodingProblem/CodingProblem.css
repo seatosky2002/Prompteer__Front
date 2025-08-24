@@ -1086,6 +1086,70 @@
   color: #000000;
 }
 
+/* 콘솔 내부 채점 결과 섹션 */
+.result-section-inline {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px solid #E9ECEF;
+}
+
+.result-header-inline {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.result-title-inline {
+  font-family: 'Fira Code';
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.4;
+  color: #000000;
+  margin-bottom: 8px;
+}
+
+.result-box-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 8px;
+  padding: 12px;
+  background: #F8F9FA;
+  border: 1px solid #E9ECEF;
+  border-radius: 4px;
+}
+
+.result-status-inline {
+  font-family: 'Noto Sans KR';
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+  color: #1973C2;
+  margin-bottom: 4px;
+}
+
+.result-status-inline.success {
+  color: #28a745;
+}
+
+.result-details-inline {
+  font-family: 'Noto Sans KR';
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #495057;
+  width: 100%;
+}
+
+.result-details-inline div {
+  margin-bottom: 2px;
+}
+
 /* 결과 액션 버튼들 */
 .result-action-buttons {
   display: flex;
@@ -1122,6 +1186,46 @@
 }
 
 .result-btn:hover {
+  background: #1864a8;
+}
+
+/* 콘솔 내부 결과 액션 버튼들 */
+.result-action-buttons-inline {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-self: stretch;
+  gap: 12px;
+  width: 100%;
+  padding: 17px 16px 16px;
+  margin-top: 12px;
+  border-top: 1px solid #E9ECEF;
+}
+
+.result-btn-inline {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 20px 12px;
+  background: #1971C2;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  width: auto;
+  flex: none;
+}
+
+.result-btn-inline span {
+  font-family: 'Inter';
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.2;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.result-btn-inline:hover {
   background: #1864a8;
 }
 

@@ -143,6 +143,26 @@ const VideoProblem = () => {
           return;
         }
         
+        // 현재 사용자 ID 가져오기
+        let currentUserId = null;
+        const token = localStorage.getItem('access_token');
+        if (token) {
+          try {
+            const userResponse = await fetch('http://localhost:8000/users/me', {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            if (userResponse.ok) {
+              const userData = await userResponse.json();
+              currentUserId = userData.id;
+              console.log('Current user ID:', currentUserId);
+            }
+          } catch (err) {
+            console.error('Failed to get current user:', err);
+          }
+        }
+        
         const transformedData = data.map((share, index) => {
           let videoUrl = null;
           let rawUrl = share.video_share?.video_url || share.video_url || share.url;
@@ -155,12 +175,20 @@ const VideoProblem = () => {
             }
           }
           
+          // 현재 사용자가 이 공유에 좋아요를 눌렀는지 확인
+          const isLiked = currentUserId && share.likes && Array.isArray(share.likes) 
+            ? share.likes.some(like => like.user_id === currentUserId)
+            : false;
+          
+          console.log(`Video ${index} isLiked:`, isLiked, 'likes:', share.likes);
+          
           return {
             id: share.id || index,
             prompt: share.prompt || '프롬프트를 불러올 수 없습니다.',
             video: videoUrl,
             likes: share.likes || [],
             likes_count: share.likes_count || 0,
+            isLiked: isLiked,
             user: share.user || null,
             created_at: share.created_at || new Date().toISOString()
           };
@@ -211,11 +239,17 @@ const VideoProblem = () => {
       }
 
       const videoUrl = await response.json();
-      let videoPath = videoUrl;
-      if (videoPath.startsWith('media/')) {
-        videoPath = videoPath.substring(6);
+      console.log('Raw video URL from backend:', videoUrl);
+      
+      // media/media/ 중복 제거
+      let cleanUrl = videoUrl;
+      if (videoUrl.includes('media/media/')) {
+        // media/media/shares/... -> media/shares/...
+        cleanUrl = videoUrl.replace('media/media/', 'media/');
       }
-      const fullVideoUrl = `http://localhost:3000/${videoPath}`;
+      
+      const fullVideoUrl = `http://localhost:8000/${cleanUrl}`;
+      console.log('Final generated video URL:', fullVideoUrl);
       setGeneratedVideoUrl(fullVideoUrl);
       setIsGenerated(true);
     } catch (error) {
@@ -294,8 +328,7 @@ const VideoProblem = () => {
     setSelectedVideo({
       id: share.id,
       video: share.video || '',
-      prompt: share.prompt,
-      likes: share.likes_count || 0
+      prompt: share.prompt
     });
   };
 
@@ -538,10 +571,6 @@ const VideoProblem = () => {
               <div className="modal-prompt-section">
                 <div className="modal-prompt-content">
                   <p className="modal-prompt-text">{selectedVideo.prompt}</p>
-                </div>
-                <div className="modal-likes">
-                  <span className="modal-heart">❤️</span>
-                  <span className="modal-like-count">{selectedVideo.likes}</span>
                 </div>
               </div>
             </div>

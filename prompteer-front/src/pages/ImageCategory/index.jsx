@@ -13,6 +13,7 @@ const ImageCategory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [challengeMedia, setChallengeMedia] = useState({});
 
   // 로그인 상태 체크
   useEffect(() => {
@@ -92,6 +93,107 @@ const ImageCategory = () => {
     fetchChallenges();
   }, []);
 
+  // 각 챌린지의 가장 인기 있는 이미지 가져오기
+  useEffect(() => {
+    const fetchPopularImages = async () => {
+      if (challenges.length === 0) return;
+
+      // 이미지 챌린지만 필터링
+      const imageChallenges = challenges.filter(challenge => 
+        challenge.type === 'image' || 
+        challenge.type === 'img' ||
+        challenge.category === '이미지' ||
+        challenge.category === '그림' ||
+        (challenge.challenge_type && (challenge.challenge_type.includes('image') || challenge.challenge_type.includes('img')))
+      );
+
+      // console.log('Fetching popular images for challenges:', imageChallenges);
+      // console.log('Image challenges IDs:', imageChallenges.map(c => c.id));
+      const mediaMap = {};
+      
+      for (const challenge of imageChallenges) {
+        try {
+          const response = await fetch(`http://localhost:8000/shares/img/?challenge_id=${challenge.id}&limit=10`);
+          // console.log(`Fetching images for challenge ${challenge.id}, response status:`, response.status);
+          
+          if (response.ok) {
+            const shares = await response.json();
+            // console.log(`Shares for challenge ${challenge.id}:`, shares);
+            // console.log(`First share details:`, shares[0]);
+            
+            if (shares && shares.length > 0) {
+              // 좋아요가 가장 많은 이미지 찾기
+              const sortedShares = shares.sort((a, b) => {
+                const likesA = (a.likes || []).length;
+                const likesB = (b.likes || []).length;
+                return likesB - likesA;
+              });
+              
+              const mostLikedShare = sortedShares[0];
+              // console.log(`Most liked share for challenge ${challenge.id}:`, mostLikedShare);
+              // console.log(`Available fields in share:`, Object.keys(mostLikedShare));
+              // console.log(`img_share object:`, mostLikedShare.img_share);
+              
+              // img_share 내부의 img_url 확인
+              const imageUrl = mostLikedShare.img_share?.img_url || 
+                             mostLikedShare.img_url || 
+                             mostLikedShare.image || 
+                             mostLikedShare.img;
+              
+              // console.log(`Raw imageUrl from API:`, imageUrl);
+              
+              if (imageUrl) {
+                // API에서 반환된 경로에서 첫 번째 'media/' 제거
+                let processedUrl = imageUrl;
+                if (processedUrl.startsWith('media/')) {
+                  processedUrl = processedUrl.substring(6); // 'media/' 제거
+                }
+                
+                const fullImageUrl = processedUrl.startsWith('http') ? processedUrl : `http://localhost:8000/${processedUrl}`;
+                mediaMap[challenge.id] = fullImageUrl;
+                // console.log(`Set image for challenge ${challenge.id}:`, fullImageUrl);
+              } else {
+                // 좋아요가 없으면 랜덤 선택
+                const randomShare = shares[Math.floor(Math.random() * shares.length)];
+                const randomImageUrl = randomShare.img_share?.img_url || 
+                                     randomShare.img_url || 
+                                     randomShare.image || 
+                                     randomShare.img;
+                if (randomImageUrl) {
+                  // API에서 반환된 경로에서 첫 번째 'media/' 제거
+                  let processedUrl = randomImageUrl;
+                  if (processedUrl.startsWith('media/')) {
+                    processedUrl = processedUrl.substring(6); // 'media/' 제거
+                  }
+                  
+                  const fullRandomImageUrl = processedUrl.startsWith('http') ? processedUrl : `http://localhost:8000/${processedUrl}`;
+                  mediaMap[challenge.id] = fullRandomImageUrl;
+                  // console.log(`Set random image for challenge ${challenge.id}:`, fullRandomImageUrl);
+                } else {
+                  // console.log(`No image URL found for challenge ${challenge.id} in share:`, randomShare);
+                }
+              }
+            } else {
+              // console.log(`No shares found for challenge ${challenge.id}`);
+            }
+          }
+        } catch (error) {
+          console.error(`Failed to fetch images for challenge ${challenge.id}:`, error);
+        }
+      }
+      
+      // console.log('Final mediaMap:', mediaMap);
+      setChallengeMedia(mediaMap);
+    };
+
+    fetchPopularImages();
+  }, [challenges]);
+
+  // challengeMedia가 업데이트될 때 로그
+  // useEffect(() => {
+  //   console.log('challengeMedia updated:', challengeMedia);
+  // }, [challengeMedia]);
+
   // 필터링 및 정렬
   const getFilteredAndSortedChallenges = () => {
     let filtered = challenges;
@@ -105,8 +207,10 @@ const ImageCategory = () => {
     if (sortBy === 'image') {
       filtered = filtered.filter(challenge => 
         challenge.type === 'image' || 
+        challenge.type === 'img' ||
         challenge.category === '이미지' ||
-        (challenge.challenge_type && challenge.challenge_type.includes('image'))
+        challenge.category === '그림' ||
+        (challenge.challenge_type && (challenge.challenge_type.includes('image') || challenge.challenge_type.includes('img')))
       );
     } else if (sortBy === 'video') {
       filtered = filtered.filter(challenge => 
@@ -123,9 +227,23 @@ const ImageCategory = () => {
     navigate(`/image/challenge/${challengeId}`);
   };
 
+  // 추천 챌린지 가져오기 (이미지 타입 중 첫 번째)
+  const getFeaturedChallenge = () => {
+    const imageChallenges = challenges.filter(challenge => 
+      challenge.type === 'image' || 
+      challenge.category === '이미지' ||
+      (challenge.challenge_type && challenge.challenge_type.includes('image'))
+    );
+    return imageChallenges.length > 0 ? imageChallenges[0] : null;
+  };
+
   const handleChallengeNow = () => {
-    // Featured 챌린지 #11로 이동
-    navigate('/image/challenge/11');
+    const featuredChallenge = getFeaturedChallenge();
+    if (featuredChallenge) {
+      navigate(`/image/challenge/${featuredChallenge.id}`);
+    } else {
+      navigate('/image/challenge/1');
+    }
   };
 
   return (
@@ -141,8 +259,20 @@ const ImageCategory = () => {
             <div className="featured-details">
               <div className="status-badge">추천</div>
               <div className="featured-info">
-                <h3 className="challenge-number">Challenge #11</h3>
-                <p className="challenge-name">일상 풍경 묘사 프롬프트 만들기</p>
+                {(() => {
+                  const featuredChallenge = getFeaturedChallenge();
+                  return featuredChallenge ? (
+                    <>
+                      <h3 className="challenge-number">Challenge #{featuredChallenge.id}</h3>
+                      <p className="challenge-name">{featuredChallenge.title || '이미지 챌린지'}</p>
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="challenge-number">Challenge #1</h3>
+                      <p className="challenge-name">이미지 챌린지</p>
+                    </>
+                  );
+                })()}
               </div>
               <button className="challenge-now-btn" onClick={handleChallengeNow}>
                 지금 도전하기 →
@@ -220,6 +350,18 @@ const ImageCategory = () => {
                 >
                   {/* Frame 17 - Main Card with Background Image */}
                   <div className="frame-17">
+                    {/* Image Content */}
+                    {challengeMedia[challenge.id] && (
+                      <img 
+                        className="challenge-image"
+                        src={challengeMedia[challenge.id]}
+                        alt={`Challenge ${challenge.id}`}
+                        onError={(e) => {
+                          // console.error(`Image load error for challenge ${challenge.id}:`, e.target.src);
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    )}
                     {/* Frame 21 - Category Badge (Top Right) */}
                     <div className="frame-21">
                       <span className="category-text">{challenge.category}</span>

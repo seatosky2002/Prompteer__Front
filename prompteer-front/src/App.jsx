@@ -30,7 +30,6 @@ function App() {
           <Route path="/board/post/:id" element={<PostDetail />} />
           <Route path="/board/shared/:id" element={<SharedPostDetail />} />
           <Route path="/board/post/:id/problem" element={<ProblemDetail />} />
-          <Route path="/board/ps/share" element={<ProblemDetail />} />
           <Route path="/board/write" element={<PostWrite />} />
           <Route path="/category/coding" element={<CodingCategory />} />
           <Route path="/coding/problem/:id" element={<CodingProblem />} />

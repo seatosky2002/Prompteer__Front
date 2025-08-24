@@ -153,6 +153,26 @@ const ImageProblem = () => {
           return;
         }
         
+        // 현재 사용자 ID 가져오기
+        let currentUserId = null;
+        const token = localStorage.getItem('access_token');
+        if (token) {
+          try {
+            const userResponse = await fetch('http://localhost:8000/users/me', {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            if (userResponse.ok) {
+              const userData = await userResponse.json();
+              currentUserId = userData.id;
+              console.log('Current user ID:', currentUserId);
+            }
+          } catch (err) {
+            console.error('Failed to get current user:', err);
+          }
+        }
+
         // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
         const transformedData = data.map((share, index) => {
           console.log(`Processing share ${index}:`, share);
@@ -197,12 +217,20 @@ const ImageProblem = () => {
           
           console.log(`Share ${index} image URL:`, imageUrl);
           
+          // 현재 사용자가 이 공유에 좋아요를 눌렀는지 확인
+          const isLiked = currentUserId && share.likes && Array.isArray(share.likes) 
+            ? share.likes.some(like => like.user_id === currentUserId)
+            : false;
+          
+          console.log(`Share ${index} isLiked:`, isLiked, 'likes:', share.likes);
+          
           return {
             id: share.id || index,
             prompt: share.prompt || '프롬프트를 불러올 수 없습니다.',
             image: imageUrl,
             likes: share.likes || [],
             likes_count: share.likes_count || 0,
+            isLiked: isLiked,
             user: share.user || null,
             created_at: share.created_at || new Date().toISOString()
           };
@@ -220,6 +248,7 @@ const ImageProblem = () => {
             image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755844087.png',
             likes: [],
             likes_count: 15,
+            isLiked: false,
             user: { username: 'user1' },
             created_at: new Date().toISOString()
           },
@@ -229,6 +258,7 @@ const ImageProblem = () => {
             image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755845877.png',
             likes: [],
             likes_count: 12,
+            isLiked: false,
             user: { username: 'user2' },
             created_at: new Date().toISOString()
           },
@@ -238,6 +268,7 @@ const ImageProblem = () => {
             image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755846010.png',
             likes: [],
             likes_count: 8,
+            isLiked: false,
             user: { username: 'user3' },
             created_at: new Date().toISOString()
           },
@@ -247,6 +278,7 @@ const ImageProblem = () => {
             image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755846584.png',
             likes: [],
             likes_count: 20,
+            isLiked: false,
             user: { username: 'user4' },
             created_at: new Date().toISOString()
           }
@@ -273,7 +305,7 @@ const ImageProblem = () => {
     
     setIsGenerating(true);
     try {
-      const response = await fetch(`http://localhost:3000/challenges/img/${id}/generate`, {
+      const response = await fetch(`http://localhost:8000/challenges/img/${id}/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -294,12 +326,17 @@ const ImageProblem = () => {
       }
 
       const imageUrl = await response.json();
-      let imagePath = imageUrl;
-      if (imagePath.startsWith('media/')) {
-        imagePath = imagePath.substring(6);
+      console.log('Raw image URL from backend:', imageUrl);
+      
+      // media/media/ 중복 제거
+      let cleanUrl = imageUrl;
+      if (imageUrl.includes('media/media/')) {
+        // media/media/shares/... -> media/shares/...
+        cleanUrl = imageUrl.replace('media/media/', 'media/');
       }
-      // 백엔드에서 "media/..." 형태의 상대 경로를 반환하므로, "/"를 추가하여 전체 URL을 만들어줍니다.
-      const fullImageUrl = `http://localhost:3000/${imagePath}`;
+      
+      const fullImageUrl = `http://localhost:8000/${cleanUrl}`;
+      console.log('Final generated image URL:', fullImageUrl);
       setGeneratedImageUrl(fullImageUrl);
       setIsGenerated(true);
     } catch (error) {
@@ -522,7 +559,23 @@ const ImageProblem = () => {
                       <div className="generated-result">
                         <div className="generated-image-placeholder">
                           {generatedImageUrl ? (
-                            <img src={generatedImageUrl} alt="Generated" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <img 
+                              src={generatedImageUrl} 
+                              alt="Generated" 
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              onLoad={() => {
+                                console.log('✅ Generated image loaded successfully:', generatedImageUrl);
+                              }}
+                              onError={(e) => {
+                                console.error('❌ Generated image failed to load:', generatedImageUrl);
+                                e.target.parentElement.innerHTML = `
+                                  <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 200px; background: #F8F9FA; border: 2px dashed #DEE2E6; border-radius: 8px; color: #6C757D;">
+                                    <span>생성된 이미지를 불러올 수 없습니다</span>
+                                    <p style="font-size: 12px; color: #ADB5BD; margin: 5px 0; word-break: break-all;">${generatedImageUrl}</p>
+                                  </div>
+                                `;
+                              }}
+                            />
                           ) : (
                             <div className="image-placeholder">생성된 이미지</div>
                           )}
@@ -599,11 +652,36 @@ const ImageProblem = () => {
                         >
                           {share.image ? (
                             <img 
-                              src={share.image} 
+                              src={(() => {
+                                const url = share.image;
+                                console.log('Processing shared image URL:', url);
+                                
+                                // 이미 http로 시작하는 완전한 URL인 경우 그대로 사용
+                                if (url.startsWith('http')) {
+                                  return url;
+                                }
+                                
+                                // media/media/ 중복 제거 로직
+                                let cleanUrl = url;
+                                if (url.includes('media/media/')) {
+                                  // media/media/shares/... -> shares/...
+                                  cleanUrl = url.substring(url.indexOf('media/media/') + 12);
+                                  cleanUrl = `media/${cleanUrl}`;
+                                } else if (url.startsWith('media/')) {
+                                  cleanUrl = url;
+                                } else if (!url.startsWith('/')) {
+                                  cleanUrl = `media/${url}`;
+                                }
+                                
+                                const finalUrl = `http://localhost:8000/${cleanUrl}`;
+                                console.log('Final shared image URL:', finalUrl);
+                                return finalUrl;
+                              })()}
                               alt={`Shared submission ${i + 1}`} 
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                               onError={(e) => {
-                                console.error(`Failed to load image for share ${share.id}:`, share.image);
+                                console.error(`Failed to load image for share ${share.id}:`, e.target.src);
+                                console.log('Original share.image:', share.image);
                                 e.target.style.display = 'none';
                                 e.target.nextSibling.style.display = 'flex';
                               }}

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import FilterButton from '../../components/ui/FilterButton/index.jsx';
@@ -15,35 +18,90 @@ const SharedPostDetail = () => {
   const [challengeData, setChallengeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // API로부터 share 데이터 가져오기
+  // 로그인 상태 체크
   useEffect(() => {
-    const fetchShareData = async () => {
+    const checkLoginStatus = () => {
+      const token = localStorage.getItem('access_token');
+      setIsLoggedIn(!!token);
+    };
+
+    checkLoginStatus();
+    
+    const handleFocus = () => {
+      checkLoginStatus();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
+
+  // JWT 토큰에서 사용자 ID 추출하는 함수
+  const getCurrentUserId = () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return null;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.sub; // 또는 payload.user_id, 백엔드 구현에 따라
+    } catch (error) {
+      console.error('Error parsing token:', error);
+      return null;
+    }
+  };
+
+
+
+  // API로부터 post 데이터 가져오기
+  useEffect(() => {
+    const fetchPostData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8000/shares/${id}`);
+        const response = await fetch(`http://localhost:8000/posts/${id}`);
         
         if (!response.ok) {
-          throw new Error('공유 데이터를 불러오는데 실패했습니다.');
+          throw new Error('게시물 데이터를 불러오는데 실패했습니다.');
         }
         
-        const share = await response.json();
-        console.log('Share data:', share);
-        setShareData(share);
+        const post = await response.json();
+        console.log('Post data:', post);
+        setShareData(post); // 기존 변수명 유지
+        
+        // 좋아요 정보 설정
+        setLikesCount(post.likes_count || 0);
+        
+        // 현재 사용자가 좋아요를 눌렀는지 확인
+        const currentUserId = getCurrentUserId();
+        if (currentUserId && post.likes) {
+          const userLiked = post.likes.some(like => like.user_id === currentUserId);
+          setIsLiked(userLiked);
+        }
+        
+        // 댓글 데이터 설정
+        if (post.comments) {
+          setComments(post.comments);
+          console.log('Comments from post:', post.comments);
+        }
         
         // 챌린지 데이터도 가져오기
-        if (share.challenge_id) {
-          await fetchChallengeData(share.challenge_id);
+        if (post.challenge_id) {
+          await fetchChallengeData(post.challenge_id);
         }
       } catch (err) {
-        console.error('Error fetching share:', err);
+        console.error('Error fetching post:', err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchShareData();
+    fetchPostData();
   }, [id]);
 
   // 챌린지 데이터 가져오기
@@ -72,18 +130,128 @@ const SharedPostDetail = () => {
   const tabs = ['전체', '질문', '프롬프트 공유'];
   const categories = ['전체', '코딩', '이미지', '영상'];
 
-  // 댓글 데이터 (예시)
-  const comments = [
-    { id: 1, content: '우왕', author: '뽀복' },
-    { id: 2, content: '대단해용', author: '뽀복' }
-  ];
+
 
   const toggleProblemExpanded = () => {
     setIsProblemExpanded(!isProblemExpanded);
   };
 
-  const handleCommentSubmit = () => {
-    console.log('댓글 작성 버튼 클릭됨');
+  // 좋아요 토글 함수
+  const handleLikeToggle = async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      alert('좋아요를 누르려면 로그인이 필요합니다.');
+      return;
+    }
+
+    try {
+      const method = isLiked ? 'DELETE' : 'POST';
+      const response = await fetch(`http://localhost:8000/posts/${id}/like`, {
+        method: method,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          // 이미 좋아요를 누른 경우 (POST 요청 시)
+          console.log('Already liked this post');
+          return;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // 상태 업데이트
+      setIsLiked(!isLiked);
+      setLikesCount(prev => isLiked ? Math.max(0, prev - 1) : prev + 1);
+      
+      console.log(`${isLiked ? 'Unliked' : 'Liked'} post ${id}`);
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      alert('좋아요 처리 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 게시글 데이터 새로고침 (댓글 포함)
+  const refreshPostData = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/posts/${id}`);
+      
+      if (!response.ok) {
+        console.warn('게시글 데이터를 새로고침할 수 없습니다.');
+        return;
+      }
+      
+      const post = await response.json();
+      setShareData(post);
+      
+      // 댓글 데이터 업데이트
+      if (post.comments) {
+        setComments(post.comments);
+        console.log('Updated comments:', post.comments);
+      }
+      
+      // 좋아요 정보도 업데이트
+      setLikesCount(post.likes_count || 0);
+      const currentUserId = getCurrentUserId();
+      if (currentUserId && post.likes) {
+        const userLiked = post.likes.some(like => like.user_id === currentUserId);
+        setIsLiked(userLiked);
+      }
+    } catch (err) {
+      console.error('Error refreshing post data:', err);
+    }
+  };
+
+  // 댓글 작성
+  const handleCommentSubmit = async () => {
+    if (!newComment.trim()) {
+      return;
+    }
+
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      alert('댓글을 작성하려면 로그인이 필요합니다.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch(`http://localhost:8000/posts/${id}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          content: newComment.trim(),
+          post_id: parseInt(id)
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || '댓글 작성에 실패했습니다.');
+      }
+
+      const newCommentData = await response.json();
+      console.log('New comment created:', newCommentData);
+      
+      // 게시글 데이터 새로고침 (댓글 포함)
+      await refreshPostData();
+      
+      // 입력 필드 초기화
+      setNewComment('');
+      
+    } catch (error) {
+      console.error('Comment creation error:', error);
+      alert(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // 탭 클릭 핸들러
@@ -118,7 +286,7 @@ const SharedPostDetail = () => {
   if (loading) {
     return (
       <div className="shared-post-detail-page">
-        <Header />
+        <Header isLoggedIn={isLoggedIn} />
         <main className="shared-post-detail-main">
           <div className="loading-message">데이터를 불러오는 중...</div>
         </main>
@@ -130,7 +298,7 @@ const SharedPostDetail = () => {
   if (error) {
     return (
       <div className="shared-post-detail-page">
-        <Header />
+        <Header isLoggedIn={isLoggedIn} />
         <main className="shared-post-detail-main">
           <div className="error-message">오류: {error}</div>
         </main>
@@ -142,7 +310,7 @@ const SharedPostDetail = () => {
   if (!shareData) {
     return (
       <div className="shared-post-detail-page">
-        <Header />
+        <Header isLoggedIn={isLoggedIn} />
         <main className="shared-post-detail-main">
           <div className="error-message">공유 데이터를 찾을 수 없습니다.</div>
         </main>
@@ -202,7 +370,7 @@ const SharedPostDetail = () => {
                     <div className="shared-post-card-header">
                       <div className="shared-post-card-title-section">
                         <h2 className="shared-post-card-title">
-                          {challengeData?.title || '이미지 프롬프트 공유'}
+                          {shareData?.title || '프롬프트 공유'}
                         </h2>
                         <div className="shared-post-card-meta">
                           <span className="shared-post-card-author">작성자: {shareData.user?.nickname || '익명'}</span>
@@ -216,14 +384,20 @@ const SharedPostDetail = () => {
 
                     <div className="shared-post-card-challenge">
                       <div className="challenge-header">
-                        <h3 className="challenge-title">
-                          {challengeData?.title || `Challenge #${shareData.challenge_id}`}
-                        </h3>
-                        <div className="challenge-likes">
-                          <svg width="20" height="18" viewBox="0 0 20 18" fill="none">
-                            <path d="M10 17.5L8.55 16.2C3.4 11.74 0 8.74 0 5.5C0 3.42 1.42 2 3.5 2C4.64 2 5.88 2.59 6.5 3.5C7.12 2.59 8.36 2 9.5 2C11.58 2 13 3.42 13 5.5C13 8.74 9.6 11.74 4.45 16.2L10 17.5Z" fill="#515151"/>
-                          </svg>
-                          <span>{shareData.likes_count || 0}</span>
+                        <div className="challenge-title-with-heart">
+                          <h3 className="challenge-title">
+                            {challengeData?.title || `Challenge #${shareData.challenge_id}`}
+                          </h3>
+                          {/* 좋아요 섹션 - Challenge Title 오른쪽으로 이동 */}
+                          <div className="shared-post-like-section">
+                            <button 
+                              className={`like-button ${isLiked ? 'liked' : ''}`}
+                              onClick={handleLikeToggle}
+                            >
+                              <span className="heart-icon">{isLiked ? '❤️' : '🤍'}</span>
+                              <span className="like-count">{likesCount}</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                       
@@ -267,83 +441,238 @@ const SharedPostDetail = () => {
                         </div>
                       </div>
                       
-                      {/* 사용한 프롬프트 섹션 */}
-                      <div className="user-prompt-section">
-                        <h4 className="section-title">사용한 프롬프트</h4>
-                        <div className="prompt-content">
-                          {shareData.prompt || '프롬프트 정보가 없습니다.'}
+
+
+                      {/* 포스트 내용 섹션 */}
+                      <div className="shared-post-content-section">
+                        <h4 className="section-title">공유 내용</h4>
+                        <div className="post-content-container">
+                          {shareData?.content ? (
+                            <ReactMarkdown 
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                img: ({node, ...props}) => (
+                                  <img 
+                                    {...props} 
+                                    style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
+                                    onError={(e) => {
+                                      console.error('❌ Markdown image failed to load:', e.target.src);
+                                      e.target.style.display = 'none';
+                                    }}
+                                  />
+                                ),
+                                a: ({node, href, children, ...props}) => {
+                                  // 비디오 파일 링크인지 확인
+                                  if (href && (href.includes('.mp4') || href.includes('video') || children?.[0] === '영상 파일')) {
+                                    console.log('Video link detected:', href);
+                                    
+                                    // media/media/ 중복 제거
+                                    let cleanUrl = href;
+                                    if (href.includes('media/media/')) {
+                                      cleanUrl = href.replace('media/media/', 'media/');
+                                    }
+                                    
+                                    // 상대 경로를 절대 경로로 변환
+                                    if (!cleanUrl.startsWith('http')) {
+                                      cleanUrl = `http://localhost:8000/${cleanUrl}`;
+                                    }
+                                    
+                                    return (
+                                      <div style={{ margin: '20px 0', textAlign: 'center' }}>
+                                        <video 
+                                          src={cleanUrl}
+                                          controls
+                                          style={{ 
+                                            maxWidth: '100%', 
+                                            height: 'auto', 
+                                            borderRadius: '8px',
+                                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                                          }}
+                                          onError={(e) => {
+                                            console.error('❌ Markdown video failed to load:', cleanUrl);
+                                            e.target.parentElement.innerHTML = `
+                                              <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 200px; background: #F8F9FA; border: 2px dashed #DEE2E6; border-radius: 8px; color: #6C757D;">
+                                                <span>영상을 불러올 수 없습니다</span>
+                                                <p style="font-size: 12px; color: #ADB5BD; margin: 5px 0; word-break: break-all;">${cleanUrl}</p>
+                                              </div>
+                                            `;
+                                          }}
+                                        >
+                                          브라우저가 비디오를 지원하지 않습니다.
+                                        </video>
+                                      </div>
+                                    );
+                                  }
+                                  
+                                  // 일반 링크는 그대로 처리
+                                  return <a href={href} {...props}>{children}</a>;
+                                }
+                              }}
+                            >
+                              {shareData.content}
+                            </ReactMarkdown>
+                          ) : (
+                            <div className="content-placeholder">
+                              <span>내용이 없습니다</span>
+                            </div>
+                          )}
                         </div>
                       </div>
 
-                      {/* 생성된 이미지 섹션 */}
-                      <div className="shared-post-image-section">
-                        <h4 className="section-title">생성된 이미지</h4>
-                        {shareData.img_share?.img_url ? (
-                          <div className="generated-image-container">
-                            <img 
-                              src={(() => {
-                                const url = shareData.img_share.img_url;
-                                console.log('Raw image URL from API:', url);
-                                
-                                if (url.startsWith('http')) {
-                                  return url;
-                                }
-                                
-                                // URL 정리: media/media/ 중복 제거
-                                let cleanUrl = url;
-                                
-                                // media/media/로 시작하는 경우 첫 번째 media/ 제거
-                                if (url.startsWith('media/media/')) {
-                                  cleanUrl = url.substring(6); // 'media/' 제거
-                                  cleanUrl = `/${cleanUrl}`;
-                                } else if (url.startsWith('media/')) {
-                                  cleanUrl = `/${url}`;
-                                } else if (!url.startsWith('/')) {
-                                  cleanUrl = `/${url}`;
-                                }
-                                
-                                const finalUrl = `http://localhost:8000${cleanUrl}`;
-                                console.log('Final image URL:', finalUrl);
-                                return finalUrl;
-                              })()}
-                              alt="생성된 이미지"
-                              className="generated-image"
-                              onLoad={(e) => {
-                                console.log('✅ Image loaded successfully:', e.target.src);
-                              }}
-                              onError={(e) => {
-                                console.error('❌ Image failed to load:', e.target.src);
-                                console.log('Original URL from API:', shareData.img_share.img_url);
-                                
-                                // 여러 URL 시도
-                                const originalUrl = shareData.img_share.img_url;
-                                const alternativeUrls = [
-                                  `http://localhost:8000/media${originalUrl}`,
-                                  `http://localhost:8000/static${originalUrl}`,
-                                  `http://localhost:8000${originalUrl}`,
-                                  originalUrl
-                                ];
-                                
-                                console.log('Trying alternative URLs:', alternativeUrls);
-                                
-                                e.target.parentElement.innerHTML = `
-                                  <div class="image-error-fallback">
-                                    <span>이미지를 불러올 수 없습니다</span>
-                                    <p>시도한 경로: ${e.target.src}</p>
-                                    <p>원본 URL: ${originalUrl}</p>
-                                  </div>
-                                `;
-                              }}
-                            />
-                          </div>
-                        ) : (
-                          <div className="generated-image-container">
-                            <div className="image-error-fallback">
-                              <span>이미지가 없습니다</span>
+                      {/* 기존 이미지/영상 섹션 (필요시 유지) */}
+                      {false && challengeData?.tag === 'img' ? (
+                        <div className="shared-post-image-section">
+                          <h4 className="section-title">생성된 이미지</h4>
+                          {shareData.img_share?.img_url ? (
+                            <div className="generated-image-container">
+                              <img 
+                                src={(() => {
+                                  const url = shareData.img_share.img_url;
+                                  console.log('Raw image URL from API:', url);
+                                  
+                                  if (url.startsWith('http')) {
+                                    return url;
+                                  }
+                                  
+                                  // URL 정리: media/media/ 중복 제거
+                                  let cleanUrl = url;
+                                  
+                                  // media/media/ 중복 제거 로직 개선
+                                  if (url.includes('media/media/')) {
+                                    // media/media/shares/... -> media/shares/...
+                                    cleanUrl = url.replace('media/media/', 'media/');
+                                  } else if (!url.startsWith('media/') && !url.startsWith('/')) {
+                                    // shares/img_shares/... -> media/shares/img_shares/...
+                                    cleanUrl = `media/${url}`;
+                                  } else if (url.startsWith('media/')) {
+                                    cleanUrl = url;
+                                  }
+                                  
+                                  // / 로 시작하지 않으면 추가
+                                  if (!cleanUrl.startsWith('/')) {
+                                    cleanUrl = `/${cleanUrl}`;
+                                  }
+                                  
+                                  const finalUrl = `http://localhost:8000${cleanUrl}`;
+                                  console.log('Final image URL:', finalUrl);
+                                  return finalUrl;
+                                })()}
+                                alt="생성된 이미지"
+                                className="generated-image"
+                                onLoad={(e) => {
+                                  console.log('✅ Image loaded successfully:', e.target.src);
+                                }}
+                                onError={(e) => {
+                                  console.error('❌ Image failed to load:', e.target.src);
+                                  console.log('Original URL from API:', shareData.img_share.img_url);
+                                  
+                                  // 여러 URL 시도
+                                  const originalUrl = shareData.img_share.img_url;
+                                  const alternativeUrls = [
+                                    `http://localhost:8000/media${originalUrl}`,
+                                    `http://localhost:8000/static${originalUrl}`,
+                                    `http://localhost:8000${originalUrl}`,
+                                    originalUrl
+                                  ];
+                                  
+                                  console.log('Trying alternative URLs:', alternativeUrls);
+                                  
+                                  e.target.parentElement.innerHTML = `
+                                    <div class="image-error-fallback">
+                                      <span>이미지를 불러올 수 없습니다</span>
+                                      <p>시도한 경로: ${e.target.src}</p>
+                                      <p>원본 URL: ${originalUrl}</p>
+                                    </div>
+                                  `;
+                                }}
+                              />
                             </div>
-                          </div>
-                        )}
-                      </div>
+                          ) : (
+                            <div className="generated-image-container">
+                              <div className="image-error-fallback">
+                                <span>이미지가 없습니다</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : challengeData?.tag === 'video' ? (
+                        <div className="shared-post-video-section">
+                          <h4 className="section-title">생성된 영상</h4>
+                          {shareData.video_share?.video_url ? (
+                            <div className="generated-video-container">
+                              <video 
+                                src={(() => {
+                                  const url = shareData.video_share.video_url;
+                                  console.log('Raw video URL from API:', url);
+                                  
+                                  if (url.startsWith('http')) {
+                                    return url;
+                                  }
+                                  
+                                  // URL 정리: media/media/ 중복 제거
+                                  let cleanUrl = url;
+                                  
+                                  // media/media/ 중복 제거 로직 개선
+                                  if (url.includes('media/media/')) {
+                                    // media/media/shares/... -> media/shares/...
+                                    cleanUrl = url.replace('media/media/', 'media/');
+                                  } else if (!url.startsWith('media/') && !url.startsWith('/')) {
+                                    // shares/video_shares/... -> media/shares/video_shares/...
+                                    cleanUrl = `media/${url}`;
+                                  } else if (url.startsWith('media/')) {
+                                    cleanUrl = url;
+                                  }
+                                  
+                                  // / 로 시작하지 않으면 추가
+                                  if (!cleanUrl.startsWith('/')) {
+                                    cleanUrl = `/${cleanUrl}`;
+                                  }
+                                  
+                                  const finalUrl = `http://localhost:8000${cleanUrl}`;
+                                  console.log('Final video URL:', finalUrl);
+                                  return finalUrl;
+                                })()}
+                                controls
+                                className="generated-video"
+                                onLoadStart={(e) => {
+                                  console.log('✅ Video loading started:', e.target.src);
+                                }}
+                                onError={(e) => {
+                                  console.error('❌ Video failed to load:', e.target.src);
+                                  console.log('Original URL from API:', shareData.video_share.video_url);
+                                  
+                                  // 여러 URL 시도
+                                  const originalUrl = shareData.video_share.video_url;
+                                  const alternativeUrls = [
+                                    `http://localhost:8000/media${originalUrl}`,
+                                    `http://localhost:8000/static${originalUrl}`,
+                                    `http://localhost:8000${originalUrl}`,
+                                    originalUrl
+                                  ];
+                                  
+                                  console.log('Trying alternative URLs:', alternativeUrls);
+                                  
+                                  e.target.parentElement.innerHTML = `
+                                    <div class="video-error-fallback">
+                                      <span>영상을 불러올 수 없습니다</span>
+                                      <p>시도한 경로: ${e.target.src}</p>
+                                      <p>원본 URL: ${originalUrl}</p>
+                                    </div>
+                                  `;
+                                }}
+                              >
+                                Your browser does not support the video tag.
+                              </video>
+                            </div>
+                          ) : (
+                            <div className="generated-video-container">
+                              <div className="video-error-fallback">
+                                <span>영상이 없습니다</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 </div>
@@ -351,20 +680,56 @@ const SharedPostDetail = () => {
 
               {/* 댓글 섹션 */}
               <div className="comments-section">
-                <div className="comments-list">
-                  {comments.map((comment) => (
-                    <CommentCard
-                      key={comment.id}
-                      content={comment.content}
-                      author={comment.author}
-                    />
-                  ))}
+                <div className="comments-header">
+                  <h3 className="comments-title">댓글 ({comments.length})</h3>
+                </div>
+                
+                <div className="figma-comments-container">
+                  {comments.length === 0 ? (
+                    <div className="no-comments">
+                      <p>아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!</p>
+                    </div>
+                  ) : (
+                    comments.map((comment) => (
+                      <div key={comment.id} className="figma-comment-item">
+                        <div className="figma-comment-content">
+                          {comment.content}
+                        </div>
+                        <div className="figma-comment-author">
+                          {comment.user?.nickname || '익명'}
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
                 
                 <div className="comment-write-section">
-                  <button className="comment-submit-btn" onClick={handleCommentSubmit}>
-                    댓글 작성
-                  </button>
+                  {/* Figma 디자인에 맞는 댓글 작성 영역 */}
+                  <div className="figma-comment-container">
+                    <div className="figma-comment-input-area">
+                      <textarea
+                        className="figma-comment-input"
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleCommentSubmit();
+                          }
+                        }}
+                        placeholder="댓글을 입력하세요..."
+                        rows={2}
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    <button 
+                      className="figma-comment-submit-btn" 
+                      onClick={handleCommentSubmit}
+                      disabled={!newComment.trim() || isSubmitting}
+                    >
+                      {isSubmitting ? '작성 중...' : '댓글 작성'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

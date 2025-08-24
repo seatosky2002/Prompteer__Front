@@ -14,6 +14,8 @@
   width: 384px;
   cursor: pointer;
   transition: transform 0.2s ease;
+  border: none;
+  border-radius: 0;
 }
 
 .video-component:hover {
@@ -28,12 +30,57 @@
   align-self: stretch;
   padding: 18px 18px 25px 25px;
   width: 100%;
-  height: 239px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: 1px solid #E9ECEF;
-  border-radius: 12px;
+  height: 280px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
   position: relative;
   overflow: hidden;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Challenge Video */
+.challenge-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  border-radius: 0 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Video Placeholder */
+.video-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  z-index: 1;
+}
+
+.video-placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #6C757D;
+}
+
+.video-placeholder-content p {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  margin: 0;
 }
 
 /* Frame 21 - Category Badge (Top Right) */
@@ -41,8 +88,11 @@
   display: flex;
   flex-direction: column;
   padding: 4px 10px;
-  background: #E7F5FF;
+  background: rgba(231, 245, 255, 0.9);
   border-radius: 16px;
+  position: relative;
+  z-index: 2;
+  backdrop-filter: blur(4px);
 }
 
 .category-text {

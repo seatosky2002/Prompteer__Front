@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Header from "../../components/common/Header/index.jsx";
-import MypageQuestionCard from "../../components/cards/MypageQuestionCard/index.jsx";
 import MypageCodingCard from "../../components/cards/MypageCodingCard/index.jsx";
 import MypageImageCard from "../../components/cards/MypageImageCard/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
@@ -11,6 +10,7 @@ import {
   getMyCompletedImgChallenges,
   getMyCompletedVideoChallenges,
   getChallengeDetails,
+  getMyPosts,
 } from "../../apis/api.js";
 import "./MyPage.css";
 
@@ -24,6 +24,16 @@ const MyPage = () => {
   const handleCodingCardClick = (challenge) => {
     setSelectedChallenge(challenge);
     setIsModalOpen(true);
+  };
+
+  const handlePostCardClick = (post) => {
+    // console.log("게시글 카드 클릭:", post);
+    // PostDetail 페이지로 리다이렉트
+    if (post.type === "question") {
+      window.location.href = `board/post/${post.id}`;
+    } else if (post.type === "share") {
+      window.location.href = `board/shared/${post.id}`;
+    }
   };
 
   const handleCloseModal = () => {
@@ -316,8 +326,52 @@ const MyPage = () => {
     }
   }, [activeTab]);
 
-  // 샘플 데이터
-  const questions = [
+  // 내가 올린 게시글 데이터 로딩
+  useEffect(() => {
+    const fetchMyPosts = async () => {
+      setIsLoadingPosts(true);
+      setPostsError(null);
+
+      try {
+        const result = await getMyPosts();
+
+        if (result.success) {
+          // 게시글 데이터를 UI에 맞게 변환
+          const transformedPosts = result.data.map((post) => ({
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            type: post.type, // 'question' 또는 'share'
+            tag: post.tag, // 'ps', 'img', 'video'
+            challengeNumber: post.challenge?.challenge_number || null,
+            likes: post.likes_count || 0,
+            commentsCount: post.comments?.length || 0,
+            createdAt: post.created_at,
+            modifiedAt: post.modified_at,
+            user: post.user,
+            attachments: post.attachments || [],
+          }));
+
+          setMyPosts(transformedPosts);
+        } else {
+          setPostsError(result.error);
+        }
+      } catch (error) {
+        console.error("내 게시글 로딩 에러:", error);
+        setPostsError("데이터를 불러오는 중 오류가 발생했습니다.");
+      } finally {
+        setIsLoadingPosts(false);
+      }
+    };
+
+    // 내가 올린 게시글 탭이 활성화되었을 때만 데이터 로딩
+    if (activeTab === "내가 올린 게시글") {
+      fetchMyPosts();
+    }
+  }, [activeTab]);
+
+  // 내가 올린 게시글 샘플 데이터
+  /* const questions = [
     {
       id: 1,
       question: "왜 틀렸는지 잘 모르겠습니다.",
@@ -345,7 +399,7 @@ const MyPage = () => {
       views: 3,
       date: "25/7/27",
     },
-  ];
+  ]; */
 
   // 피그마 디자인에 맞춰 18개의 코딩 챌린지 (6x3 그리드)
   // 코딩 챌린지 예전 하드코딩
@@ -514,6 +568,11 @@ const MyPage = () => {
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageError, setImageError] = useState(null);
 
+  // 실제 API에서 가져온 내가 올린 게시글 데이터
+  const [myPosts, setMyPosts] = useState([]);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+  const [postsError, setPostsError] = useState(null);
+
   const tabs = [
     { id: "내가 올린 게시글", label: "내가 올린 게시글", icon: "❓" },
     { id: "코딩 챌린지", label: "코딩 챌린지", icon: "💻" },
@@ -527,32 +586,65 @@ const MyPage = () => {
           <div className="mypage-content-section">
             <h2 className="section-title">내가 올린 게시글</h2>
             <div className="questions-list">
-              {questions.map((question) => (
-                <div key={question.id} className="question-card">
-                  <div className="question-header">
-                    <span className="category-tag">{question.category}</span>
-                    <h3 className="question-title">{question.question}</h3>
-                  </div>
-                  <div className="question-stats">
-                    <div className="stat-item">
-                      <span className="stat-label">좋아요</span>
-                      <span className="stat-value">{question.likes}</span>
-                    </div>
-                    <div className="stat-item">
-                      <span className="stat-label">작성자</span>
-                      <span className="stat-value">{question.author}</span>
-                    </div>
-                    <div className="stat-item">
-                      <span className="stat-label">조회수</span>
-                      <span className="stat-value">{question.views}</span>
-                    </div>
-                    <div className="stat-item">
-                      <span className="stat-label">날짜</span>
-                      <span className="stat-value">{question.date}</span>
-                    </div>
-                  </div>
+              {isLoadingPosts ? (
+                <div className="loading-state">
+                  <p>게시글 목록을 불러오는 중...</p>
                 </div>
-              ))}
+              ) : postsError ? (
+                <div className="error-state">
+                  <p>에러: {postsError}</p>
+                  <button onClick={() => window.location.reload()}>
+                    다시 시도
+                  </button>
+                </div>
+              ) : myPosts.length === 0 ? (
+                <div className="empty-state">
+                  <p>아직 작성한 게시글이 없습니다.</p>
+                </div>
+              ) : (
+                myPosts.map(
+                  (
+                    post // 나중에 MypageQuestionCard 컴포넌트로 변경
+                  ) => (
+                    <div
+                      key={post.id}
+                      className="question-card"
+                      onClick={() => handlePostCardClick(post)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <div className="question-header">
+                        <span className="category-tag">
+                          {post.type === "question" ? "질문" : "공유"}
+                          {post.tag && ` - ${post.tag.toUpperCase()}`}
+                        </span>
+                        <h3 className="question-title">{post.title}</h3>
+                      </div>
+                      <div className="question-stats">
+                        <div className="stat-item">
+                          <span className="stat-label">좋아요</span>
+                          <span className="stat-value">{post.likes}</span>
+                        </div>
+                        <div className="stat-item">
+                          <span className="stat-label">작성자</span>
+                          <span className="stat-value">
+                            {post.user?.nickname || "알 수 없음"}
+                          </span>
+                        </div>
+                        <div className="stat-item">
+                          <span className="stat-label">조회수</span>
+                          <span className="stat-value">0</span>
+                        </div>
+                        <div className="stat-item">
+                          <span className="stat-label">날짜</span>
+                          <span className="stat-value">
+                            {new Date(post.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                )
+              )}
             </div>
           </div>
         );
@@ -636,32 +728,61 @@ const MyPage = () => {
           <div className="mypage-content-section">
             <h2 className="section-title">내가 올린 게시글</h2>
             <div className="questions-list">
-              {questions.map((question) => (
-                <div key={question.id} className="question-card">
-                  <div className="question-header">
-                    <span className="category-tag">{question.category}</span>
-                    <h3 className="question-title">{question.question}</h3>
-                  </div>
-                  <div className="question-stats">
-                    <div className="stat-item">
-                      <span className="stat-label">좋아요</span>
-                      <span className="stat-value">{question.likes}</span>
-                    </div>
-                    <div className="stat-item">
-                      <span className="stat-label">작성자</span>
-                      <span className="stat-value">{question.author}</span>
-                    </div>
-                    <div className="stat-item">
-                      <span className="stat-label">조회수</span>
-                      <span className="stat-value">{question.views}</span>
-                    </div>
-                    <div className="stat-item">
-                      <span className="stat-label">날짜</span>
-                      <span className="stat-value">{question.date}</span>
-                    </div>
-                  </div>
+              {isLoadingPosts ? (
+                <div className="loading-state">
+                  <p>게시글 목록을 불러오는 중...</p>
                 </div>
-              ))}
+              ) : postsError ? (
+                <div className="error-state">
+                  <p>에러: {postsError}</p>
+                  <button onClick={() => window.location.reload()}>
+                    다시 시도
+                  </button>
+                </div>
+              ) : myPosts.length === 0 ? (
+                <div className="empty-state">
+                  <p>아직 작성한 게시글이 없습니다.</p>
+                </div>
+              ) : (
+                myPosts.map((post) => (
+                  <div
+                    key={post.id}
+                    className="question-card"
+                    onClick={() => handlePostCardClick(post)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <div className="question-header">
+                      <span className="category-tag">
+                        {post.type === "question" ? "질문" : "공유"}
+                        {post.tag && ` - ${post.tag.toUpperCase()}`}
+                      </span>
+                      <h3 className="question-title">{post.title}</h3>
+                    </div>
+                    <div className="question-stats">
+                      <div className="stat-item">
+                        <span className="stat-label">좋아요</span>
+                        <span className="stat-value">{post.likes}</span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">작성자</span>
+                        <span className="stat-value">
+                          {post.user?.nickname || "알 수 없음"}
+                        </span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">조회수</span>
+                        <span className="stat-value">0</span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">날짜</span>
+                        <span className="stat-value">
+                          {new Date(post.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         );

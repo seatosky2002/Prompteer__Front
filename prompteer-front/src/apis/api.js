@@ -384,3 +384,89 @@ export const getMyCompletedVideoChallenges = async () => {
     }
   }
 };
+
+// 모든 게시글 조회 API
+export const getAllPosts = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams(); // posts/ 뒤에 붙는 쿼리 파라미터를 사용하기 위해서.
+
+    // 기본값 설정
+    queryParams.append("skip", params.skip || 0); // skip 파라미터에 담는다. params에 처음부터 다 담아서..
+    queryParams.append("limit", params.limit || 100); // 내 게시글 모두 가져오기 위해 큰 값 설정
+
+    // types 파라미터 (question, share)
+    if (params.types && params.types.length > 0) {
+      params.types.forEach((type) => queryParams.append("types", type));
+    }
+
+    // tags 파라미터 (ps, img, video)
+    // tags로 필터링 하는거
+    if (params.tags && params.tags.length > 0) {
+      params.tags.forEach((tag) => queryParams.append("tags", tag));
+    }
+
+    const response = await instanceWithToken.get(
+      `posts/?${queryParams.toString()}`
+    );
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: "로그인을 다시 해주세요.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "게시글 목록을 가져올 수 없습니다.",
+      };
+    }
+  }
+};
+
+// 내가 작성한 게시글 목록 조회 API (마이페이지용)
+// 일단은 임시로 프론트에서 필터링 ... 나중에 백에서 필터링 해주는 것으로 변경 예정
+export const getMyPosts = async () => {
+  try {
+    // 1. 현재 사용자 정보 가져오기
+    const userResult = await getCurrentUser();
+    if (!userResult.success) {
+      return {
+        success: false,
+        error: "사용자 정보를 가져올 수 없습니다.",
+      };
+    }
+
+    // 2. 모든 게시글 가져오기
+    const postsResult = await getAllPosts({
+      // params에 이런 것들 담기
+      types: ["question", "share"], // 질문글과 공유글 모두
+      limit: 100, // 충분히 큰 값으로 설정
+    });
+
+    if (!postsResult.success) {
+      return postsResult;
+    }
+
+    // 3. 현재 사용자의 이메일로 필터링
+    const myPosts = postsResult.data.filter(
+      (post) => post.user && post.user.email === userResult.data.email
+    );
+
+    return {
+      success: true,
+      data: myPosts,
+    };
+  } catch (error) {
+    console.error("내 게시글 조회 에러:", error);
+    return {
+      success: false,
+      error: "내 게시글 목록을 가져올 수 없습니다.",
+    };
+  }
+};

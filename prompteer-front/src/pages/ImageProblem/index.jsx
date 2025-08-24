@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { getCurrentUser } from '../../apis/api.js';
@@ -179,7 +180,7 @@ const ImageProblem = () => {
         const token = localStorage.getItem('access_token');
         if (token) {
           try {
-            const userResponse = await fetch('/api/users/me', {
+            const userResponse = await fetch(API_ENDPOINTS.USERS_ME, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -266,7 +267,7 @@ const ImageProblem = () => {
           {
             id: 1,
             prompt: '일상 풍경을 묘사한 프롬프트',
-            image: '/api/media/shares/img_shares/1_generated_image_1755844087.png',
+            image: `${API_ENDPOINTS.MEDIA}/shares/img_shares/1_generated_image_1755844087.png`,
             likes: [],
             likes_count: 15,
             isLiked: false,
@@ -276,7 +277,7 @@ const ImageProblem = () => {
           {
             id: 2,
             prompt: '자연스러운 풍경 묘사',
-            image: '/api/media/shares/img_shares/1_generated_image_1755845877.png',
+            image: `${API_ENDPOINTS.MEDIA}/shares/img_shares/1_generated_image_1755845877.png`,
             likes: [],
             likes_count: 12,
             isLiked: false,
@@ -286,7 +287,7 @@ const ImageProblem = () => {
           {
             id: 3,
             prompt: '도시 풍경 묘사',
-            image: '/api/media/shares/img_shares/1_generated_image_1755846010.png',
+            image: `${API_ENDPOINTS.MEDIA}/shares/img_shares/1_generated_image_1755846010.png`,
             likes: [],
             likes_count: 8,
             isLiked: false,
@@ -296,7 +297,7 @@ const ImageProblem = () => {
           {
             id: 4,
             prompt: '자연과 도시의 조화',
-            image: '/api/media/shares/img_shares/1_generated_image_1755846584.png',
+            image: `${API_ENDPOINTS.MEDIA}/shares/img_shares/1_generated_image_1755846584.png`,
             likes: [],
             likes_count: 20,
             isLiked: false,

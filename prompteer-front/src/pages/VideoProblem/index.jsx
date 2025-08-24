@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { getCurrentUser } from '../../apis/api.js';
@@ -169,7 +170,7 @@ const VideoProblem = () => {
         const token = localStorage.getItem('access_token');
         if (token) {
           try {
-            const userResponse = await fetch('/api/users/me', {
+            const userResponse = await fetch(API_ENDPOINTS.USERS_ME, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }

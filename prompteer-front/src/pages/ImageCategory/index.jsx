@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { searchChallenges } from '../../services/challengeApi.js';
@@ -78,7 +79,7 @@ const ImageCategory = () => {
         setLoading(true);
         
         // /challenges/img/ 엔드포인트에서 직접 이미지 챌린지 데이터 가져오기
-        const response = await fetch('/api/challenges/img/');
+        const response = await fetch(API_ENDPOINTS.CHALLENGES_IMG);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

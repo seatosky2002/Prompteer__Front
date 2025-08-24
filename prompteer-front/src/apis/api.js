@@ -328,3 +328,59 @@ export const getChallengeDetails = async (challengeId) => {
     }
   }
 };
+
+// 내가 완료한 이미지 챌린지 목록 조회 API, 마이페이지용
+export const getMyCompletedImgChallenges = async () => {
+  try {
+    const response = await instanceWithToken.get(
+      "users/me/completed-challenges/img"
+    );
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: "로그인을 다시 해주세요.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "완료한 이미지 챌린지 목록을 가져올 수 없습니다.",
+      };
+    }
+  }
+};
+
+// 내가 완료한 비디오 챌린지 목록 조회 API, 마이페이지용
+export const getMyCompletedVideoChallenges = async () => {
+  try {
+    const response = await instanceWithToken.get(
+      "users/me/completed-challenges/video"
+    );
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: "로그인을 다시 해주세요.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "완료한 비디오 챌린지 목록을 가져올 수 없습니다.",
+      };
+    }
+  }
+};

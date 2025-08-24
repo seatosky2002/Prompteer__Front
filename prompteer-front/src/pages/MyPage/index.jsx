@@ -8,6 +8,8 @@ import CodingDetailPrompt from "../../components/cards/CodingDetailPrompt";
 import ImageDetailPrompt from "../../components/cards/ImageDetailPrompt";
 import {
   getMyCompletedPsChallenges,
+  getMyCompletedImgChallenges,
+  getMyCompletedVideoChallenges,
   getChallengeDetails,
 } from "../../apis/api.js";
 import "./MyPage.css";
@@ -137,6 +139,183 @@ const MyPage = () => {
     }
   }, [activeTab]);
 
+  // 이미지/영상 챌린지 데이터 로딩
+  useEffect(() => {
+    const fetchImageChallenges = async () => {
+      setIsLoadingImage(true);
+      setImageError(null);
+
+      try {
+        // 이미지와 비디오 챌린지를 병렬로 가져오기
+        // Promise.all로 하면 순차적으로 getMy~ 하는 것보다 빠르다.
+        const [imgResult, videoResult] = await Promise.all([
+          getMyCompletedImgChallenges(),
+          getMyCompletedVideoChallenges(),
+        ]);
+
+        let allChallenges = [];
+
+        // 이미지 챌린지 처리
+        if (imgResult.success) {
+          const imgChallengesWithDetails = await Promise.all(
+            // Promise.all은 배열 안에 있는 각 챌린지들에 대한 병렬 처리를 가능하게 한다.
+            // getChallengeDetails가 아래에서 계속 불러지기 때문에.
+            imgResult.data.map(async (challenge) => {
+              try {
+                const challengeDetails = await getChallengeDetails(
+                  challenge.challenge_id
+                );
+
+                if (challengeDetails.success) {
+                  const details = challengeDetails.data;
+                  return {
+                    id: challenge.id,
+                    challengeNumber: challenge.challenge_id,
+                    title:
+                      details.title || `Challenge #${challenge.challenge_id}`,
+                    description: details.content || "내용 없음",
+                    difficulty: details.level || "알 수 없음",
+                    type: "이미지",
+                    prompt: challenge.prompt,
+                    imageUrl: challenge.img_share?.img_url || "이미지 없음",
+                    likes: challenge.likes_count || 0,
+                    createdAt: challenge.created_at,
+                    user: challenge.user,
+                    tag: details.tag,
+                    references: details.img_challenge?.references || [],
+                  };
+                } else {
+                  // 여기까지 올일 없음. 이미지 Result는 받아오는데 챌린지 디테일만 못받는 경우라서.
+                  return {
+                    id: challenge.id,
+                    challengeNumber: challenge.challenge_id,
+                    title: `Challenge #${challenge.challenge_id}`,
+                    description: challenge.prompt || "프롬프트 없음",
+                    difficulty: "알 수 없음",
+                    type: "이미지",
+                    prompt: challenge.prompt,
+                    imageUrl: challenge.img_share?.img_url || "이미지 없음",
+                    likes: challenge.likes_count || 0,
+                    createdAt: challenge.created_at,
+                    user: challenge.user,
+                  };
+                }
+              } catch (error) {
+                // 에러 난 경우 기본 정보만 사용
+                console.error(
+                  `이미지 챌린지 ${challenge.challenge_id} 상세 정보 로딩 에러:`,
+                  error
+                );
+                return {
+                  id: challenge.id,
+                  challengeNumber: challenge.challenge_id,
+                  title: `Challenge #${challenge.challenge_id}`,
+                  description: challenge.prompt || "프롬프트 없음",
+                  difficulty: "알 수 없음",
+                  type: "이미지",
+                  prompt: challenge.prompt,
+                  imageUrl: challenge.img_share?.img_url || "이미지 없음",
+                  likes: challenge.likes_count || 0,
+                  createdAt: challenge.created_at,
+                  user: challenge.user,
+                };
+              }
+            })
+          );
+          allChallenges = [...allChallenges, ...imgChallengesWithDetails];
+        }
+
+        // 비디오 챌린지 처리
+        if (videoResult.success) {
+          const videoChallengesWithDetails = await Promise.all(
+            videoResult.data.map(async (challenge) => {
+              try {
+                const challengeDetails = await getChallengeDetails(
+                  challenge.challenge_id
+                );
+
+                if (challengeDetails.success) {
+                  const details = challengeDetails.data;
+                  return {
+                    id: challenge.id,
+                    challengeNumber: challenge.challenge_id,
+                    title:
+                      details.title || `Challenge #${challenge.challenge_id}`,
+                    description: details.content || "내용 없음",
+                    difficulty: details.level || "알 수 없음",
+                    type: "영상",
+                    prompt: challenge.prompt,
+                    imageUrl: challenge.video_share?.video_url || "영상 없음",
+                    likes: challenge.likes_count || 0,
+                    createdAt: challenge.created_at,
+                    user: challenge.user,
+                    tag: details.tag,
+                    references: details.video_challenge?.references || [],
+                  };
+                } else {
+                  // 여기까지 올일 없음. 이미지 Result는 받아오는데 챌린지 디테일만 못받는 경우라서.
+                  return {
+                    id: challenge.id,
+                    challengeNumber: challenge.challenge_id,
+                    title: `Challenge #${challenge.challenge_id}`,
+                    description: challenge.prompt || "프롬프트 없음",
+                    difficulty: "알 수 없음",
+                    type: "영상",
+                    prompt: challenge.prompt,
+                    imageUrl: challenge.video_share?.video_url || "영상 없음",
+                    likes: challenge.likes_count || 0,
+                    createdAt: challenge.created_at,
+                    user: challenge.user,
+                  };
+                }
+              } catch (error) {
+                console.error(
+                  `비디오 챌린지 ${challenge.challenge_id} 상세 정보 로딩 에러:`,
+                  error
+                );
+                return {
+                  id: challenge.id,
+                  challengeNumber: challenge.challenge_id,
+                  title: `Challenge #${challenge.challenge_id}`,
+                  description: challenge.prompt || "프롬프트 없음",
+                  difficulty: "알 수 없음",
+                  type: "영상",
+                  prompt: challenge.prompt,
+                  imageUrl: challenge.video_share?.video_url || "영상 없음",
+                  likes: challenge.likes_count || 0,
+                  createdAt: challenge.created_at,
+                  user: challenge.user,
+                };
+              }
+            })
+          );
+          allChallenges = [...allChallenges, ...videoChallengesWithDetails];
+        }
+
+        // 에러 처리
+        if (!imgResult.success && !videoResult.success) {
+          setImageError("이미지/영상 챌린지 목록을 가져올 수 없습니다.");
+        } else if (!imgResult.success) {
+          setImageError("이미지 챌린지 목록을 가져올 수 없습니다.");
+        } else if (!videoResult.success) {
+          setImageError("비디오 챌린지 목록을 가져올 수 없습니다.");
+        } else {
+          setImageChallenges(allChallenges);
+        }
+      } catch (error) {
+        console.error("이미지/영상 챌린지 로딩 에러:", error);
+        setImageError("데이터를 불러오는 중 오류가 발생했습니다.");
+      } finally {
+        setIsLoadingImage(false);
+      }
+    };
+
+    // 이미지/영상 챌린지 탭이 활성화되었을 때만 데이터 로딩
+    if (activeTab === "이미지/영상 챌린지") {
+      fetchImageChallenges();
+    }
+  }, [activeTab]);
+
   // 샘플 데이터
   const questions = [
     {
@@ -194,7 +373,7 @@ const MyPage = () => {
   const [isLoadingCoding, setIsLoadingCoding] = useState(false);
   const [codingError, setCodingError] = useState(null);
 
-  // 피그마 디자인에 맞춰 12개의 이미지/영상 챌린지 (6x2 그리드)
+  /*// 피그마 디자인에 맞춰 12개의 이미지/영상 챌린지 (6x2 그리드)
   const imageChallenges = [
     {
       id: 1,
@@ -328,7 +507,12 @@ const MyPage = () => {
         "A cute and whimsical aquatic creature, resembling a stylized, adorable water bug or pill bug, floating gracefully in a soft, dreamy underwater environment. The creature has a smooth, rounded body with segments, rendered in vibrant pastel shades of pink, orange, and light teal, with subtle iridescent or glowing accents. Its small antennae and legs are also soft and rounded. There is one larger main creature in the center, and a smaller, similar creature in the background. The background is a blurred, ethereal aquatic scene with soft light rays and gentle bubbles, using complementary pastel blues and greens. The art style is a blend of cute illustration, digital art, and 3D rendering, with soft, diffused lighting, smooth textures, and a clean, appealing aesthetic. No sharp edges or realistic insect details.",
       likes: 19,
     },
-  ];
+  ];*/
+
+  // 실제 API에서 가져온 이미지/영상 챌린지 데이터
+  const [imageChallenges, setImageChallenges] = useState([]);
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
+  const [imageError, setImageError] = useState(null);
 
   const tabs = [
     { id: "내가 올린 게시글", label: "내가 올린 게시글", icon: "❓" },
@@ -413,19 +597,36 @@ const MyPage = () => {
           <div className="mypage-content-section">
             <h2 className="section-title">참여한 이미지/영상 챌린지 목록</h2>
             <div className="image-section">
-              <div className="image-grid">
-                {imageChallenges.map((challenge) => (
-                  <MypageImageCard
-                    key={challenge.id}
-                    challengeId={challenge.id}
-                    title={`Challenge #${challenge.challengeNumber}`}
-                    description={challenge.title}
-                    type={challenge.type}
-                    difficulty={challenge.difficulty}
-                    onClick={() => handleImageCardClick(challenge)}
-                  />
-                ))}
-              </div>
+              {isLoadingImage ? (
+                <div className="loading-state">
+                  <p>이미지/영상 챌린지 목록을 불러오는 중...</p>
+                </div>
+              ) : imageError ? (
+                <div className="error-state">
+                  <p>에러: {imageError}</p>
+                  <button onClick={() => window.location.reload()}>
+                    다시 시도
+                  </button>
+                </div>
+              ) : imageChallenges.length === 0 ? (
+                <div className="empty-state">
+                  <p>아직 참여한 이미지/영상 챌린지가 없습니다.</p>
+                </div>
+              ) : (
+                <div className="image-grid">
+                  {imageChallenges.map((challenge) => (
+                    <MypageImageCard
+                      key={challenge.id}
+                      challengeId={challenge.id}
+                      title={challenge.title}
+                      description={challenge.description}
+                      type={challenge.type}
+                      difficulty={challenge.difficulty}
+                      onClick={() => handleImageCardClick(challenge)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         );

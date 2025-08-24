@@ -4,6 +4,7 @@ import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import FilterButton from '../../components/ui/FilterButton/index.jsx';
 import CategoryFilter from '../../components/ui/CategoryFilter/index.jsx';
+import { getCurrentUser } from '../../apis/api.js';
 
 import './PostDetail.css';
 
@@ -20,6 +21,49 @@ const PostDetail = () => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // 로그인 상태 체크
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = localStorage.getItem('access_token');
+
+      if (!token) {
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+        return;
+      }
+
+      try {
+        // 실제 API로 토큰 유효성 검증
+        const result = await getCurrentUser();
+
+        if (result.success) {
+          setIsLoggedIn(true);
+          setCurrentUser(result.data);
+        } else {
+          // 토큰이 있지만 만료되었거나 무효함 (axios interceptor가 이미 토큰 삭제 처리함)
+          setIsLoggedIn(false);
+          setCurrentUser(null);
+        }
+      } catch (error) {
+        // API 호출 실패 (네트워크 오류 등)
+        console.error("Login status check failed:", error);
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+      }
+    };
+
+    checkLoginStatus();
+    
+    const handleFocus = () => {
+      checkLoginStatus();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   // 게시글 데이터 가져오기
   useEffect(() => {
@@ -111,11 +155,12 @@ const PostDetail = () => {
       return;
     }
 
-    const accessToken = localStorage.getItem('access_token');
-    if (!accessToken) {
+    if (!isLoggedIn) {
       alert('댓글을 작성하려면 로그인이 필요합니다.');
       return;
     }
+
+    const accessToken = localStorage.getItem('access_token');
 
     setIsSubmitting(true);
 
@@ -289,13 +334,7 @@ const PostDetail = () => {
                         <div className="problem-content-section">
                           {isProblemExpanded && (
                             <div className="problem-content-card">
-                              <div className="problem-section">
-                                <h4 className="section-title">[제한]</h4>
-                                <div className="section-content">
-                                  시간 : {challengeData.time_limit || '1초'}<br/>
-                                  메모리 : {challengeData.memory_limit || '256MB'}
-                                </div>
-                              </div>
+
                               
                               <div className="problem-section">
                                 <h4 className="section-title">[문제 설명]</h4>

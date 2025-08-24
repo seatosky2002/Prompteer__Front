@@ -275,7 +275,7 @@
   flex-direction: column;
   align-items: stretch;
   width: 100%;
-  gap: 30px;
+  gap: 0px;
   max-width: none;
 }
 
@@ -521,8 +521,9 @@
 
 /* 댓글 섹션 개선된 스타일 */
 .comments-header {
-  margin-bottom: 20px;
-  padding-bottom: 10px;
+  margin-top: 50px !important;
+  margin-bottom: 2px !important;
+  padding-bottom: 2px !important;
   border-bottom: 2px solid #E9ECEF;
 }
 
@@ -539,7 +540,8 @@
   padding: 40px 20px;
   background: #F8F9FA;
   border-radius: 8px;
-  margin-bottom: 20px;
+  margin-top: 0px !important;
+  margin-bottom: 1px;
 }
 
 .no-comments p {

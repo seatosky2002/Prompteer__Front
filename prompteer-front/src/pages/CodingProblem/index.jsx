@@ -5,6 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
+import { getCurrentUser } from '../../apis/api.js';
 import './CodingProblem.css';
 
 const CodingProblem = () => {
@@ -31,26 +32,43 @@ const CodingProblem = () => {
   const [showWorkModal, setShowWorkModal] = useState(false);
   const [likedShares, setLikedShares] = useState(new Set()); // 사용자가 좋아요를 누른 공유들
 
-  // JWT 토큰에서 사용자 ID 추출하는 함수
+  // 현재 사용자 정보 저장
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // JWT 토큰에서 사용자 ID 추출하는 함수 (기존 코드와의 호환성을 위해 유지)
   const getCurrentUserId = () => {
-    const token = localStorage.getItem('access_token');
-    if (!token) return null;
-    
-    try {
-      // JWT 토큰의 payload 부분을 디코딩
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.user_id || payload.sub;
-    } catch (error) {
-      console.error('Failed to decode JWT token:', error);
-      return null;
-    }
+    return currentUser?.id || null;
   };
 
   // 로그인 상태 체크
   useEffect(() => {
-    const checkLoginStatus = () => {
+    const checkLoginStatus = async () => {
       const token = localStorage.getItem('access_token');
-      setIsLoggedIn(!!token);
+
+      if (!token) {
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+        return;
+      }
+
+      try {
+        // 실제 API로 토큰 유효성 검증
+        const result = await getCurrentUser();
+
+        if (result.success) {
+          setIsLoggedIn(true);
+          setCurrentUser(result.data);
+        } else {
+          // 토큰이 있지만 만료되었거나 무효함 (axios interceptor가 이미 토큰 삭제 처리함)
+          setIsLoggedIn(false);
+          setCurrentUser(null);
+        }
+      } catch (error) {
+        // API 호출 실패 (네트워크 오류 등)
+        console.error("Login status check failed:", error);
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+      }
     };
 
     checkLoginStatus();

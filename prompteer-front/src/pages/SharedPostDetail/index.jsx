@@ -8,6 +8,7 @@ import Footer from '../../components/common/Footer/index.jsx';
 import FilterButton from '../../components/ui/FilterButton/index.jsx';
 import CategoryFilter from '../../components/ui/CategoryFilter/index.jsx';
 import CommentCard from '../../components/ui/CommentCard/index.jsx';
+import { getCurrentUser } from '../../apis/api.js';
 import './SharedPostDetail.css';
 
 const SharedPostDetail = () => {
@@ -24,12 +25,42 @@ const SharedPostDetail = () => {
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // JWT 토큰에서 사용자 ID 추출하는 함수 (기존 코드와의 호환성을 위해 유지)
+  const getCurrentUserId = () => {
+    return currentUser?.id || null;
+  };
 
   // 로그인 상태 체크
   useEffect(() => {
-    const checkLoginStatus = () => {
+    const checkLoginStatus = async () => {
       const token = localStorage.getItem('access_token');
-      setIsLoggedIn(!!token);
+
+      if (!token) {
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+        return;
+      }
+
+      try {
+        // 실제 API로 토큰 유효성 검증
+        const result = await getCurrentUser();
+
+        if (result.success) {
+          setIsLoggedIn(true);
+          setCurrentUser(result.data);
+        } else {
+          // 토큰이 있지만 만료되었거나 무효함 (axios interceptor가 이미 토큰 삭제 처리함)
+          setIsLoggedIn(false);
+          setCurrentUser(null);
+        }
+      } catch (error) {
+        // API 호출 실패 (네트워크 오류 등)
+        console.error("Login status check failed:", error);
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+      }
     };
 
     checkLoginStatus();
@@ -41,20 +72,6 @@ const SharedPostDetail = () => {
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
-
-  // JWT 토큰에서 사용자 ID 추출하는 함수
-  const getCurrentUserId = () => {
-    const token = localStorage.getItem('access_token');
-    if (!token) return null;
-    
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.sub; // 또는 payload.user_id, 백엔드 구현에 따라
-    } catch (error) {
-      console.error('Error parsing token:', error);
-      return null;
-    }
-  };
 
 
 
@@ -405,13 +422,7 @@ const SharedPostDetail = () => {
                         <div className="problem-view-card">
                           {isProblemExpanded && (
                             <div className="problem-expanded-content">
-                              <div className="problem-section">
-                                <h4 className="section-title">[제한]</h4>
-                                <div className="section-content">
-                                  시간 : {challengeData?.time_limit || '제한없음'}<br/>
-                                  메모리 : {challengeData?.memory_limit || '제한없음'}
-                                </div>
-                              </div>
+
                               
                               <div className="problem-section">
                                 <h4 className="section-title">[문제 설명]</h4>

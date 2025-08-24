@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { searchChallenges } from '../../services/challengeApi.js';
+import { getCurrentUser } from '../../apis/api.js';
 import './VideoCategory.css';
 
 const VideoCategory = () => {
@@ -17,9 +18,29 @@ const VideoCategory = () => {
 
   // 로그인 상태 체크
   useEffect(() => {
-    const checkLoginStatus = () => {
+    const checkLoginStatus = async () => {
       const token = localStorage.getItem('access_token');
-      setIsLoggedIn(!!token);
+
+      if (!token) {
+        setIsLoggedIn(false);
+        return;
+      }
+
+      try {
+        // 실제 API로 토큰 유효성 검증
+        const result = await getCurrentUser();
+
+        if (result.success) {
+          setIsLoggedIn(true);
+        } else {
+          // 토큰이 있지만 만료되었거나 무효함 (axios interceptor가 이미 토큰 삭제 처리함)
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        // API 호출 실패 (네트워크 오류 등)
+        console.error("Login status check failed:", error);
+        setIsLoggedIn(false);
+      }
     };
 
     checkLoginStatus();

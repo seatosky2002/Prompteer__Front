@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { getCurrentUser } from '../../apis/api.js';
@@ -65,7 +66,7 @@ const VideoProblem = () => {
     const fetchChallengeData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8000/challenges/${id}`);
+        const response = await fetch(`/api/challenges/${id}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -151,7 +152,7 @@ const VideoProblem = () => {
       
       setLoadingVideos(true);
       try {
-        const response = await fetch(`http://localhost:8000/shares/video/?challenge_id=${id}`);
+        const response = await fetch(`/api/shares/video/?challenge_id=${id}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -169,7 +170,7 @@ const VideoProblem = () => {
         const token = localStorage.getItem('access_token');
         if (token) {
           try {
-            const userResponse = await fetch('http://localhost:8000/users/me', {
+            const userResponse = await fetch(API_ENDPOINTS.USERS_ME, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -190,9 +191,9 @@ const VideoProblem = () => {
 
           if (rawUrl) {
             if (rawUrl.startsWith('media/media/')) {
-              videoUrl = `http://localhost:8000/media/${rawUrl.substring(12)}`;
+              videoUrl = `/api/media/${rawUrl.substring(12)}`;
             } else {
-              videoUrl = `http://localhost:8000/${rawUrl}`;
+              videoUrl = `/api/${rawUrl}`;
             }
           }
           
@@ -241,7 +242,7 @@ const VideoProblem = () => {
     
     setIsGenerating(true);
     try {
-      const response = await fetch(`http://localhost:8000/challenges/video/${id}/generate`, {
+      const response = await fetch(`/api/challenges/video/${id}/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -269,7 +270,7 @@ const VideoProblem = () => {
         cleanUrl = videoUrl.replace('media/media/', 'media/');
       }
       
-      const fullVideoUrl = `http://localhost:8000/${cleanUrl}`;
+      const fullVideoUrl = `/api/${cleanUrl}`;
       console.log('Final generated video URL:', fullVideoUrl);
       setGeneratedVideoUrl(fullVideoUrl);
       setIsGenerated(true);
@@ -316,7 +317,7 @@ const VideoProblem = () => {
       const isLiked = currentShare?.isLiked || false;
       const method = isLiked ? 'DELETE' : 'POST';
       
-      const response = await fetch(`http://localhost:8000/shares/${shareId}/like`, {
+      const response = await fetch(`/api/shares/${shareId}/like`, {
         method: method,
         headers: {
           'Authorization': `Bearer ${token}`,

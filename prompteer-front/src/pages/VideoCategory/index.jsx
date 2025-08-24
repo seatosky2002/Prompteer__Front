@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { searchChallenges } from '../../services/challengeApi.js';
@@ -79,7 +80,7 @@ const VideoCategory = () => {
         
         console.log('Fetching video challenges from API...');
         // /challenges/video/ 엔드포인트에서 직접 비디오 챌린지 데이터 가져오기
-        const response = await fetch('http://localhost:8000/challenges/video/?limit=50');
+        const response = await fetch(API_ENDPOINTS.CHALLENGES_VIDEO + '?limit=50');
         
         console.log('Video challenges response status:', response.status);
         
@@ -149,7 +150,7 @@ const VideoCategory = () => {
       
       for (const challenge of videoChallenges) {
         try {
-          const videoShareUrl = `http://localhost:8000/shares/video/?challenge_id=${challenge.id}&limit=10`;
+          const videoShareUrl = `/api/shares/video/?challenge_id=${challenge.id}&limit=10`;
           console.log(`Fetching videos from: ${videoShareUrl}`);
           
           const response = await fetch(videoShareUrl);
@@ -190,7 +191,7 @@ const VideoCategory = () => {
                   processedUrl = processedUrl.substring(6); // 'media/' 제거
                 }
                 
-                const fullVideoUrl = processedUrl.startsWith('http') ? processedUrl : `http://localhost:8000/${processedUrl}`;
+                const fullVideoUrl = processedUrl.startsWith('http') ? processedUrl : `/api/${processedUrl}`;
                 mediaMap[challenge.id] = fullVideoUrl;
                 console.log(`Set video for challenge ${challenge.id}:`, fullVideoUrl);
               } else {
@@ -211,7 +212,7 @@ const VideoCategory = () => {
                     processedUrl = processedUrl.substring(6); // 'media/' 제거
                   }
                   
-                  const fullRandomVideoUrl = processedUrl.startsWith('http') ? processedUrl : `http://localhost:8000/${processedUrl}`;
+                  const fullRandomVideoUrl = processedUrl.startsWith('http') ? processedUrl : `/api/${processedUrl}`;
                   mediaMap[challenge.id] = fullRandomVideoUrl;
                   console.log(`Set random video for challenge ${challenge.id}:`, fullRandomVideoUrl);
                 } else {

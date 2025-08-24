@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import FilterButton from '../../components/ui/FilterButton/index.jsx';
@@ -41,7 +42,7 @@ const ProblemDetail = () => {
       try {
         setLoading(true);
         // PS 카테고리의 프롬프트 공유 게시글들을 가져옴
-        const response = await fetch('http://localhost:8000/posts/?types=share&tags=ps');
+        const response = await fetch(`${API_ENDPOINTS.POSTS}/?types=share&tags=ps`);
         if (response.ok) {
           const data = await response.json();
           setPsSharePosts(data);

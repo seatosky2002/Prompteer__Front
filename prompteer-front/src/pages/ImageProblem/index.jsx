@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { getCurrentUser } from '../../apis/api.js';
@@ -158,7 +159,7 @@ const ImageProblem = () => {
       setLoadingImages(true);
       try {
         console.log('Fetching shared images for challenge:', id);
-        const response = await fetch(`http://localhost:8000/shares/img/?challenge_id=${id}`);
+        const response = await fetch(`/api/shares/img/?challenge_id=${id}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -179,7 +180,7 @@ const ImageProblem = () => {
         const token = localStorage.getItem('access_token');
         if (token) {
           try {
-            const userResponse = await fetch('http://localhost:8000/users/me', {
+            const userResponse = await fetch(API_ENDPOINTS.USERS_ME, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -207,32 +208,32 @@ const ImageProblem = () => {
             // media/media/... 형태의 URL을 media/... 형태로 변환
             if (imgUrl.startsWith('media/media/')) {
               // 'media/media/' 부분을 'media/'로 변경
-              imageUrl = `http://localhost:8000/media/${imgUrl.substring(12)}`;
+              imageUrl = `/api/media/${imgUrl.substring(12)}`;
               console.log(`Converted URL: ${imageUrl}`);
             } else {
-              imageUrl = `http://localhost:8000/${imgUrl}`;
+              imageUrl = `/api/${imgUrl}`;
               console.log(`Direct URL: ${imageUrl}`);
             }
           } else if (share.img_url) {
             const imgUrl = share.img_url;
             if (imgUrl.startsWith('media/media/')) {
-              imageUrl = `http://localhost:8000/media/${imgUrl.substring(12)}`;
+              imageUrl = `/api/media/${imgUrl.substring(12)}`;
             } else {
-              imageUrl = `http://localhost:8000/${imgUrl}`;
+              imageUrl = `/api/${imgUrl}`;
             }
           } else if (share.image_url) {
             const imgUrl = share.image_url;
             if (imgUrl.startsWith('media/media/')) {
-              imageUrl = `http://localhost:8000/media/${imgUrl.substring(12)}`;
+              imageUrl = `/api/media/${imgUrl.substring(12)}`;
             } else {
-              imageUrl = `http://localhost:8000/${imgUrl}`;
+              imageUrl = `/api/${imgUrl}`;
             }
           } else if (share.url) {
             const imgUrl = share.url;
             if (imgUrl.startsWith('media/media/')) {
-              imageUrl = `http://localhost:8000/media/${imgUrl.substring(12)}`;
+              imageUrl = `/api/media/${imgUrl.substring(12)}`;
             } else {
-              imageUrl = `http://localhost:8000/${imgUrl}`;
+              imageUrl = `/api/${imgUrl}`;
             }
           }
           
@@ -266,7 +267,7 @@ const ImageProblem = () => {
           {
             id: 1,
             prompt: '일상 풍경을 묘사한 프롬프트',
-            image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755844087.png',
+            image: `${API_ENDPOINTS.MEDIA}/shares/img_shares/1_generated_image_1755844087.png`,
             likes: [],
             likes_count: 15,
             isLiked: false,
@@ -276,7 +277,7 @@ const ImageProblem = () => {
           {
             id: 2,
             prompt: '자연스러운 풍경 묘사',
-            image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755845877.png',
+            image: `${API_ENDPOINTS.MEDIA}/shares/img_shares/1_generated_image_1755845877.png`,
             likes: [],
             likes_count: 12,
             isLiked: false,
@@ -286,7 +287,7 @@ const ImageProblem = () => {
           {
             id: 3,
             prompt: '도시 풍경 묘사',
-            image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755846010.png',
+            image: `${API_ENDPOINTS.MEDIA}/shares/img_shares/1_generated_image_1755846010.png`,
             likes: [],
             likes_count: 8,
             isLiked: false,
@@ -296,7 +297,7 @@ const ImageProblem = () => {
           {
             id: 4,
             prompt: '자연과 도시의 조화',
-            image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755846584.png',
+            image: `${API_ENDPOINTS.MEDIA}/shares/img_shares/1_generated_image_1755846584.png`,
             likes: [],
             likes_count: 20,
             isLiked: false,
@@ -326,7 +327,7 @@ const ImageProblem = () => {
     
     setIsGenerating(true);
     try {
-      const response = await fetch(`http://localhost:8000/challenges/img/${id}/generate`, {
+      const response = await fetch(`/api/challenges/img/${id}/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -356,7 +357,7 @@ const ImageProblem = () => {
         cleanUrl = imageUrl.replace('media/media/', 'media/');
       }
       
-      const fullImageUrl = `http://localhost:8000/${cleanUrl}`;
+      const fullImageUrl = `/api/${cleanUrl}`;
       console.log('Final generated image URL:', fullImageUrl);
       setGeneratedImageUrl(fullImageUrl);
       setIsGenerated(true);
@@ -409,7 +410,7 @@ const ImageProblem = () => {
       
       console.log(`Attempting to ${isLiked ? 'unlike' : 'like'} share ${shareId}`);
       
-      const response = await fetch(`http://localhost:8000/shares/${shareId}/like`, {
+      const response = await fetch(`/api/shares/${shareId}/like`, {
         method: method,
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -694,7 +695,7 @@ const ImageProblem = () => {
                                   cleanUrl = `media/${url}`;
                                 }
                                 
-                                const finalUrl = `http://localhost:8000/${cleanUrl}`;
+                                const finalUrl = `/api/${cleanUrl}`;
                                 console.log('Final shared image URL:', finalUrl);
                                 return finalUrl;
                               })()}

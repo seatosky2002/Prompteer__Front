@@ -2,18 +2,22 @@
 // 멋사 10주차 참고
 
 import axios from "axios";
+import { API_BASE_URL } from "../config/api";
 
-// FastAPI 백엔드 baseURL 설정
-const API_BASE_URL = "http://localhost:8000/";
+// FastAPI 백엔드 baseURL 설정 (config에서 가져옴)
+const BASE_URL = `${API_BASE_URL}/`;
 
 // 누구나 접근 가능한 API들
 export const instance = axios.create({
-  baseURL: API_BASE_URL,
+
+  baseURL: BASE_URL
+
 });
 
 // 로그인 해야지 접근 가능한 API들
 export const instanceWithToken = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: BASE_URL
+
 });
 
 // request interceptor. 모든 '요청'에 토큰 추가

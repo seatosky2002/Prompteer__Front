@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { API_ENDPOINTS } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import FilterButton from '../../components/ui/FilterButton/index.jsx';
@@ -85,7 +86,7 @@ const Board = () => {
       params.append('limit', postsPerPage);
 
       try {
-        const response = await fetch(`http://localhost:8000/posts/?${params.toString()}`);
+        const response = await fetch(`${API_ENDPOINTS.POSTS}/?${params.toString()}`);
         if (!response.ok) {
           throw new Error('데이터를 불러오는 데 실패했습니다.');
         }

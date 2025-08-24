@@ -70,7 +70,7 @@ const PostDetail = () => {
     const fetchPostData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8000/posts/${id}`);
+        const response = await fetch(`/api/posts/${id}`);
         
         if (!response.ok) {
           throw new Error('게시글을 불러오는데 실패했습니다.');
@@ -111,7 +111,7 @@ const PostDetail = () => {
   // 챌린지 데이터 가져오기
   const fetchChallengeData = async (challengeId) => {
     try {
-      const response = await fetch(`http://localhost:8000/challenges/${challengeId}`);
+      const response = await fetch(`/api/challenges/${challengeId}`);
       
       if (!response.ok) {
         console.warn('챌린지 데이터를 불러올 수 없습니다.');
@@ -129,7 +129,7 @@ const PostDetail = () => {
   // 게시글 데이터 새로고침 (댓글 포함)
   const refreshPostData = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/posts/${id}`);
+      const response = await fetch(`/api/posts/${id}`);
       
       if (!response.ok) {
         console.warn('게시글 데이터를 새로고침할 수 없습니다.');
@@ -165,7 +165,7 @@ const PostDetail = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`http://localhost:8000/posts/${id}/comments`, {
+      const response = await fetch(`/api/posts/${id}/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

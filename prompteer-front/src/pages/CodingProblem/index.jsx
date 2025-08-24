@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useParams, useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
+import { API_ENDPOINTS, buildApiUrl } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { getCurrentUser } from '../../apis/api.js';
@@ -88,7 +89,7 @@ const CodingProblem = () => {
     const fetchProblemData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/challenges/${id}`);
+        const response = await fetch(buildApiUrl(`/challenges/${id}`));
 
         
         if (!response.ok) {
@@ -180,7 +181,7 @@ const CodingProblem = () => {
   const fetchOthersWork = async () => {
     try {
       setLoadingOthers(true);
-      const response = await fetch(`http://localhost:8000/shares/ps/?challenge_id=${id}`);
+      const response = await fetch(`${API_ENDPOINTS.SHARES_PS}?challenge_id=${id}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -194,7 +195,7 @@ const CodingProblem = () => {
       const token = localStorage.getItem('access_token');
       if (token) {
         try {
-          const userResponse = await fetch('http://localhost:8000/users/me', {
+          const userResponse = await fetch(API_ENDPOINTS.USERS_ME, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -323,7 +324,7 @@ const CodingProblem = () => {
     }
 
     try {
-      const response = await fetch(`/challenges/ps/${id}/generate`, {
+      const response = await fetch(buildApiUrl(`/challenges/ps/${id}/generate`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -380,7 +381,7 @@ const CodingProblem = () => {
     }
 
     try {
-      const response = await fetch(`/challenges/ps/${id}/score`, {
+      const response = await fetch(buildApiUrl(`/challenges/ps/${id}/score`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -477,7 +478,7 @@ ${editorCode}
       
       console.log(`Attempting to ${isLiked ? 'unlike' : 'like'} share ${shareId}`);
       
-      const response = await fetch(`http://localhost:8000/shares/${shareId}/like`, {
+      const response = await fetch(buildApiUrl(`/shares/${shareId}/like`), {
         method: method,
         headers: {
           'Authorization': `Bearer ${accessToken}`,

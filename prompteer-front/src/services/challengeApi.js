@@ -1,8 +1,10 @@
 // challengeApi.js - FastAPI 챌린지 엔드포인트와 통신하는 서비스
 
-// API 엔드포인트들
-const CODING_API_URL = 'http://localhost:8000/challenges/ps/';
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+import { API_ENDPOINTS, buildApiUrl } from '../config/api';
+
+// API 엔드포인트들 (config에서 가져옴)
+const CODING_API_URL = API_ENDPOINTS.CHALLENGES_PS;
+const API_BASE_URL = buildApiUrl('/v1');
 
 /**
  * 모든 챌린지를 가져오는 함수

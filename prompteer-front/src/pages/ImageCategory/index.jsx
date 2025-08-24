@@ -78,7 +78,7 @@ const ImageCategory = () => {
         setLoading(true);
         
         // /challenges/img/ 엔드포인트에서 직접 이미지 챌린지 데이터 가져오기
-        const response = await fetch('http://localhost:8000/challenges/img/');
+        const response = await fetch('/api/challenges/img/');
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -134,7 +134,7 @@ const ImageCategory = () => {
       
       for (const challenge of imageChallenges) {
         try {
-          const response = await fetch(`http://localhost:8000/shares/img/?challenge_id=${challenge.id}&limit=10`);
+          const response = await fetch(`/api/shares/img/?challenge_id=${challenge.id}&limit=10`);
           // console.log(`Fetching images for challenge ${challenge.id}, response status:`, response.status);
           
           if (response.ok) {
@@ -170,7 +170,7 @@ const ImageCategory = () => {
                   processedUrl = processedUrl.substring(6); // 'media/' 제거
                 }
                 
-                const fullImageUrl = processedUrl.startsWith('http') ? processedUrl : `http://localhost:8000/${processedUrl}`;
+                const fullImageUrl = processedUrl.startsWith('http') ? processedUrl : `/api/${processedUrl}`;
                 mediaMap[challenge.id] = fullImageUrl;
                 // console.log(`Set image for challenge ${challenge.id}:`, fullImageUrl);
               } else {
@@ -187,7 +187,7 @@ const ImageCategory = () => {
                     processedUrl = processedUrl.substring(6); // 'media/' 제거
                   }
                   
-                  const fullRandomImageUrl = processedUrl.startsWith('http') ? processedUrl : `http://localhost:8000/${processedUrl}`;
+                  const fullRandomImageUrl = processedUrl.startsWith('http') ? processedUrl : `/api/${processedUrl}`;
                   mediaMap[challenge.id] = fullRandomImageUrl;
                   // console.log(`Set random image for challenge ${challenge.id}:`, fullRandomImageUrl);
                 } else {

@@ -3,6 +3,7 @@
 // =============================================================================
 
 import { instance, instanceWithToken } from "./axios";
+import { API_ENDPOINTS } from "../config/api";
 
 // Account 관련 API들
 export const signIn = async (loginData) => {
@@ -13,7 +14,7 @@ export const signIn = async (loginData) => {
     formData.append("username", loginData.email); // username 필드 사용
     formData.append("password", loginData.password);
 
-    const response = await instance.post("/users/login", formData, {
+    const response = await instance.post("users/login", formData, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -60,7 +61,7 @@ export const signIn = async (loginData) => {
 export const signUp = async (userData) => {
   try {
     // 백엔드 서버 꺼졌을때와 같은 상황을 대비하여 try - catch로 구현하는게 훨씬 안전하다고 한다. response 자체가 존재하지 않는 상황이 있을 수도 있어서.
-    const response = await instance.post("/users/register/", userData); // 비동기적으로 백에다가 데이터 전송 후 받음
+    const response = await instance.post("users/register", userData); // 비동기적으로 백에다가 데이터 전송 후 받음
 
     if (response.status === 201) {
       // 회원가입 성공 시 자동으로 토큰 발급됨

@@ -180,7 +180,7 @@ const CodingProblem = () => {
   const fetchOthersWork = async () => {
     try {
       setLoadingOthers(true);
-      const response = await fetch(`http://localhost:8000/shares/ps/?challenge_id=${id}`);
+      const response = await fetch(`/api/shares/ps/?challenge_id=${id}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -194,7 +194,7 @@ const CodingProblem = () => {
       const token = localStorage.getItem('access_token');
       if (token) {
         try {
-          const userResponse = await fetch('http://localhost:8000/users/me', {
+          const userResponse = await fetch('/api/users/me', {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -477,7 +477,7 @@ ${editorCode}
       
       console.log(`Attempting to ${isLiked ? 'unlike' : 'like'} share ${shareId}`);
       
-      const response = await fetch(`http://localhost:8000/shares/${shareId}/like`, {
+      const response = await fetch(`/api/shares/${shareId}/like`, {
         method: method,
         headers: {
           'Authorization': `Bearer ${accessToken}`,

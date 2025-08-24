@@ -8,7 +8,9 @@ import {
   getPsShares,
   getImgShares,
   getVideoShares,
-  getChallengeDetails,
+  getPsChallenges,
+  getImgChallenges,
+  getVideoChallenges,
 } from "../../apis/api";
 import "./MainPage.css";
 
@@ -54,7 +56,7 @@ const MainPage = () => {
           let sharesResult;
 
           if (categoryInfo.api === "ps") {
-            sharesResult = await getPsShares({ limit: 100 });
+            sharesResult = await getPsShares({ limit: 100 }); // limit 그냥 디폴트 100개로 수행..
           } else if (categoryInfo.api === "img") {
             sharesResult = await getImgShares({ limit: 100 });
           } else if (categoryInfo.api === "video") {
@@ -91,58 +93,96 @@ const MainPage = () => {
               );
 
               if (topChallengeId && maxShares > 0) {
-                // 해당 챌린지의 상세 정보를 가져오기 위해 챌린지 API 호출
+                // 해당 챌린지의 상세 정보를 가져오기 위해 챌린지 목록 API 호출
                 let challengeDetails = null;
 
                 if (categoryInfo.api === "ps") {
-                  // PS 챌린지 상세 정보 가져오기
-                  const challengeResult = await getChallengeDetails(
-                    topChallengeId
-                  );
-                  if (challengeResult && challengeResult.success) {
-                    challengeDetails = challengeResult.data;
+                  // PS 챌린지 목록에서 topChallengeId에 해당하는 챌린지 찾기.
+                  // 전체 PS 챌린지 목록에서 필터링하는거라.. 코드 효율화 무조건 필요
+                  const challengesResult = await getPsChallenges({
+                    limit: 100,
+                  });
+                  if (challengesResult && challengesResult.success) {
+                    challengeDetails = challengesResult.data.find(
+                      (challenge) => challenge.id === topChallengeId
+                    ); // 필터링
+                  }
+                } else if (categoryInfo.api === "img") {
+                  // 이미지 챌린지 목록에서 topChallengeId에 해당하는 챌린지 찾기
+                  const challengesResult = await getImgChallenges({
+                    limit: 100,
+                  });
+                  if (challengesResult && challengesResult.success) {
+                    challengeDetails = challengesResult.data.find(
+                      (challenge) => challenge.id === topChallengeId
+                    );
+                  }
+                } else if (categoryInfo.api === "video") {
+                  // 비디오 챌린지 목록에서 topChallengeId에 해당하는 챌린지 찾기
+                  const challengesResult = await getVideoChallenges({
+                    limit: 100,
+                  });
+                  if (challengesResult && challengesResult.success) {
+                    challengeDetails = challengesResult.data.find(
+                      (challenge) => challenge.id === topChallengeId
+                    );
                   }
                 }
-                // img와 video 챌린지는 별도 API가 필요할 수 있음
 
                 // 카테고리별로 데이터 구조 변환
                 if (categoryInfo.api === "ps") {
                   topChallengesData.push({
                     // 이것도 배열로 정의. 데이터 배열 자체를 topChallengesData라는 배열에 추가하는 것.
-                    challengeId: topChallengeId,
-                    title: `Challenge #${topChallengeId}\n${
-                      challengeDetails?.title || "제목 없음"
-                    }`,
-                    description:
-                      challengeDetails?.problemDescription?.situation ||
-                      challengeDetails?.description ||
-                      "설명 없음",
-                    difficulty: challengeDetails?.difficulty || "중급",
-                    participants: Math.floor(Math.random() * 1500) + 300, // 임시 참가자 수
+                    id: topChallengeId,
+                    title: challengeDetails?.title,
+                    description: challengeDetails?.content,
+                    difficulty:
+                      challengeDetails?.level === "Easy"
+                        ? "초급"
+                        : challengeDetails?.level === "Medium"
+                        ? "중급"
+                        : challengeDetails?.level === "Hard"
+                        ? "고급"
+                        : "None",
+
                     category: categoryInfo.category,
                     shares: maxShares,
                   });
                 } else if (categoryInfo.api === "img") {
                   topChallengesData.push({
-                    challengeId: topChallengeId,
-                    title: `Challenge #${topChallengeId}`,
-                    description: "이미지 생성 챌린지",
-                    difficulty: "중급",
-                    participants: Math.floor(Math.random() * 1500) + 300,
+                    id: topChallengeId,
+                    title: challengeDetails?.title,
+                    description: challengeDetails?.content,
+                    difficulty:
+                      challengeDetails?.level === "Easy"
+                        ? "초급"
+                        : challengeDetails?.level === "Medium"
+                        ? "중급"
+                        : challengeDetails?.level === "Hard"
+                        ? "고급"
+                        : "None",
+
                     category: categoryInfo.category,
-                    isImageChallenge: categoryInfo.isImageChallenge,
                     shares: maxShares,
+                    isImageChallenge: true,
                   });
                 } else if (categoryInfo.api === "video") {
                   topChallengesData.push({
-                    challengeId: topChallengeId,
-                    title: `Challenge #${topChallengeId}`,
-                    description: "영상 생성 챌린지",
-                    difficulty: "중급",
-                    participants: Math.floor(Math.random() * 1500) + 300,
+                    id: topChallengeId,
+                    title: challengeDetails?.title,
+                    description: challengeDetails?.content,
+                    difficulty:
+                      challengeDetails?.level === "Easy"
+                        ? "초급"
+                        : challengeDetails?.level === "Medium"
+                        ? "중급"
+                        : challengeDetails?.level === "Hard"
+                        ? "고급"
+                        : "None",
+
                     category: categoryInfo.category,
-                    isVideoChallenge: categoryInfo.isVideoChallenge,
                     shares: maxShares,
+                    isVideoChallenge: true,
                   });
                 }
               }
@@ -238,9 +278,11 @@ const MainPage = () => {
 */
   const handleChallengeClick = (challenge) => {
     if (challenge.category === "코딩") {
-      navigate(`/coding/problem/${challenge.challengeId}`);
+      navigate(`/coding/problem/${challenge.id}`);
     } else if (challenge.category === "그림") {
-      navigate(`/image/challenge/${challenge.challengeId}`);
+      navigate(`/image/challenge/${challenge.id}`);
+    } else if (challenge.category === "영상") {
+      navigate(`/video/challenge/${challenge.id}`);
     }
   };
 
@@ -276,7 +318,7 @@ const MainPage = () => {
                 <div key={index} className="challenge-wrapper">
                   {challenge.isImageChallenge ? (
                     <ImageChallengeCard
-                      challenge={challenge}
+                      challenge={challenge} // 해당하는 챌린지를 컴포넌트에 넘기기
                       imageUrl={null} // MainPage에서는 이미지 URL을 제공하지 않음
                       onClick={handleChallengeClick}
                     />

@@ -594,3 +594,93 @@ export const getVideoShares = async (params = {}) => {
     }
   }
 };
+
+// PS 챌린지 목록 가져오기
+export const getPsChallenges = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+    queryParams.append("skip", params.skip || 0);
+    queryParams.append("limit", params.limit || 100); // 디폴트 100개
+
+    const response = await instanceWithToken.get(
+      `challenges/ps/?${queryParams.toString()}`
+    );
+    if (response.status === 200) {
+      return { success: true, data: response.data };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return { success: false, error: "로그인을 다시 해주세요." };
+    } else if (error.response?.status === 422) {
+      return {
+        success: false,
+        error: "잘못된 파라미터입니다.",
+        details: error.response.data.detail,
+      };
+    } else {
+      return { success: false, error: "PS 챌린지 목록을 가져올 수 없습니다." };
+    }
+  }
+};
+
+// 이미지 챌린지 목록 가져오기
+export const getImgChallenges = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+    queryParams.append("skip", params.skip || 0);
+    queryParams.append("limit", params.limit || 100); // 디폴트 100개
+
+    const response = await instanceWithToken.get(
+      `challenges/img/?${queryParams.toString()}`
+    );
+    if (response.status === 200) {
+      return { success: true, data: response.data };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return { success: false, error: "로그인을 다시 해주세요." };
+    } else if (error.response?.status === 422) {
+      return {
+        success: false,
+        error: "잘못된 파라미터입니다.",
+        details: error.response.data.detail,
+      };
+    } else {
+      return {
+        success: false,
+        error: "이미지 챌린지 목록을 가져올 수 없습니다.",
+      };
+    }
+  }
+};
+
+// 비디오 챌린지 목록 가져오기
+export const getVideoChallenges = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+    queryParams.append("skip", params.skip || 0);
+    queryParams.append("limit", params.limit || 100); // 디폴트 100개
+
+    const response = await instanceWithToken.get(
+      `challenges/video/?${queryParams.toString()}`
+    );
+    if (response.status === 200) {
+      return { success: true, data: response.data };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return { success: false, error: "로그인을 다시 해주세요." };
+    } else if (error.response?.status === 422) {
+      return {
+        success: false,
+        error: "잘못된 파라미터입니다.",
+        details: error.response.data.detail,
+      };
+    } else {
+      return {
+        success: false,
+        error: "비디오 챌린지 목록을 가져올 수 없습니다.",
+      };
+    }
+  }
+};

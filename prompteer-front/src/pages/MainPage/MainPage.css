@@ -54,6 +54,21 @@
   margin-top: 15px;
 }
 
+/* Loading and Error States */
+.main-page-challenges-grid .loading-message,
+.main-page-challenges-grid .error-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 18px;
+  color: #6c757d;
+}
+
+.main-page-challenges-grid .error-message {
+  color: #dc3545;
+}
+
 .challenge-wrapper {
   display: flex;
   flex-direction: column;
@@ -131,6 +146,82 @@
 }
 
 .image-challenge-meta {
+  margin-top: 8px;
+}
+
+/* Video Challenge Card */
+.video-challenge-card {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 283px;
+}
+
+.video-challenge-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.video-challenge-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.video-placeholder {
+  height: 239px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  position: relative;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="40,25 40,75 70,50" fill="white" opacity="0.8"/><circle cx="50" cy="50" r="35" fill="none" stroke="white" stroke-width="2" opacity="0.3"/></svg>');
+  background-size: cover;
+  background-position: center;
+}
+
+.video-category {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background-color: #fff5f5;
+  color: #c92a2a;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.video-challenge-info {
+  padding: 5px 25px 25px 25px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.video-challenge-title {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19px;
+  color: #212529;
+  margin: 0 0 8px 0;
+}
+
+.video-challenge-description {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  color: #212529;
+  margin: 0;
+  flex: 1;
+}
+
+.video-challenge-meta {
   margin-top: 8px;
 }
 

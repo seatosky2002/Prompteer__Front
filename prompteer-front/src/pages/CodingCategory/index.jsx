@@ -96,13 +96,12 @@ const CodingCategory = () => {
         const transformedData = data.map((challenge) => ({
           id: challenge.id,
           title: challenge.title || "제목 없음",
-          description:
-            (
-              challenge.content ||
-              challenge.problemDescription?.situation ||
-              challenge.description ||
-              "설명 없음"
-            ).replace(/\n/g, " "),
+          description: (
+            challenge.content ||
+            challenge.problemDescription?.situation ||
+            challenge.description ||
+            "설명 없음"
+          ).replace(/\n/g, " "),
           challenge_type: "CODE",
           type: "code",
           difficulty: getDifficultyText(
@@ -135,7 +134,9 @@ const CodingCategory = () => {
     const fetchFeaturedChallenge = async () => {
       try {
         // 첫 번째 챌린지나 특정 추천 챌린지를 가져오기
+
         const response = await fetch(API_ENDPOINTS.CHALLENGES_PS);
+
         
         if (response.ok) {
           const data = await response.json();
@@ -144,18 +145,18 @@ const CodingCategory = () => {
             const featured = data[0];
             setFeaturedChallenge({
               id: featured.id,
-              title: featured.title || '제목 없음',
-              challengeNumber: featured.id
+              title: featured.title || "제목 없음",
+              challengeNumber: featured.id,
             });
           }
         }
       } catch (error) {
-        console.error('Failed to fetch featured challenge:', error);
+        console.error("Failed to fetch featured challenge:", error);
         // 에러 시 기본값 설정
         setFeaturedChallenge({
           id: 1,
-          title: '코딩 챌린지',
-          challengeNumber: 1
+          title: "코딩 챌린지",
+          challengeNumber: 1,
         });
       }
     };
@@ -220,7 +221,7 @@ const CodingCategory = () => {
                   Challenge #{featuredChallenge?.challengeNumber || 1}
                 </h3>
                 <p className="challenge-name">
-                  {featuredChallenge?.title || '로딩 중...'}
+                  {featuredChallenge?.title || "로딩 중..."}
                 </p>
               </div>
               <button
@@ -309,7 +310,9 @@ const CodingCategory = () => {
                   <div className="frame-127">
                     {/* Frame 22 */}
                     <div className="frame-22">
-                      <div className="challenge-number">Challenge #{challenge.id}</div>
+                      <div className="challenge-number">
+                        Challenge #{challenge.id}
+                      </div>
                       <h3 className="challenge-title">{challenge.title}</h3>
                     </div>
                     {/* Frame 21 - Category Badge */}
@@ -341,8 +344,6 @@ const CodingCategory = () => {
                       </div>
                     </div>
                   </div>
-
-
                 </div>
               ))}
             </div>

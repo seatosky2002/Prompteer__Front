@@ -148,9 +148,9 @@
 
 .post-card-title {
   font-family: 'Inter', sans-serif;
-  font-weight: 400;
-  font-size: 24px;
-  line-height: 1.21;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.3;
   color: #000000;
   margin: 0;
 }
@@ -192,16 +192,18 @@
   width: 100%;
 }
 
-.challenge-title {
-  font-family: 'Inter', sans-serif;
-  font-weight: 400;
+.post-detail-page .challenge-title,
+.post-detail-page .post-card-challenge .challenge-title,
+.post-detail-page .challenge-header .challenge-title {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 700 !important;
   font-style: normal;
-  font-size: 24px;
-  line-height: 100%;
+  font-size: 48px !important;
+  line-height: 1.3 !important;
   letter-spacing: 0%;
   vertical-align: middle;
-  color: #000000;
-  margin: 0;
+  color: #000000 !important;
+  margin: 0 !important;
 }
 
 .challenge-likes {
@@ -271,9 +273,10 @@
 .comments-section {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
   gap: 30px;
+  max-width: none;
 }
 
 .comments-list {
@@ -288,7 +291,7 @@
 .comment-write-section {
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: stretch;
 }
 
 .comment-submit-btn {
@@ -378,14 +381,380 @@
   }
   
   .post-card-title {
-    font-size: 20px;
+    font-size: 28px;
   }
   
-  .challenge-title {
-    font-size: 24px;
+  .post-detail-page .challenge-title,
+  .post-detail-page .post-card-challenge .challenge-title,
+  .post-detail-page .challenge-header .challenge-title {
+    font-size: 36px !important;
   }
   
   .post-card-text {
     font-size: 16px;
+  }
+}
+
+/* 문제 상세 내용 스타일 */
+.problem-content-section {
+  margin-top: 30px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #E9ECEF;
+  position: relative;
+}
+
+.problem-content-card {
+  margin-bottom: 20px;
+}
+
+.problem-section {
+  margin-bottom: 25px;
+}
+
+.problem-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #495057;
+  margin-bottom: 12px;
+}
+
+.section-content {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #495057;
+  white-space: pre-wrap;
+}
+
+.problem-expand-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background: #F8F9FA;
+  border: 1px solid #E9ECEF;
+  border-radius: 50%;
+  cursor: pointer;
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: all 0.2s ease;
+}
+
+.problem-expand-icon:hover {
+  background: #E9ECEF;
+  border-color: #228BE6;
+}
+
+/* 프롬프트와 코드 섹션 스타일 */
+.user-prompt-section,
+.user-code-section {
+  margin-top: 30px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #E9ECEF;
+}
+
+.user-prompt-section .section-title,
+.user-code-section .section-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #495057;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #228BE6;
+}
+
+.prompt-content {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #495057;
+  white-space: pre-wrap;
+}
+
+.code-content {
+  margin-top: 15px;
+}
+
+.code-block {
+  background: #F8F9FA;
+  border: 1px solid #E9ECEF;
+  border-radius: 6px;
+  padding: 20px;
+  margin: 0;
+  overflow-x: auto;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #495057;
+}
+
+.code-block code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* 로딩 및 에러 메시지 스타일 */
+.loading-message,
+.error-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 18px;
+  color: #6C757D;
+}
+
+/* 댓글 섹션 개선된 스타일 */
+.comments-header {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #E9ECEF;
+}
+
+.comments-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #495057;
+  margin: 0;
+}
+
+.no-comments {
+  text-align: center;
+  padding: 40px 20px;
+  background: #F8F9FA;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.no-comments p {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  color: #6C757D;
+  margin: 0;
+}
+
+.comment-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #E9ECEF;
+  border-radius: 8px;
+  margin-top: 12px;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.comment-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #E9ECEF;
+  border-radius: 6px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #495057;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+}
+
+.comment-input:focus {
+  outline: none;
+  border-color: #228BE6;
+  box-shadow: 0 0 0 2px rgba(34, 139, 230, 0.1);
+}
+
+.comment-input::placeholder {
+  color: #ADB5BD;
+}
+
+.comment-submit-btn:disabled {
+  background: #E9ECEF;
+  color: #6C757D;
+  cursor: not-allowed;
+}
+
+.comment-submit-btn:disabled:hover {
+  background: #E9ECEF;
+}
+
+/* Figma 디자인에 맞는 댓글 작성 영역 */
+.figma-comment-container {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: 20px;
+  padding: 20px 30px;
+  background: #FFFFFF;
+  width: 100%;
+  max-width: none;
+}
+
+.figma-comment-input-area {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 10px;
+  padding: 12px 20px;
+  background: #F5F5F5;
+  border-radius: 8px;
+  min-width: 0;
+}
+
+.figma-comment-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.4;
+  color: #000000;
+  resize: none;
+  outline: none;
+  min-height: 24px;
+}
+
+.figma-comment-input::placeholder {
+  color: #666666;
+  white-space: pre-line;
+}
+
+.figma-comment-submit-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 32px;
+  background: #1971C2 !important;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.21;
+  color: #FFFFFF !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.figma-comment-submit-btn:hover {
+  background: #1864a8 !important;
+}
+
+.figma-comment-submit-btn:disabled {
+  background: #E9ECEF !important;
+  color: #6C757D !important;
+  cursor: not-allowed;
+}
+
+.figma-comment-submit-btn:disabled:hover {
+  background: #E9ECEF !important;
+}
+
+/* 로딩 중 상태 */
+.figma-comment-input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Figma 디자인에 맞는 댓글 목록 */
+.figma-comments-container {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 15px;
+}
+
+.figma-comment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  align-self: stretch;
+  gap: 20px;
+  padding: 20px 30px;
+  background: #FFFFFF;
+  border: 1px solid #E9ECEF;
+  border-radius: 8px;
+}
+
+.figma-comment-content {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.21;
+  color: #000000;
+  flex: 1;
+  word-wrap: break-word;
+}
+
+.figma-comment-author {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.21;
+  color: #000000;
+  white-space: nowrap;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .figma-comment-container {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .figma-comment-input {
+    font-size: 18px;
+  }
+  
+  .figma-comment-submit-btn {
+    width: 100%;
+  }
+  
+  .figma-comment-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 16px 20px;
+  }
+  
+  .figma-comment-content {
+    font-size: 18px;
+  }
+  
+  .figma-comment-author {
+    font-size: 16px;
+    align-self: flex-end;
   }
 }

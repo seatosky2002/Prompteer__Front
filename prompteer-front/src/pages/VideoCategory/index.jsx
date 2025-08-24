@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { searchChallenges } from '../../services/challengeApi.js';
-import './ImageCategory.css';
+import './VideoCategory.css';
 
-const ImageCategory = () => {
+const VideoCategory = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('image'); // 'image' or 'video'
+  const [sortBy, setSortBy] = useState('video'); // 'image' or 'video'
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -56,32 +56,44 @@ const ImageCategory = () => {
       try {
         setLoading(true);
         
-        // /challenges/img/ 엔드포인트에서 직접 이미지 챌린지 데이터 가져오기
-        const response = await fetch('http://localhost:8000/challenges/img/');
+        console.log('Fetching video challenges from API...');
+        // /challenges/video/ 엔드포인트에서 직접 비디오 챌린지 데이터 가져오기
+        const response = await fetch('http://localhost:8000/challenges/video/?limit=50');
+        
+        console.log('Video challenges response status:', response.status);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('Image challenges API response:', data);
+        console.log('Video challenges API response:', data);
+        console.log('Number of video challenges found:', data.length);
+        
+        if (data.length === 0) {
+          console.warn('No video challenges found in database');
+          setError('비디오 챌린지가 없습니다. 먼저 비디오 챌린지를 생성해주세요.');
+          setChallenges([]);
+          return;
+        }
         
         // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
         const transformedData = data.map(challenge => ({
           id: challenge.id,
           title: challenge.title || '제목 없음',
           description: challenge.content || challenge.description || '설명 없음',
-          category: challenge.tag || '이미지',
+          category: challenge.tag || '영상',
           difficulty: getDifficultyText(challenge.level),
           participants: Math.floor(Math.random() * 1500) + 300, // 임시 참가자 수
-          type: 'image'
+          type: 'video'
         }));
         
+        console.log('Transformed video challenges:', transformedData);
         setChallenges(transformedData);
         setError(null);
       } catch (err) {
-        console.error('Failed to fetch image challenges:', err);
-        setError('이미지 챌린지 데이터를 불러오는데 실패했습니다.');
+        console.error('Failed to fetch video challenges:', err);
+        setError(`비디오 챌린지 데이터를 불러오는데 실패했습니다: ${err.message}`);
         
         // 에러 시 빈 배열로 설정
         setChallenges([]);
@@ -93,36 +105,43 @@ const ImageCategory = () => {
     fetchChallenges();
   }, []);
 
-  // 각 챌린지의 가장 인기 있는 이미지 가져오기
+  // 각 챌린지의 가장 인기 있는 비디오 가져오기
   useEffect(() => {
-    const fetchPopularImages = async () => {
-      if (challenges.length === 0) return;
+    const fetchPopularVideos = async () => {
+      if (challenges.length === 0) {
+        console.log('No challenges available, skipping video fetch');
+        return;
+      }
 
-      // 이미지 챌린지만 필터링
-      const imageChallenges = challenges.filter(challenge => 
-        challenge.type === 'image' || 
-        challenge.type === 'img' ||
-        challenge.category === '이미지' ||
-        challenge.category === '그림' ||
-        (challenge.challenge_type && (challenge.challenge_type.includes('image') || challenge.challenge_type.includes('img')))
+      // 비디오 챌린지만 필터링
+      const videoChallenges = challenges.filter(challenge => 
+        challenge.type === 'video' || 
+        challenge.category === '영상' ||
+        (challenge.challenge_type && challenge.challenge_type.includes('video'))
       );
 
-      // console.log('Fetching popular images for challenges:', imageChallenges);
-      // console.log('Image challenges IDs:', imageChallenges.map(c => c.id));
-      const mediaMap = {};
+      console.log('Fetching popular videos for challenges:', videoChallenges);
+      console.log('Video challenges IDs:', videoChallenges.map(c => c.id));
       
-      for (const challenge of imageChallenges) {
+      const mediaMap = {};
+      let totalVideosFound = 0;
+      
+      for (const challenge of videoChallenges) {
         try {
-          const response = await fetch(`http://localhost:8000/shares/img/?challenge_id=${challenge.id}&limit=10`);
-          // console.log(`Fetching images for challenge ${challenge.id}, response status:`, response.status);
+          const videoShareUrl = `http://localhost:8000/shares/video/?challenge_id=${challenge.id}&limit=10`;
+          console.log(`Fetching videos from: ${videoShareUrl}`);
+          
+          const response = await fetch(videoShareUrl);
+          console.log(`Fetching videos for challenge ${challenge.id}, response status:`, response.status);
           
           if (response.ok) {
             const shares = await response.json();
-            // console.log(`Shares for challenge ${challenge.id}:`, shares);
-            // console.log(`First share details:`, shares[0]);
+            console.log(`Shares for challenge ${challenge.id}:`, shares);
+            console.log(`Number of shares found:`, shares.length);
             
             if (shares && shares.length > 0) {
-              // 좋아요가 가장 많은 이미지 찾기
+              totalVideosFound += shares.length;
+              // 좋아요가 가장 많은 비디오 찾기
               const sortedShares = shares.sort((a, b) => {
                 const likesA = (a.likes || []).length;
                 const likesB = (b.likes || []).length;
@@ -130,69 +149,84 @@ const ImageCategory = () => {
               });
               
               const mostLikedShare = sortedShares[0];
-              // console.log(`Most liked share for challenge ${challenge.id}:`, mostLikedShare);
-              // console.log(`Available fields in share:`, Object.keys(mostLikedShare));
-              // console.log(`img_share object:`, mostLikedShare.img_share);
+              console.log(`Most liked share for challenge ${challenge.id}:`, mostLikedShare);
               
-              // img_share 내부의 img_url 확인
-              const imageUrl = mostLikedShare.img_share?.img_url || 
-                             mostLikedShare.img_url || 
-                             mostLikedShare.image || 
-                             mostLikedShare.img;
+              // video_share 내부의 video_url 확인
+              const videoUrl = mostLikedShare.video_share?.video_url || 
+                             mostLikedShare.video_url;
               
-              // console.log(`Raw imageUrl from API:`, imageUrl);
+              console.log(`Raw videoUrl for challenge ${challenge.id}:`, videoUrl);
+              console.log(`Full share object:`, mostLikedShare);
               
-              if (imageUrl) {
-                // API에서 반환된 경로에서 첫 번째 'media/' 제거
-                let processedUrl = imageUrl;
-                if (processedUrl.startsWith('media/')) {
+              if (videoUrl) {
+                // API에서 반환된 경로 처리
+                let processedUrl = videoUrl;
+                
+                // 중복된 media/ 제거
+                if (processedUrl.startsWith('media/media/')) {
+                  processedUrl = processedUrl.substring(6); // 첫 번째 'media/' 제거
+                } else if (processedUrl.startsWith('media/')) {
                   processedUrl = processedUrl.substring(6); // 'media/' 제거
                 }
                 
-                const fullImageUrl = processedUrl.startsWith('http') ? processedUrl : `http://localhost:8000/${processedUrl}`;
-                mediaMap[challenge.id] = fullImageUrl;
-                // console.log(`Set image for challenge ${challenge.id}:`, fullImageUrl);
+                const fullVideoUrl = processedUrl.startsWith('http') ? processedUrl : `http://localhost:8000/${processedUrl}`;
+                mediaMap[challenge.id] = fullVideoUrl;
+                console.log(`Set video for challenge ${challenge.id}:`, fullVideoUrl);
               } else {
                 // 좋아요가 없으면 랜덤 선택
                 const randomShare = shares[Math.floor(Math.random() * shares.length)];
-                const randomImageUrl = randomShare.img_share?.img_url || 
-                                     randomShare.img_url || 
-                                     randomShare.image || 
-                                     randomShare.img;
-                if (randomImageUrl) {
-                  // API에서 반환된 경로에서 첫 번째 'media/' 제거
-                  let processedUrl = randomImageUrl;
-                  if (processedUrl.startsWith('media/')) {
+                const randomVideoUrl = randomShare.video_share?.video_url || 
+                                     randomShare.video_url;
+                console.log(`Random videoUrl for challenge ${challenge.id}:`, randomVideoUrl);
+                
+                if (randomVideoUrl) {
+                  // API에서 반환된 경로 처리
+                  let processedUrl = randomVideoUrl;
+                  
+                  // 중복된 media/ 제거
+                  if (processedUrl.startsWith('media/media/')) {
+                    processedUrl = processedUrl.substring(6); // 첫 번째 'media/' 제거
+                  } else if (processedUrl.startsWith('media/')) {
                     processedUrl = processedUrl.substring(6); // 'media/' 제거
                   }
                   
-                  const fullRandomImageUrl = processedUrl.startsWith('http') ? processedUrl : `http://localhost:8000/${processedUrl}`;
-                  mediaMap[challenge.id] = fullRandomImageUrl;
-                  // console.log(`Set random image for challenge ${challenge.id}:`, fullRandomImageUrl);
+                  const fullRandomVideoUrl = processedUrl.startsWith('http') ? processedUrl : `http://localhost:8000/${processedUrl}`;
+                  mediaMap[challenge.id] = fullRandomVideoUrl;
+                  console.log(`Set random video for challenge ${challenge.id}:`, fullRandomVideoUrl);
                 } else {
-                  // console.log(`No image URL found for challenge ${challenge.id} in share:`, randomShare);
+                  console.log(`No video URL found for challenge ${challenge.id} in random share:`, randomShare);
                 }
               }
             } else {
-              // console.log(`No shares found for challenge ${challenge.id}`);
+              console.log(`No shares found for challenge ${challenge.id}`);
             }
+          } else {
+            console.error(`Failed to fetch videos for challenge ${challenge.id}, status:`, response.status);
           }
         } catch (error) {
-          console.error(`Failed to fetch images for challenge ${challenge.id}:`, error);
+          console.error(`Failed to fetch videos for challenge ${challenge.id}:`, error);
         }
       }
       
-      // console.log('Final mediaMap:', mediaMap);
+      console.log('=== VIDEO FETCH SUMMARY ===');
+      console.log(`Total challenges processed: ${videoChallenges.length}`);
+      console.log(`Total videos found: ${totalVideosFound}`);
+      console.log(`Videos successfully loaded: ${Object.keys(mediaMap).length}`);
+      console.log('Final mediaMap:', mediaMap);
+      console.log('=== END SUMMARY ===');
+      
+      if (Object.keys(mediaMap).length === 0 && videoChallenges.length > 0) {
+        console.warn('No videos were loaded for any challenges. This might indicate:');
+        console.warn('1. No video shares exist in the database');
+        console.warn('2. Video URLs are malformed');
+        console.warn('3. API endpoint issues');
+      }
+      
       setChallengeMedia(mediaMap);
     };
 
-    fetchPopularImages();
+    fetchPopularVideos();
   }, [challenges]);
-
-  // challengeMedia가 업데이트될 때 로그
-  // useEffect(() => {
-  //   console.log('challengeMedia updated:', challengeMedia);
-  // }, [challengeMedia]);
 
   // 필터링 및 정렬
   const getFilteredAndSortedChallenges = () => {
@@ -207,10 +241,8 @@ const ImageCategory = () => {
     if (sortBy === 'image') {
       filtered = filtered.filter(challenge => 
         challenge.type === 'image' || 
-        challenge.type === 'img' ||
         challenge.category === '이미지' ||
-        challenge.category === '그림' ||
-        (challenge.challenge_type && (challenge.challenge_type.includes('image') || challenge.challenge_type.includes('img')))
+        (challenge.challenge_type && challenge.challenge_type.includes('image'))
       );
     } else if (sortBy === 'video') {
       filtered = filtered.filter(challenge => 
@@ -224,34 +256,34 @@ const ImageCategory = () => {
   };
 
   const handleChallengeClick = (challengeId) => {
-    navigate(`/image/challenge/${challengeId}`);
+    navigate(`/video/challenge/${challengeId}`);
   };
 
-  // 추천 챌린지 가져오기 (이미지 타입 중 첫 번째)
+  // 추천 챌린지 가져오기 (비디오 타입 중 첫 번째)
   const getFeaturedChallenge = () => {
-    const imageChallenges = challenges.filter(challenge => 
-      challenge.type === 'image' || 
-      challenge.category === '이미지' ||
-      (challenge.challenge_type && challenge.challenge_type.includes('image'))
+    const videoChallenges = challenges.filter(challenge => 
+      challenge.type === 'video' || 
+      challenge.category === '영상' ||
+      (challenge.challenge_type && challenge.challenge_type.includes('video'))
     );
-    return imageChallenges.length > 0 ? imageChallenges[0] : null;
+    return videoChallenges.length > 0 ? videoChallenges[0] : null;
   };
 
   const handleChallengeNow = () => {
     const featuredChallenge = getFeaturedChallenge();
     if (featuredChallenge) {
-      navigate(`/image/challenge/${featuredChallenge.id}`);
+      navigate(`/video/challenge/${featuredChallenge.id}`);
     } else {
-      navigate('/image/challenge/1');
+      navigate('/video/challenge/1');
     }
   };
 
   return (
-    <div className="image-category-page">
+    <div className="video-category-page">
       <Header isLoggedIn={isLoggedIn} />
 
       {/* Main Content */}
-      <main className="image-main">
+      <main className="video-main">
         {/* Featured Section */}
         <div className="featured-section">
           <div className="featured-content">
@@ -264,12 +296,12 @@ const ImageCategory = () => {
                   return featuredChallenge ? (
                     <>
                       <h3 className="challenge-number">Challenge #{featuredChallenge.id}</h3>
-                      <p className="challenge-name">{featuredChallenge.title || '이미지 챌린지'}</p>
+                      <p className="challenge-name">{featuredChallenge.title || '영상 챌린지'}</p>
                     </>
                   ) : (
                     <>
                       <h3 className="challenge-number">Challenge #1</h3>
-                      <p className="challenge-name">이미지 챌린지</p>
+                      <p className="challenge-name">영상 챌린지</p>
                     </>
                   );
                 })()}
@@ -284,13 +316,13 @@ const ImageCategory = () => {
         {/* Body Container - Figma: body_container */}
         <div className="body-container">
           {/* Search Container - Figma: 검색창 외부 */}
-          <div className="image-category-search-outer-container">
+          <div className="video-category-search-outer-container">
             {/* Search Inner - Figma: 검색창 내부 */}
-            <div className="image-category-search-inner-container">
+            <div className="video-category-search-inner-container">
               {/* Search Box - Figma: 검색창 */}
-              <div className="image-category-search-box">
+              <div className="video-category-search-box">
                 <svg
-                  className="image-category-search-icon"
+                  className="video-category-search-icon"
                   width="20"
                   height="20"
                   viewBox="0 0 20 20"
@@ -310,20 +342,20 @@ const ImageCategory = () => {
                   placeholder="문제 제목으로 검색..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="image-category-search-input"
+                  className="video-category-search-input"
                 />
               </div>
               {/* Filter Frame - Figma: Frame 106 */}
               <div className="filter-frame">
                 <button
                   className={`filter-btn ${sortBy === 'image' ? 'active' : ''}`}
-                  onClick={() => setSortBy('image')}
+                  onClick={() => navigate('/category/image')}
                 >
                   이미지
                 </button>
                 <button
                   className={`filter-btn ${sortBy === 'video' ? 'active' : ''}`}
-                  onClick={() => navigate('/category/video')}
+                  onClick={() => setSortBy('video')}
                 >
                   영상
                 </button>
@@ -345,22 +377,47 @@ const ImageCategory = () => {
               {getFilteredAndSortedChallenges().map((challenge) => (
                 <div
                   key={challenge.id}
-                  className="image-component"
+                  className="video-component"
                   onClick={() => handleChallengeClick(challenge.id)}
                 >
                   {/* Frame 17 - Main Card with Background Image */}
                   <div className="frame-17">
-                    {/* Image Content */}
-                    {challengeMedia[challenge.id] && (
-                      <img 
-                        className="challenge-image"
+                    {/* Video Content */}
+                    {challengeMedia[challenge.id] ? (
+                      <video 
+                        className="challenge-video"
                         src={challengeMedia[challenge.id]}
-                        alt={`Challenge ${challenge.id}`}
+                        muted
+                        loop
+                        playsInline
+                        preload="metadata"
+                        onMouseEnter={(e) => {
+                          console.log('Video hover play:', e.target.src);
+                          e.target.play().catch(err => console.log('Play failed:', err));
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.pause();
+                        }}
                         onError={(e) => {
-                          // console.error(`Image load error for challenge ${challenge.id}:`, e.target.src);
+                          console.error('Video load error:', e.target.src, e);
                           e.target.style.display = 'none';
                         }}
+                        onLoadStart={() => {
+                          console.log('Video load started:', challengeMedia[challenge.id]);
+                        }}
+                        onCanPlay={() => {
+                          console.log('Video can play:', challengeMedia[challenge.id]);
+                        }}
                       />
+                    ) : (
+                      <div className="video-placeholder">
+                        <div className="video-placeholder-content">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 5V19L19 12L8 5Z" fill="#6C757D"/>
+                          </svg>
+                          <p>비디오 로딩 중...</p>
+                        </div>
+                      </div>
                     )}
                     {/* Frame 21 - Category Badge (Top Right) */}
                     <div className="frame-21">
@@ -401,4 +458,4 @@ const ImageCategory = () => {
   );
 };
 
-export default ImageCategory;
+export default VideoCategory;

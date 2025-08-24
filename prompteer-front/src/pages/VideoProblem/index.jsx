@@ -2,25 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
-import './ImageProblem.css';
+import './VideoProblem.css';
 
-const ImageProblem = () => {
+const VideoProblem = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [promptText, setPromptText] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
-  const [generatedImageUrl, setGeneratedImageUrl] = useState('');
-  const [showOthersImages, setShowOthersImages] = useState(true);
+  const [generatedVideoUrl, setGeneratedVideoUrl] = useState('');
+  const [showOthersVideos, setShowOthersVideos] = useState(true);
   const [sortBy, setSortBy] = useState('likes');
-  const [imageLikes, setImageLikes] = useState(Array.from({ length: 8 }, () => 10));
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [sharedImages, setSharedImages] = useState([]);
+  const [videoLikes, setVideoLikes] = useState(Array.from({ length: 8 }, () => 10));
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [sharedVideos, setSharedVideos] = useState([]);
   const [problemData, setProblemData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loadingImages, setLoadingImages] = useState(false);
+  const [loadingVideos, setLoadingVideos] = useState(false);
 
   // 로그인 상태 체크
   useEffect(() => {
@@ -44,22 +44,17 @@ const ImageProblem = () => {
     const fetchChallengeData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:3000/challenges/${id}`);
+        const response = await fetch(`http://localhost:8000/challenges/${id}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('Challenge data:', data);
-        console.log('Data structure:', JSON.stringify(data, null, 2));
-        console.log('Data ID:', data.id);
-        console.log('Data keys:', Object.keys(data));
         
-        // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
         const transformedData = {
           title: data.title || '제목 없음',
-          category: data.tag === 'img' ? '이미지' : data.tag === 'video' ? '영상' : data.tag === 'ps' ? 'PS' : data.tag || '카테고리 없음',
+          category: data.tag === 'video' ? '영상' : data.tag || '카테고리 없음',
           difficulty: data.level === 'Easy' ? '초급' : data.level === 'Medium' ? '중급' : data.level === 'Hard' ? '고급' : data.level || '중급',
           sections: [
             {
@@ -91,10 +86,9 @@ const ImageProblem = () => {
         console.error('Failed to fetch challenge data:', err);
         setError('챌린지 데이터를 불러오는데 실패했습니다.');
         
-        // 에러 시 기본 데이터 사용
         setProblemData({
           title: `Challenge #${id}\n데이터 로딩 실패`,
-          category: '이미지',
+          category: '영상',
           difficulty: '중급',
           sections: [
             {
@@ -129,27 +123,23 @@ const ImageProblem = () => {
     }
   }, [id]);
 
-  // 공유된 이미지 목록 가져오기
+  // 공유된 비디오 목록 가져오기
   useEffect(() => {
-    const fetchSharedImages = async () => {
+    const fetchSharedVideos = async () => {
       if (!id) return;
       
-      setLoadingImages(true);
+      setLoadingVideos(true);
       try {
-        console.log('Fetching shared images for challenge:', id);
-        const response = await fetch(`http://localhost:8000/shares/img/?challenge_id=${id}`);
+        const response = await fetch(`http://localhost:8000/shares/video/?challenge_id=${id}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('Shared images data:', data);
-        console.log('First share structure:', data[0] ? JSON.stringify(data[0], null, 2) : 'No data');
         
         if (data.length === 0) {
-          console.log('No shared images found for this challenge');
-          setSharedImages([]);
+          setSharedVideos([]);
           return;
         }
         
@@ -172,62 +162,30 @@ const ImageProblem = () => {
             console.error('Failed to get current user:', err);
           }
         }
-
-        // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
+        
         const transformedData = data.map((share, index) => {
-          console.log(`Processing share ${index}:`, share);
-          
-          // 이미지 URL을 찾는 로직 개선
-          let imageUrl = null;
-          if (share.img_share?.img_url) {
-            const imgUrl = share.img_share.img_url;
-            console.log(`Original img_url: ${imgUrl}`);
-            
-            // media/media/... 형태의 URL을 media/... 형태로 변환
-            if (imgUrl.startsWith('media/media/')) {
-              // 'media/media/' 부분을 'media/'로 변경
-              imageUrl = `http://localhost:8000/media/${imgUrl.substring(12)}`;
-              console.log(`Converted URL: ${imageUrl}`);
+          let videoUrl = null;
+          let rawUrl = share.video_share?.video_url || share.video_url || share.url;
+
+          if (rawUrl) {
+            if (rawUrl.startsWith('media/media/')) {
+              videoUrl = `http://localhost:8000/media/${rawUrl.substring(12)}`;
             } else {
-              imageUrl = `http://localhost:8000/${imgUrl}`;
-              console.log(`Direct URL: ${imageUrl}`);
-            }
-          } else if (share.img_url) {
-            const imgUrl = share.img_url;
-            if (imgUrl.startsWith('media/media/')) {
-              imageUrl = `http://localhost:8000/media/${imgUrl.substring(12)}`;
-            } else {
-              imageUrl = `http://localhost:8000/${imgUrl}`;
-            }
-          } else if (share.image_url) {
-            const imgUrl = share.image_url;
-            if (imgUrl.startsWith('media/media/')) {
-              imageUrl = `http://localhost:8000/media/${imgUrl.substring(12)}`;
-            } else {
-              imageUrl = `http://localhost:8000/${imgUrl}`;
-            }
-          } else if (share.url) {
-            const imgUrl = share.url;
-            if (imgUrl.startsWith('media/media/')) {
-              imageUrl = `http://localhost:8000/media/${imgUrl.substring(12)}`;
-            } else {
-              imageUrl = `http://localhost:8000/${imgUrl}`;
+              videoUrl = `http://localhost:8000/${rawUrl}`;
             }
           }
-          
-          console.log(`Share ${index} image URL:`, imageUrl);
           
           // 현재 사용자가 이 공유에 좋아요를 눌렀는지 확인
           const isLiked = currentUserId && share.likes && Array.isArray(share.likes) 
             ? share.likes.some(like => like.user_id === currentUserId)
             : false;
           
-          console.log(`Share ${index} isLiked:`, isLiked, 'likes:', share.likes);
+          console.log(`Video ${index} isLiked:`, isLiked, 'likes:', share.likes);
           
           return {
             id: share.id || index,
             prompt: share.prompt || '프롬프트를 불러올 수 없습니다.',
-            image: imageUrl,
+            video: videoUrl,
             likes: share.likes || [],
             likes_count: share.likes_count || 0,
             isLiked: isLiked,
@@ -236,60 +194,17 @@ const ImageProblem = () => {
           };
         });
         
-        console.log('Transformed shared images:', transformedData);
-        setSharedImages(transformedData);
+        setSharedVideos(transformedData);
       } catch (err) {
-        console.error('Failed to fetch shared images:', err);
-        // 에러 시 기본 데이터 사용 (실제 백엔드 이미지 URL 사용)
-        setSharedImages([
-          {
-            id: 1,
-            prompt: '일상 풍경을 묘사한 프롬프트',
-            image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755844087.png',
-            likes: [],
-            likes_count: 15,
-            isLiked: false,
-            user: { username: 'user1' },
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 2,
-            prompt: '자연스러운 풍경 묘사',
-            image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755845877.png',
-            likes: [],
-            likes_count: 12,
-            isLiked: false,
-            user: { username: 'user2' },
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 3,
-            prompt: '도시 풍경 묘사',
-            image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755846010.png',
-            likes: [],
-            likes_count: 8,
-            isLiked: false,
-            user: { username: 'user3' },
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 4,
-            prompt: '자연과 도시의 조화',
-            image: 'http://localhost:8000/media/shares/img_shares/1_generated_image_1755846584.png',
-            likes: [],
-            likes_count: 20,
-            isLiked: false,
-            user: { username: 'user4' },
-            created_at: new Date().toISOString()
-          }
-        ]);
+        console.error('Failed to fetch shared videos:', err);
+        setSharedVideos([]);
       } finally {
-        setLoadingImages(false);
+        setLoadingVideos(false);
       }
     };
 
-    fetchSharedImages();
-  }, [id, isGenerated]); // id가 바뀌거나 새로 이미지가 생성되면 다시 불러옴
+    fetchSharedVideos();
+  }, [id, isGenerated]);
 
   const handleGenerate = async () => {
     if (!promptText.trim()) {
@@ -299,13 +214,13 @@ const ImageProblem = () => {
 
     const token = localStorage.getItem('access_token');
     if (!token) {
-      alert('이미지를 생성하려면 로그인이 필요합니다.');
+      alert('비디오를 생성하려면 로그인이 필요합니다.');
       return;
     }
     
     setIsGenerating(true);
     try {
-      const response = await fetch(`http://localhost:8000/challenges/img/${id}/generate`, {
+      const response = await fetch(`http://localhost:8000/challenges/video/${id}/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -316,8 +231,6 @@ const ImageProblem = () => {
 
       if (response.status === 401) {
         alert('인증에 실패했습니다. 다시 로그인해주세요.');
-        // 선택적으로 로그인 페이지로 리디렉션 할 수 있습니다.
-        // window.location.href = '/login';
         throw new Error('Unauthorized');
       }
 
@@ -325,24 +238,24 @@ const ImageProblem = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const imageUrl = await response.json();
-      console.log('Raw image URL from backend:', imageUrl);
+      const videoUrl = await response.json();
+      console.log('Raw video URL from backend:', videoUrl);
       
       // media/media/ 중복 제거
-      let cleanUrl = imageUrl;
-      if (imageUrl.includes('media/media/')) {
+      let cleanUrl = videoUrl;
+      if (videoUrl.includes('media/media/')) {
         // media/media/shares/... -> media/shares/...
-        cleanUrl = imageUrl.replace('media/media/', 'media/');
+        cleanUrl = videoUrl.replace('media/media/', 'media/');
       }
       
-      const fullImageUrl = `http://localhost:8000/${cleanUrl}`;
-      console.log('Final generated image URL:', fullImageUrl);
-      setGeneratedImageUrl(fullImageUrl);
+      const fullVideoUrl = `http://localhost:8000/${cleanUrl}`;
+      console.log('Final generated video URL:', fullVideoUrl);
+      setGeneratedVideoUrl(fullVideoUrl);
       setIsGenerated(true);
     } catch (error) {
-      console.error('Failed to generate image:', error);
+      console.error('Failed to generate video:', error);
       if (error.message !== 'Unauthorized') {
-        alert('이미지 생성에 실패했습니다.');
+        alert('비디오 생성에 실패했습니다.');
       }
     } finally {
       setIsGenerating(false);
@@ -352,23 +265,20 @@ const ImageProblem = () => {
   const handleRetry = () => {
     setPromptText('');
     setIsGenerated(false);
-    // showOthersImages는 항상 true 유지
   };
 
   const handleNewProblem = () => {
-    // 다른 문제로 이동하는 로직
-    window.location.href = '/coding/';
+    window.location.href = '/video/category';
   };
 
   const handleShare = () => {
-    console.log('handleShare 호출됨, id:', id, 'type:', typeof id);
     navigate('/board/write', {
       state: {
         problemId: id,
-        category: 'image',
+        category: 'video',
         boardCategory: '프롬프트 공유',
         promptText: promptText,
-        generatedImageUrl: generatedImageUrl
+        generatedVideoUrl: generatedVideoUrl
       }
     });
   };
@@ -381,12 +291,9 @@ const ImageProblem = () => {
     }
 
     try {
-      // 현재 좋아요 상태 확인
-      const currentShare = sharedImages.find(img => img.id === shareId);
+      const currentShare = sharedVideos.find(vid => vid.id === shareId);
       const isLiked = currentShare?.isLiked || false;
       const method = isLiked ? 'DELETE' : 'POST';
-      
-      console.log(`Attempting to ${isLiked ? 'unlike' : 'like'} share ${shareId}`);
       
       const response = await fetch(`http://localhost:8000/shares/${shareId}/like`, {
         method: method,
@@ -396,64 +303,44 @@ const ImageProblem = () => {
         },
       });
 
-      console.log('Like response status:', response.status);
-
       if (!response.ok) {
-        if (response.status === 409) {
-          // 이미 좋아요를 누른 경우 (POST 요청 시)
-          alert('이미 좋아요를 누른 공유입니다.');
-          return;
-        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // 상태 업데이트
-      setSharedImages(prevImages => 
-        prevImages.map(img => 
-          img.id === shareId 
+      setSharedVideos(prevVideos => 
+        prevVideos.map(vid => 
+          vid.id === shareId 
             ? { 
-                ...img, 
+                ...vid, 
                 isLiked: !isLiked,
-                likes_count: isLiked ? Math.max(0, img.likes_count - 1) : img.likes_count + 1
+                likes_count: isLiked ? Math.max(0, vid.likes_count - 1) : vid.likes_count + 1
               }
-            : img
+            : vid
         )
       );
-      
-      console.log(`${isLiked ? 'Unliked' : 'Liked'} share ${shareId}`);
     } catch (err) {
       console.error('Error liking/unliking share:', err);
-      if (err.message.includes('HTTP error! status: 409')) {
-        alert('이미 좋아요를 누른 공유입니다.');
-      } else {
-        alert('좋아요 처리에 실패했습니다. 다시 시도해주세요.');
-      }
+      alert('좋아요 처리에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
-  const handleImageClick = (share) => {
-    setSelectedImage({
+  const handleVideoClick = (share) => {
+    setSelectedVideo({
       id: share.id,
-      image: share.image || 'https://via.placeholder.com/400x400/CCCCCC/FFFFFF?text=No+Image',
-      prompt: share.prompt,
-      likes: share.likes_count || 0
+      video: share.video || '',
+      prompt: share.prompt
     });
   };
 
   const handleCloseModal = () => {
-    setSelectedImage(null);
+    setSelectedVideo(null);
   };
 
-  // 정렬 기준에 따라 데이터 정렬하는 함수
   const sortDataByCriteria = (data, criteria) => {
     const sortedData = [...data];
-    console.log('Sorting data by:', criteria, 'Data:', sortedData);
-    
     switch (criteria) {
       case 'likes':
-        const likesSorted = sortedData.sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0));
-        console.log('Likes sorted:', likesSorted.map(item => ({ id: item.id, likes_count: item.likes_count })));
-        return likesSorted;
+        return sortedData.sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0));
       case 'random':
         return sortedData.sort(() => Math.random() - 0.5);
       default:
@@ -461,18 +348,15 @@ const ImageProblem = () => {
     }
   };
 
-  // 정렬 변경 시 데이터 재정렬
   useEffect(() => {
-    if (sharedImages.length > 0) {
-      const sortedData = sortDataByCriteria(sharedImages, sortBy);
-      setSharedImages(sortedData);
+    if (sharedVideos.length > 0) {
+      const sortedData = sortDataByCriteria(sharedVideos, sortBy);
+      setSharedVideos(sortedData);
     }
   }, [sortBy]);
 
-  // toggleOthersImages 함수 제거 - 항상 표시되므로 불필요
-
   return (
-    <div className="image-problem-page">
+    <div className="video-problem-page">
       <Header isLoggedIn={isLoggedIn} />
       <div className="body-section">
         <div className="container">
@@ -487,7 +371,6 @@ const ImageProblem = () => {
             </div>
           ) : problemData ? (
             <div className="main-layout">
-              {/* Frame 34: 좌측 문제 정보 */}
               <div className="frame-34">
                 <div className="problem-header">
                   <div className="problem-title-section">
@@ -519,14 +402,13 @@ const ImageProblem = () => {
                 </div>
               </div>
 
-              {/* Frame 50: 우측 상단 프롬프트 입력 영역 */}
               <div className="frame-50">
                 <div className="prompt-container">
                   <div className="prompt-editor">
                     <div className="editor-frame">
                       <textarea
                         className="prompt-textarea"
-                        placeholder="이곳에 이미지 생성 프롬프트를 작성하세요..."
+                        placeholder="이곳에 비디오 생성 프롬프트를 작성하세요..."
                         value={promptText}
                         onChange={(e) => setPromptText(e.target.value)}
                         readOnly={isGenerated}
@@ -540,48 +422,30 @@ const ImageProblem = () => {
                         onClick={handleGenerate}
                         disabled={isGenerating}
                       >
-                        <span>{isGenerating ? '생성 중...' : '이미지 생성'}</span>
+                        <span>{isGenerating ? '생성 중...' : '비디오 생성'}</span>
                       </button>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Frame 56: 우측 하단 미리보기 영역 */}
               <div className="frame-56">
                 <div className="preview-content">
                   {!isGenerated ? (
                     <div className="preview-message">
-                      <p>'이미지 생성' 버튼을 눌러<br />AI가 생성한 이미지를 확인하세요.</p>
+                      <p>'비디오 생성' 버튼을 눌러<br />AI가 생성한 비디오를 확인하세요.</p>
                     </div>
                   ) : (
                     <>
                       <div className="generated-result">
-                        <div className="generated-image-placeholder">
-                          {generatedImageUrl ? (
-                            <img 
-                              src={generatedImageUrl} 
-                              alt="Generated" 
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              onLoad={() => {
-                                console.log('✅ Generated image loaded successfully:', generatedImageUrl);
-                              }}
-                              onError={(e) => {
-                                console.error('❌ Generated image failed to load:', generatedImageUrl);
-                                e.target.parentElement.innerHTML = `
-                                  <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 200px; background: #F8F9FA; border: 2px dashed #DEE2E6; border-radius: 8px; color: #6C757D;">
-                                    <span>생성된 이미지를 불러올 수 없습니다</span>
-                                    <p style="font-size: 12px; color: #ADB5BD; margin: 5px 0; word-break: break-all;">${generatedImageUrl}</p>
-                                  </div>
-                                `;
-                              }}
-                            />
+                        <div className="generated-video-placeholder">
+                          {generatedVideoUrl ? (
+                            <video src={generatedVideoUrl} controls style={{ maxWidth: '100%', maxHeight: '100%' }} />
                           ) : (
-                            <div className="image-placeholder">생성된 이미지</div>
+                            <div className="video-placeholder">생성된 비디오</div>
                           )}
                         </div>
                       </div>
-                      {/* 결과 버튼 바 - 피그마 44-2711 */}
                       <div className="result-action-bar">
                         <button className="result-action-btn" onClick={handleRetry}>
                           <span>다시 풀기</span>
@@ -600,16 +464,14 @@ const ImageProblem = () => {
             </div>
           ) : null}
           
-          {/* 하단 안내 문구 */}
           {isGenerated && (
             <div className="result-notice">
-              <p>*문제의 프롬포트와 그림은 해당 문제를 푼 도전자에게 모두 공개됩니다.</p>
+              <p>*문제의 프롬포트와 영상은 해당 문제를 푼 도전자에게 모두 공개됩니다.</p>
               <p>*프롬프트 공유하기는 해당 문제를 풀지 않아도, 모든 사람을 대상으로 게시판에 공유하는 것을 말합니다.</p>
             </div>
           )}
         </div>
 
-        {/* 구경하기 섹션 - 기존 레이아웃을 밀어내지 않도록 별도 컨테이너 */}
         {isGenerated && (
           <div className="others-section-wrapper">
             <div className="others-section">
@@ -633,69 +495,42 @@ const ImageProblem = () => {
                 </div>
                 
                 <div className="others-grid">
-                  {loadingImages ? (
-                    <div className="loading-images">
-                      <p>이미지를 불러오는 중...</p>
+                  {loadingVideos ? (
+                    <div className="loading-videos">
+                      <p>비디오를 불러오는 중...</p>
                     </div>
-                  ) : sharedImages.length === 0 ? (
-                    <div className="no-images">
-                      <p>아직 이 문제에 제출된 이미지가 없습니다.</p>
-                      <p>첫 번째로 이미지를 제출해보세요!</p>
+                  ) : sharedVideos.length === 0 ? (
+                    <div className="no-videos">
+                      <p>아직 이 문제에 제출된 비디오가 없습니다.</p>
+                      <p>첫 번째로 비디오를 제출해보세요!</p>
                     </div>
                   ) : (
-                    sharedImages.map((share, i) => (
-                      <div key={share.id || i} className="other-image-card">
+                    sharedVideos.map((share, i) => (
+                      <div key={share.id || i} className="other-video-card">
                         <div 
-                          className="other-image-placeholder"
-                          onClick={() => handleImageClick(share)}
+                          className="other-video-placeholder"
+                          onClick={() => handleVideoClick(share)}
                           style={{ cursor: 'pointer' }}
                         >
-                          {share.image ? (
-                            <img 
-                              src={(() => {
-                                const url = share.image;
-                                console.log('Processing shared image URL:', url);
-                                
-                                // 이미 http로 시작하는 완전한 URL인 경우 그대로 사용
-                                if (url.startsWith('http')) {
-                                  return url;
-                                }
-                                
-                                // media/media/ 중복 제거 로직
-                                let cleanUrl = url;
-                                if (url.includes('media/media/')) {
-                                  // media/media/shares/... -> shares/...
-                                  cleanUrl = url.substring(url.indexOf('media/media/') + 12);
-                                  cleanUrl = `media/${cleanUrl}`;
-                                } else if (url.startsWith('media/')) {
-                                  cleanUrl = url;
-                                } else if (!url.startsWith('/')) {
-                                  cleanUrl = `media/${url}`;
-                                }
-                                
-                                const finalUrl = `http://localhost:8000/${cleanUrl}`;
-                                console.log('Final shared image URL:', finalUrl);
-                                return finalUrl;
-                              })()}
-                              alt={`Shared submission ${i + 1}`} 
+                          {share.video ? (
+                            <video 
+                              src={share.video} 
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                               onError={(e) => {
-                                console.error(`Failed to load image for share ${share.id}:`, e.target.src);
-                                console.log('Original share.image:', share.image);
                                 e.target.style.display = 'none';
                                 e.target.nextSibling.style.display = 'flex';
                               }}
                             />
                           ) : null}
-                          <div className="image-placeholder-text" style={{ display: share.image ? 'none' : 'flex' }}>
-                            이미지를 불러올 수 없습니다
+                          <div className="video-placeholder-text" style={{ display: share.video ? 'none' : 'flex' }}>
+                            비디오를 불러올 수 없습니다
                           </div>
                         </div>
-                        <div className="image-info">
-                          <div className="image-prompt">
+                        <div className="video-info">
+                          <div className="video-prompt">
                             <p>{share.prompt}</p>
                           </div>
-                          <div className="image-likes">
+                          <div className="video-likes">
                             <span 
                               className={`heart ${share.isLiked ? 'liked' : ''}`}
                               onClick={(e) => {
@@ -719,28 +554,23 @@ const ImageProblem = () => {
         )}
       </div>
       
-      {/* 이미지 모달 */}
-      {selectedImage && (
-        <div className="image-modal-overlay" onClick={handleCloseModal}>
-          <div className="image-modal" onClick={(e) => e.stopPropagation()}>
+      {selectedVideo && (
+        <div className="video-modal-overlay" onClick={handleCloseModal}>
+          <div className="video-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <button className="modal-close-btn" onClick={handleCloseModal}>
                 ✕
               </button>
             </div>
             <div className="modal-content">
-              <div className="modal-image-section">
-                <div className="modal-image-placeholder">
-                  <img src={selectedImage.image} alt="Selected submission" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              <div className="modal-video-section">
+                <div className="modal-video-placeholder">
+                  <video src={selectedVideo.video} controls style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </div>
               </div>
               <div className="modal-prompt-section">
                 <div className="modal-prompt-content">
-                  <p className="modal-prompt-text">{selectedImage.prompt}</p>
-                </div>
-                <div className="modal-likes">
-                  <span className="modal-heart">❤️</span>
-                  <span className="modal-like-count">{selectedImage.likes}</span>
+                  <p className="modal-prompt-text">{selectedVideo.prompt}</p>
                 </div>
               </div>
             </div>
@@ -753,4 +583,4 @@ const ImageProblem = () => {
   );
 };
 
-export default ImageProblem;
+export default VideoProblem;

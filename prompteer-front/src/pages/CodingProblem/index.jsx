@@ -135,7 +135,7 @@ const CodingProblem = () => {
         // 에러 시 기본 데이터 설정
         setProblemData({
           id: id,
-          title: `Challenge #${id} - 데이터 로딩 실패`,
+          title: `데이터 로딩 실패 (ID: ${id})`,
           category: 'PS',
           difficulty: 'Easy',
           timeLimit: '1 초',
@@ -171,20 +171,46 @@ const CodingProblem = () => {
       const data = await response.json();
       console.log('Others work data:', data);
       
-      // 현재 로그인한 사용자 ID 가져오기
-      const currentUserId = getCurrentUserId();
+      // 현재 사용자 ID 가져오기 (백엔드 API 호출)
+      let currentUserId = null;
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        try {
+          const userResponse = await fetch('http://localhost:8000/users/me', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            currentUserId = userData.id;
+            console.log('Current user ID:', currentUserId);
+          }
+        } catch (err) {
+          console.error('Failed to get current user:', err);
+        }
+      }
       
       // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
-      const transformedData = data.map((work, index) => ({
-        id: work.id || index,
-        prompt: work.prompt || '프롬프트를 불러올 수 없습니다.',
-        code: work.ps_share?.code || '코드를 불러올 수 없습니다.',
-        memory: work.ps_share?.max_memory_kb || Math.floor(Math.random() * 1000) + 1000,
-        time: work.ps_share?.elapsed_time ? Math.round(work.ps_share.elapsed_time * 1000) : Math.floor(Math.random() * 100) + 50,
-        attempts: work.ps_share?.attempts || Math.floor(Math.random() * 5) + 1,
-        likes: work.likes_count !== undefined ? work.likes_count : 0,
-        isLiked: currentUserId ? work.likes.some(like => like.user_id === currentUserId) : false
-      }));
+      const transformedData = data.map((work, index) => {
+        // 현재 사용자가 이 공유에 좋아요를 눌렀는지 확인
+        const isLiked = currentUserId && work.likes && Array.isArray(work.likes) 
+          ? work.likes.some(like => like.user_id === currentUserId)
+          : false;
+        
+        console.log(`Work ${index} isLiked:`, isLiked, 'likes:', work.likes);
+        
+        return {
+          id: work.id || index,
+          prompt: work.prompt || '프롬프트를 불러올 수 없습니다.',
+          code: work.ps_share?.code || '코드를 불러올 수 없습니다.',
+          memory: work.ps_share?.max_memory_kb || Math.floor(Math.random() * 1000) + 1000,
+          time: work.ps_share?.elapsed_time ? Math.round(work.ps_share.elapsed_time * 1000) : Math.floor(Math.random() * 100) + 50,
+          attempts: work.ps_share?.attempts || Math.floor(Math.random() * 5) + 1,
+          likes: work.likes_count !== undefined ? work.likes_count : 0,
+          isLiked: isLiked
+        };
+      });
       
       // 사용자가 좋아요를 누른 공유들 업데이트
       const likedShareIds = transformedData
@@ -294,7 +320,17 @@ const CodingProblem = () => {
       }
 
       const data = await response.json();
-      const generated = data.content;
+      let generated = data.content;
+
+      // 마크다운 코드 블록 제거
+      if (generated) {
+        // ```python으로 시작하고 ```로 끝나는 경우 제거
+        generated = generated.replace(/^```python\s*\n/, '').replace(/\n```\s*$/, '');
+        // ```로 시작하고 ```로 끝나는 경우 제거
+        generated = generated.replace(/^```\s*\n/, '').replace(/\n```\s*$/, '');
+        // 앞뒤 공백 제거
+        generated = generated.trim();
+      }
 
       setGeneratedCode(generated);
       setEditorCode(generated);
@@ -695,49 +731,49 @@ ${editorCode}
                 <div className="console-content-wrapper">
                   <div className="console-content">
                     <pre className="console-output">{consoleOutput}</pre>
+                    {showResult && (
+                      <>
+                        <div className="result-section-inline">
+                          <div className="result-header-inline">
+                            <div className="result-title-inline">채점결과</div>
+                          </div>
+                          <div className="result-box-inline">
+                            <div className={`result-status-inline ${scoringResult && scoringResult.every(r => r.status === 'Accepted') ? 'success' : ''}`}>
+                              {scoringResult && scoringResult.every(r => r.status === 'Accepted') ? '정답입니다!' : '오답입니다.'}
+                            </div>
+                            <div className="result-details-inline">
+                              {scoringResult ? (
+                                scoringResult.map((res, index) => (
+                                  <div key={index}>
+                                    테스트케이스 {index + 1}: {res.status}
+                                    {res.status !== 'Accepted' && ` (시간: ${res.elapsed_time.toFixed(2)}s, 메모리: ${res.max_memory_kb}KB)`}
+                                  </div>
+                                ))
+                              ) : (
+                                <>
+                                  메모리: 34024 KB<br />
+                                  시간: 68 ms<br />
+                                  수동 수정: 3회
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="result-action-buttons-inline">
+                          <button className="result-btn-inline retry-btn" onClick={handleRetry}>
+                            <span>다시 풀기</span>
+                          </button>
+                          <button className="result-btn-inline other-btn" onClick={handleOtherProblem}>
+                            <span>다른 문제 풀기</span>
+                          </button>
+                          <button className="result-btn-inline share-btn" onClick={handleSharePrompt}>
+                            <span>프롬프트 공유하기</span>
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
-                {showResult && (
-                  <>
-                    <div className="result-section">
-                      <div className="result-header">
-                        <div className="result-title">채점결과</div>
-                      </div>
-                      <div className="result-box">
-                        <div className={`result-status ${scoringResult && scoringResult.every(r => r.status === 'Accepted') ? 'success' : ''}`}>
-                          {scoringResult && scoringResult.every(r => r.status === 'Accepted') ? '정답입니다!' : '오답입니다.'}
-                        </div>
-                        <div className="result-details">
-                          {scoringResult ? (
-                            scoringResult.map((res, index) => (
-                              <div key={index}>
-                                테스트케이스 {index + 1}: {res.status}
-                                {res.status !== 'Accepted' && `(시간: ${res.elapsed_time.toFixed(2)}s, 메모리: ${res.max_memory_kb}KB)`}
-                              </div>
-                            ))
-                          ) : (
-                            <>
-                              메모리: 34024 KB<br />
-                              시간: 68 ms<br />
-                              수동 수정: 3회
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="result-action-buttons">
-                      <button className="result-btn retry-btn" onClick={handleRetry}>
-                        <span>다시 풀기</span>
-                      </button>
-                      <button className="result-btn other-btn" onClick={handleOtherProblem}>
-                        <span>다른 문제 풀기</span>
-                      </button>
-                      <button className="result-btn share-btn" onClick={handleSharePrompt}>
-                        <span>프롬프트 공유하기</span>
-                      </button>
-                    </div>
-                  </>
-                )}
               </div>
             </div>
           </div>
@@ -815,7 +851,9 @@ ${editorCode}
                               className={`like-button ${likedShares.has(work.id) ? 'liked' : ''}`}
                               onClick={(e) => handleLikeToggle(work.id, e)}
                             >
-                              <div className="heart-icon">♥</div>
+                              <div className="heart-icon">
+                                {likedShares.has(work.id) ? '❤️' : '🤍'}
+                              </div>
                               <div className="like-count">{work.likes || 0}</div>
                             </button>
                           </div>

@@ -5,31 +5,8 @@
   box-sizing: border-box;
 }
 
-/* Remove all possible borders and outlines from images and containers */
-.image-category-page .image-component,
-.image-category-page .image-component *,
-.image-category-page .frame-17,
-.image-category-page .challenge-image {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-}
-
-.image-category-page .image-component:focus,
-.image-category-page .image-component:active,
-.image-category-page .image-component:focus-visible,
-.image-category-page .frame-17:focus,
-.image-category-page .frame-17:active,
-.image-category-page .challenge-image:focus,
-.image-category-page .challenge-image:active {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* 이미지 컴포넌트 - Figma 디자인 기반 */
-.image-component {
+/* 비디오 컴포넌트 - Figma 디자인 기반 */
+.video-component {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,7 +18,7 @@
   border-radius: 0;
 }
 
-.image-component:hover {
+.video-component:hover {
   transform: translateY(-2px);
 }
 
@@ -61,13 +38,10 @@
   overflow: hidden;
   outline: none !important;
   box-shadow: none !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  -webkit-tap-highlight-color: transparent !important;
 }
 
-/* Challenge Image */
-.challenge-image {
+/* Challenge Video */
+.challenge-video {
   position: absolute;
   top: 0;
   left: 0;
@@ -79,12 +53,34 @@
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
-  background: none !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  user-select: none;
-  -webkit-user-drag: none;
-  -webkit-tap-highlight-color: transparent;
+}
+
+/* Video Placeholder */
+.video-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  z-index: 1;
+}
+
+.video-placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #6C757D;
+}
+
+.video-placeholder-content p {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  margin: 0;
 }
 
 /* Frame 21 - Category Badge (Top Right) */
@@ -131,7 +127,7 @@
   width: 100%;
 }
 
-.image-category-page .challenge-id {
+.video-category-page .challenge-id {
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 700;
   font-size: 16px;
@@ -145,7 +141,7 @@
   width: 100%;
 }
 
-.image-category-page .challenge-title {
+.video-category-page .challenge-title {
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 400;
   font-size: 14px;
@@ -185,7 +181,7 @@
 }
 
 /* Frame 27 - Difficulty Badge */
-.image-category-page .frame-27 {
+.frame-27 {
   display: flex;
   flex-direction: column;
   padding: 4px 10px;
@@ -197,7 +193,7 @@
   min-width: fit-content;
 }
 
-.image-category-page .difficulty-text {
+.difficulty-text {
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 700;
   font-size: 13px;
@@ -207,15 +203,15 @@
 }
 
 /* 난이도별 색상 */
-.image-category-page .frame-27.difficulty-초급 {
+.difficulty-초급 {
   background: #51CF66;
 }
 
-.image-category-page .frame-27.difficulty-중급 {
+.difficulty-중급 {
   background: #FFD43B;
 }
 
-.image-category-page .frame-27.difficulty-고급 {
+.difficulty-고급 {
   background: #FF4E4E;
 }
 
@@ -231,14 +227,14 @@
 }
 
 /* 기존 스타일 유지 */
-.image-category-page {
+.video-category-page {
   font-family: 'Noto Sans KR', sans-serif;
   background-color: #F8F9FA;
   display: flex;
   flex-direction: column;
 }
 
-.image-main {
+.video-main {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -305,7 +301,7 @@
   width: 311px;
 }
 
-.image-category-page .featured-content .challenge-number {
+.video-category-page .featured-content .challenge-number {
   font-family: 'Noto Sans KR', sans-serif !important;
   font-weight: 800 !important;
   font-size: 32px !important;
@@ -359,7 +355,7 @@
 }
 
 /* Search Outer Container - Figma: 검색창 외부 */
-.image-category-search-outer-container {
+.video-category-search-outer-container {
   display: flex;
   flex-direction: column;
   align-self: stretch;
@@ -374,7 +370,7 @@
 }
 
 /* Search Inner Container - Figma: 검색창 내부 */
-.image-category-search-inner-container {
+.video-category-search-inner-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -385,7 +381,7 @@
 }
 
 /* Search Box - Figma: 검색창 */
-.image-category-search-box {
+.video-category-search-box {
   display: flex;
   align-items: center;
   background: #ffffff;
@@ -398,11 +394,11 @@
   gap: 10px;
 }
 
-.image-category-search-icon {
+.video-category-search-icon {
   flex-shrink: 0;
 }
 
-.image-category-search-input {
+.video-category-search-input {
   border: none;
   outline: none;
   background: transparent;
@@ -414,7 +410,7 @@
   height: 100%;
 }
 
-.image-category-search-input::placeholder {
+.video-category-search-input::placeholder {
   color: #adb5bd;
   font-size: 14px;
 }

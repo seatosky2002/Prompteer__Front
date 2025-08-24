@@ -3,14 +3,18 @@
 
 import axios from "axios";
 
-// FastAPI 백엔드 baseURL 설정 (프록시 사용을 위해 제거)
-// axios.defaults.baseURL = "http://localhost:8000/";
+// FastAPI 백엔드 baseURL 설정
+const API_BASE_URL = "http://localhost:8000/";
 
 // 누구나 접근 가능한 API들
-export const instance = axios.create();
+export const instance = axios.create({
+  baseURL: API_BASE_URL
+});
 
 // 로그인 해야지 접근 가능한 API들
-export const instanceWithToken = axios.create();
+export const instanceWithToken = axios.create({
+  baseURL: API_BASE_URL
+});
 
 // request interceptor. 모든 '요청'에 토큰 추가
 // instanceWithToken에는 front의 local에서 access token을 참고 담아줘야한다.

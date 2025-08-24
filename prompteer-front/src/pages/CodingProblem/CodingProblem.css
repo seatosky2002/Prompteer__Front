@@ -28,11 +28,11 @@
 .problem-layout {
   display: flex;
   flex-direction: row;
-  align-items: stretch;
+  align-items: flex-start; /* stretch에서 flex-start로 변경 */
   padding: 0;
   width: 100%;
   gap: 0;
-  min-height: auto; /* 자동 높이로 변경 */
+  min-height: calc(100vh - 200px); /* 최소 높이 설정으로 스크롤 영역 확보 */
 }
 
 /* Main - 중앙 정렬 수정 */
@@ -56,7 +56,7 @@
   padding: 24px 24px 24px 0px; /* pr-6 py-6 */
   gap: 20px; /* gap-5 (20px) */
   width: 384px; /* w-96 */
-  min-height: auto; /* 자동 높이로 변경 */
+  height: calc(100vh - 200px); /* 고정 높이로 변경 */
   border-right: 1px solid #E9ECEF; /* border-r border-gray-200 */
   flex: none;
   order: 0;
@@ -189,8 +189,29 @@
   display: flex;
   flex-direction: column;
   gap: 20px; /* gap-5 */
-  max-height: 600px; /* 스크롤을 위한 최대 높이 설정 */
+  height: calc(100vh - 400px); /* 헤더와 문제 제목 영역을 제외한 높이 */
   padding-right: 10px; /* 스크롤바 공간 */
+  scrollbar-width: thin; /* Firefox 스크롤바 스타일 */
+  scrollbar-color: #ADB5BD #F8F9FA; /* Firefox 스크롤바 색상 */
+}
+
+/* Webkit 브라우저 스크롤바 스타일 */
+.problem-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.problem-content::-webkit-scrollbar-track {
+  background: #F8F9FA;
+  border-radius: 4px;
+}
+
+.problem-content::-webkit-scrollbar-thumb {
+  background: #ADB5BD;
+  border-radius: 4px;
+}
+
+.problem-content::-webkit-scrollbar-thumb:hover {
+  background: #6C757D;
 }
 
 .problem-section {
@@ -436,7 +457,7 @@
 
 .stat-text {
   font-family: 'Noto Sans KR', sans-serif;
-  font-size: 16px; /* Figma 폰트 크기 */
+  font-size: 12px; /* 줄어든 폰트 크기 */
   font-weight: 400; /* 일반 텍스트는 400 */
   color: #101010; /* Figma 색상 */
   line-height: 1.2;
@@ -464,7 +485,7 @@
   border-radius: 8px; /* Figma border radius */
   padding: 20px; /* Figma padding */
   font-family: 'Noto Sans KR', sans-serif; /* Figma 폰트 */
-  font-size: 14px; /* Figma 폰트 크기 */
+  font-size: 11px; /* 줄어든 폰트 크기 */
   line-height: 1.2;
   color: #000000; /* Figma 텍스트 색상 */
   white-space: nowrap;
@@ -489,7 +510,7 @@
   border-radius: 8px;
   padding: 20px;
   font-family: 'Fira Code', monospace;
-  font-size: 15px;
+  font-size: 11px;
   line-height: 1.7;
   color: #757575;
   flex: 1;
@@ -516,6 +537,8 @@
   align-items: center;
   gap: 5px; /* Figma gap */
   flex-shrink: 0;
+  width: auto;
+  min-width: 40px;
 }
 
 /* Figma 하트 아이콘 */
@@ -524,11 +547,14 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
   transition: all 0.2s ease;
+  width: 40px;
+  text-align: center;
 }
 
 .like-button:hover {
@@ -551,6 +577,11 @@
   color: #515151; /* Figma 색상 */
   font-size: 18px;
   transition: color 0.2s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  margin: 0 auto !important;
 }
 
 .like-count {
@@ -560,6 +591,10 @@
   color: #515151; /* Figma 색상 */
   line-height: 1.2;
   transition: color 0.2s ease;
+  display: block !important;
+  text-align: center !important;
+  margin: 0 auto !important;
+  width: 100% !important;
 }
 
 .like-button:hover .heart-icon,
@@ -701,7 +736,7 @@
   order: 1;
   align-self: stretch;
   flex-grow: 0;
-  min-height: 400px; /* 더 작은 높이로 조정 */
+  height: calc(100vh - 200px); /* 사이드바와 동일한 높이 */
 }
 
 /* Frame 135: 코드 워크스페이스 - 높이 통일 */
@@ -922,7 +957,7 @@
   order: 2;
   align-self: stretch;
   flex-grow: 0;
-  min-height: 400px; /* 더 작은 높이로 조정 */
+  height: calc(100vh - 200px); /* 사이드바와 동일한 높이 */
 }
 
 /* Frame 136: 콘솔 섹션 - 높이 통일 */
@@ -932,7 +967,7 @@
   align-items: center;
   padding: 33px 16px 16px;
   width: 500px;
-  height: 900px;
+  height: 100%; /* 부모 높이에 맞춤 */
   flex: none;
   order: 0;
   align-self: stretch;
@@ -948,7 +983,7 @@
   align-items: stretch;
   padding: 16px 17px 0px;
   width: 468px;
-  height: 600px;
+  height: 100%; /* 부모 높이에 맞춤 */
   overflow: auto;
   background: #FFFFFF;
   border: 1px solid #E9ECEF;
@@ -1051,6 +1086,70 @@
   color: #000000;
 }
 
+/* 콘솔 내부 채점 결과 섹션 */
+.result-section-inline {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px solid #E9ECEF;
+}
+
+.result-header-inline {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.result-title-inline {
+  font-family: 'Fira Code';
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.4;
+  color: #000000;
+  margin-bottom: 8px;
+}
+
+.result-box-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 8px;
+  padding: 12px;
+  background: #F8F9FA;
+  border: 1px solid #E9ECEF;
+  border-radius: 4px;
+}
+
+.result-status-inline {
+  font-family: 'Noto Sans KR';
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+  color: #1973C2;
+  margin-bottom: 4px;
+}
+
+.result-status-inline.success {
+  color: #28a745;
+}
+
+.result-details-inline {
+  font-family: 'Noto Sans KR';
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #495057;
+  width: 100%;
+}
+
+.result-details-inline div {
+  margin-bottom: 2px;
+}
+
 /* 결과 액션 버튼들 */
 .result-action-buttons {
   display: flex;
@@ -1087,6 +1186,46 @@
 }
 
 .result-btn:hover {
+  background: #1864a8;
+}
+
+/* 콘솔 내부 결과 액션 버튼들 */
+.result-action-buttons-inline {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-self: stretch;
+  gap: 12px;
+  width: 100%;
+  padding: 17px 16px 16px;
+  margin-top: 12px;
+  border-top: 1px solid #E9ECEF;
+}
+
+.result-btn-inline {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 20px 12px;
+  background: #1971C2;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  width: auto;
+  flex: none;
+}
+
+.result-btn-inline span {
+  font-family: 'Inter';
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.2;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.result-btn-inline:hover {
   background: #1864a8;
 }
 
@@ -1292,28 +1431,7 @@
   color: #757575;
 }
 
-.work-like {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-}
-
-.heart-icon {
-  width: 20px;
-  height: 18px;
-  color: #515151;
-  font-size: 16px;
-}
-
-.work-like span {
-  font-family: 'Noto Sans KR';
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 1.2;
-  color: #515151;
-}
+/* 중복된 스타일 제거됨 - 위의 .work-actions와 .like-button 사용 */
 
 /* 반응형 디자인 */
 @media (max-width: 1200px) {
@@ -1599,7 +1717,7 @@
   border-radius: 8px; /* Figma border radius */
   padding: 20px; /* Figma padding */
   font-family: 'Noto Sans KR', sans-serif; /* Figma 폰트 */
-  font-size: 14px; /* Figma 폰트 크기 */
+  font-size: 11px; /* 줄어든 폰트 크기 */
   line-height: 1.2;
   color: #000000; /* Figma 텍스트 색상 */
   white-space: nowrap;
@@ -1631,7 +1749,7 @@
   border-radius: 8px;
   padding: 20px;
   font-family: 'Fira Code', monospace;
-  font-size: 15px;
+  font-size: 11px;
   line-height: 1.7;
   color: #757575;
   flex: 1;

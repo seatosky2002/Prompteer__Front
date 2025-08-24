@@ -1,55 +1,201 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import FilterButton from '../../components/ui/FilterButton/index.jsx';
 import CategoryFilter from '../../components/ui/CategoryFilter/index.jsx';
-import CommentCard from '../../components/ui/CommentCard/index.jsx';
+
 import './PostDetail.css';
 
 const PostDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [isProblemExpanded, setIsProblemExpanded] = useState(true);
+  const [postData, setPostData] = useState(null);
+  const [challengeData, setChallengeData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('질문');
+  const [activeCategory, setActiveCategory] = useState('코딩');
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 게시물 데이터 (실제로는 API에서 id로 조회)
-  const getPostData = (postId) => {
-    // 샘플 데이터 - 실제로는 API 호출
-    const samplePosts = {
-      '1': {
-        title: '왜 틀렸는지 잘 모르겠습니다.',
-        author: '뽀복',
-        date: '25/7/27',
-        challengeTitle: 'Challenge #13 알고리즘 문제',
-        likes: 15,
-        type: '질문',
-        category: '코딩',
-        content: `이 프롬프트를 사용해봤는데 자꾸 틀렸다고 나와요.\n\n"주어진 배열을 정렬하는 함수를 작성해줘. 배열의 원소는 숫자야."\n\n이런 식으로 프롬프트를 작성했는데 뭔가 빠진 게 있을까요?`
-      },
-      '6': {
-        title: '코딩 프롬포트 공유하니까 참고하세영',
-        author: '뽀복',
-        date: '25/7/27',
-        challengeTitle: 'Challenge #11 알파벳 문자열',
-        likes: 10,
-        type: '프롬포트 공유',
-        category: '코딩',
-        content: `이 프롬프트 정말 잘 되는 것 같아요:\n\n"너는 알고리즘 문제 해결 전문가야. 주어진 문제를 분석하고, 시간복잡도와 공간복잡도를 고려한 최적의 해결책을 제시해줘. 단계별로 설명하고 코드도 같이 작성해줘."\n\n[프롬포트끝]\n\n이런 식으로 했더니 정답률이 훨씬 올라갔어요!`
+  // 게시글 데이터 가져오기
+  useEffect(() => {
+    const fetchPostData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`http://localhost:8000/posts/${id}`);
+        
+        if (!response.ok) {
+          throw new Error('게시글을 불러오는데 실패했습니다.');
+        }
+        
+        const post = await response.json();
+        console.log('Post data:', post);
+        setPostData(post);
+        
+        // 게시글에서 댓글 데이터 추출
+        if (post.comments) {
+          setComments(post.comments);
+          console.log('Comments from post:', post.comments);
+        }
+        
+        // 게시글 타입에 따라 activeTab 설정
+        if (post.type === 'share') {
+          setActiveTab('프롬프트 공유');
+        } else {
+          setActiveTab('질문');
+        }
+        
+        // 챌린지 ID가 있으면 챌린지 데이터도 가져오기
+        if (post.challenge_id) {
+          await fetchChallengeData(post.challenge_id);
+        }
+      } catch (err) {
+        console.error('Error fetching post:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
-    
-    return samplePosts[postId] || samplePosts['1'];
+
+    fetchPostData();
+  }, [id]);
+
+  // 챌린지 데이터 가져오기
+  const fetchChallengeData = async (challengeId) => {
+    try {
+      const response = await fetch(`http://localhost:8000/challenges/${challengeId}`);
+      
+      if (!response.ok) {
+        console.warn('챌린지 데이터를 불러올 수 없습니다.');
+        return;
+      }
+      
+      const challenge = await response.json();
+      console.log('Challenge data:', challenge);
+      setChallengeData(challenge);
+    } catch (err) {
+      console.error('Error fetching challenge:', err);
+    }
   };
 
-  const postData = getPostData(id);
-  
-  const [activeTab, setActiveTab] = useState(postData.type || '질문');
-  const [activeCategory, setActiveCategory] = useState(postData.category || '코딩');
+  // 게시글 데이터 새로고침 (댓글 포함)
+  const refreshPostData = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/posts/${id}`);
+      
+      if (!response.ok) {
+        console.warn('게시글 데이터를 새로고침할 수 없습니다.');
+        return;
+      }
+      
+      const post = await response.json();
+      setPostData(post);
+      
+      // 댓글 데이터 업데이트
+      if (post.comments) {
+        setComments(post.comments);
+        console.log('Updated comments:', post.comments);
+      }
+    } catch (err) {
+      console.error('Error refreshing post data:', err);
+    }
+  };
 
-  const tabs = ['전체', '질문', '프롬포트 공유'];
-  const categories = ['전체', '코딩', '이미지', '영상', '탈옥', '문서'];
+  // 댓글 작성
+  const handleCommentSubmit = async () => {
+    if (!newComment.trim()) {
+      return;
+    }
+
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      alert('댓글을 작성하려면 로그인이 필요합니다.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch(`http://localhost:8000/posts/${id}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          content: newComment.trim(),
+          post_id: parseInt(id)
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || '댓글 작성에 실패했습니다.');
+      }
+
+      const newCommentData = await response.json();
+      console.log('New comment created:', newCommentData);
+      
+      // 게시글 데이터 새로고침 (댓글 포함)
+      await refreshPostData();
+      
+      // 입력 필드 초기화
+      setNewComment('');
+      
+      // 성공 메시지는 댓글이 추가된 것으로 충분함
+    } catch (error) {
+      console.error('Comment creation error:', error);
+      alert(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="post-detail-page">
+        <Header />
+        <main className="post-detail-main">
+          <div className="loading-message">게시글을 불러오는 중...</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="post-detail-page">
+        <Header />
+        <main className="post-detail-main">
+          <div className="error-message">에러: {error}</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!postData) {
+    return (
+      <div className="post-detail-page">
+        <Header />
+        <main className="post-detail-main">
+          <div className="error-message">게시글을 찾을 수 없습니다.</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const tabs = ['전체', '질문', '프롬프트 공유'];
+  const categories = ['전체', '코딩', '이미지', '영상'];
 
   const handleFilterNavigate = (filterType, value) => {
-    const typeMapping = { '질문': 'question', '프롬포트 공유': 'share' };
+    const typeMapping = { '질문': 'question', '프롬프트 공유': 'share' };
     const tagMapping = { '코딩': 'ps', '이미지': 'img', '영상': 'video' };
 
     const params = new URLSearchParams();
@@ -62,19 +208,15 @@ const PostDetail = () => {
     navigate(`/board?${params.toString()}`);
   };
 
-  // 댓글 데이터 (예시)
-  const comments = [
-    { id: 1, content: '우왕', author: '뽀복' },
-    { id: 2, content: '대단해용', author: '뽀복' }
-  ];
-
   const handleProblemView = () => {
     navigate(`/board/post/${id}/problem`);
   };
 
-  const handleCommentSubmit = () => {
-    console.log('댓글 작성 버튼 클릭됨');
+  const toggleProblemExpanded = () => {
+    setIsProblemExpanded(!isProblemExpanded);
   };
+
+
 
   return (
     <div className="post-detail-page">
@@ -128,35 +270,66 @@ const PostDetail = () => {
                       <div className="post-card-title-section">
                         <h2 className="post-card-title">{postData.title}</h2>
                         <div className="post-card-meta">
-                          <span className="post-card-author">작성자: {postData.author}</span>
-                          <span className="post-card-date">{postData.date}</span>
+                          <span className="post-card-author">작성자: {postData.user?.nickname || '익명'}</span>
+                          <span className="post-card-date">{new Date(postData.created_at).toLocaleDateString()}</span>
                         </div>
                       </div>
                       <hr className="post-card-divider" />
                     </div>
 
                     <div className="post-card-challenge">
-                      <div className="challenge-header">
-                        <h3 className="challenge-title">{postData.challengeTitle}</h3>
-                        <div className="challenge-likes">
-                          <svg width="20" height="18" viewBox="0 0 20 18" fill="none">
-                            <path d="M10 17.5L8.55 16.2C3.4 11.74 0 8.74 0 5.5C0 3.42 1.42 2 3.5 2C4.64 2 5.88 2.59 6.5 3.5C7.12 2.59 8.36 2 9.5 2C11.58 2 13 3.42 13 5.5C13 8.74 9.6 11.74 4.45 16.2L10 17.5Z" fill="#515151"/>
-                          </svg>
-                          <span>{postData.likes}</span>
+                      {challengeData && (
+                        <div className="challenge-header">
+                          <h3 className="challenge-title">Challenge #{postData.challenge_id} {challengeData.title}</h3>
                         </div>
-                      </div>
+                      )}
                       
-                      <div className="challenge-actions">
-                        <button className="problem-view-btn" onClick={handleProblemView}>
-                          <div className="problem-view-content">
-                            <span>문제 보기</span>
+                      {/* 문제 상세 내용 (챌린지 데이터가 있는 경우) */}
+                      {challengeData && (
+                        <div className="problem-content-section">
+                          {isProblemExpanded && (
+                            <div className="problem-content-card">
+                              <div className="problem-section">
+                                <h4 className="section-title">[제한]</h4>
+                                <div className="section-content">
+                                  시간 : {challengeData.time_limit || '1초'}<br/>
+                                  메모리 : {challengeData.memory_limit || '256MB'}
+                                </div>
+                              </div>
+                              
+                              <div className="problem-section">
+                                <h4 className="section-title">[문제 설명]</h4>
+                                <div className="section-content">
+                                  {challengeData.content}
+                                </div>
+                              </div>
+
+                              {challengeData.level && (
+                                <div className="problem-section">
+                                  <h4 className="section-title">[난이도]</h4>
+                                  <div className="section-content">
+                                    {challengeData.level}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          <div className="problem-expand-icon" onClick={toggleProblemExpanded}>
                             <svg width="14" height="9" viewBox="0 0 14 9" fill="none">
-                              <path d="M1 1L7 7L13 1" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path 
+                                d={isProblemExpanded ? "M13 8L7 2L1 8" : "M1 1L7 7L13 1"} 
+                                stroke="#000000" 
+                                strokeWidth="2" 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round"
+                              />
                             </svg>
                           </div>
-                        </button>
-                      </div>
+                        </div>
+                      )}
                       
+                      {/* 게시글 내용 - 작성자가 직접 작성한 질문이나 설명 */}
                       <div className="post-card-text">
                         {postData.content}
                       </div>
@@ -167,20 +340,56 @@ const PostDetail = () => {
 
               {/* 댓글 섹션 */}
               <div className="comments-section">
-                <div className="comments-list">
-                  {comments.map((comment) => (
-                    <CommentCard
-                      key={comment.id}
-                      content={comment.content}
-                      author={comment.author}
-                    />
-                  ))}
+                <div className="comments-header">
+                  <h3 className="comments-title">댓글 ({comments.length})</h3>
+                </div>
+                
+                <div className="figma-comments-container">
+                  {comments.length === 0 ? (
+                    <div className="no-comments">
+                      <p>아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!</p>
+                    </div>
+                  ) : (
+                    comments.map((comment) => (
+                      <div key={comment.id} className="figma-comment-item">
+                        <div className="figma-comment-content">
+                          {comment.content}
+                        </div>
+                        <div className="figma-comment-author">
+                          {comment.user?.nickname || '익명'}
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
                 
                 <div className="comment-write-section">
-                  <button className="comment-submit-btn" onClick={handleCommentSubmit}>
-                    댓글 작성
-                  </button>
+                  {/* Figma 디자인에 맞는 댓글 작성 영역 */}
+                  <div className="figma-comment-container">
+                    <div className="figma-comment-input-area">
+                      <textarea
+                        className="figma-comment-input"
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleCommentSubmit();
+                          }
+                        }}
+                        placeholder="댓글을 입력하세요..."
+                        rows={2}
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    <button 
+                      className="figma-comment-submit-btn" 
+                      onClick={handleCommentSubmit}
+                      disabled={!newComment.trim() || isSubmitting}
+                    >
+                      {isSubmitting ? '작성 중...' : '댓글 작성'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

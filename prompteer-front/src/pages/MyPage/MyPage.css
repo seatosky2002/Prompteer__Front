@@ -252,7 +252,7 @@
 
 .coding-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(153px, 153px));
   gap: 16px;
   max-height: 663px;
   overflow-y: auto;
@@ -326,7 +326,7 @@
 
   .coding-grid,
   .image-grid {
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 160px));
     gap: 14px;
   }
 }
@@ -355,7 +355,7 @@
 
   .coding-grid,
   .image-grid {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 150px));
     gap: 12px;
   }
 }
@@ -382,8 +382,7 @@
 
   .coding-grid,
   .image-grid {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 140px));
   }
 }
 
@@ -414,7 +413,7 @@
 
   .coding-grid,
   .image-grid {
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(130px, 130px));
     gap: 8px;
   }
 }

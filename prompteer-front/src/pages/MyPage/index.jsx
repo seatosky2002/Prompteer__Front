@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../components/common/Header/index.jsx";
 import MypageQuestionCard from "../../components/cards/MypageQuestionCard/index.jsx";
 import MypageCodingCard from "../../components/cards/MypageCodingCard/index.jsx";
@@ -6,10 +6,14 @@ import MypageImageCard from "../../components/cards/MypageImageCard/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
 import CodingDetailPrompt from "../../components/cards/CodingDetailPrompt";
 import ImageDetailPrompt from "../../components/cards/ImageDetailPrompt";
+import {
+  getMyCompletedPsChallenges,
+  getChallengeDetails,
+} from "../../apis/api.js";
 import "./MyPage.css";
 
 const MyPage = () => {
-  const [activeTab, setActiveTab] = useState("내가 올린 질문");
+  const [activeTab, setActiveTab] = useState("내가 올린 게시글");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -34,6 +38,104 @@ const MyPage = () => {
     setIsImageModalOpen(false);
     setSelectedImageChallenge(null);
   };
+
+  // 코딩 챌린지 데이터 로딩
+  useEffect(() => {
+    const fetchCodingChallenges = async () => {
+      setIsLoadingCoding(true);
+      setCodingError(null);
+
+      try {
+        const result = await getMyCompletedPsChallenges();
+
+        if (result.success) {
+          // 각 챌린지의 상세 정보도 함께 가져오기
+          const challengesWithDetails = await Promise.all(
+            result.data.map(async (challenge) => {
+              try {
+                // 챌린지 상세 정보 가져오기
+                const challengeDetails = await getChallengeDetails(
+                  challenge.challenge_id
+                );
+
+                if (challengeDetails.success) {
+                  const details = challengeDetails.data;
+                  return {
+                    id: challenge.id,
+                    challengeNumber: challenge.challenge_id,
+                    title:
+                      details.title || `Challenge #${challenge.challenge_id}`,
+                    description: details.content || "내용 없음",
+                    difficulty: details.level || "알 수 없음",
+                    prompt: challenge.prompt,
+                    output: challenge.ps_share?.code || "코드 없음",
+                    likes: challenge.likes_count || 0,
+                    isCorrect: challenge.ps_share?.is_correct || false,
+                    createdAt: challenge.created_at,
+                    user: challenge.user,
+                    // 추가 정보들
+                    tag: details.tag,
+                    accuracyRate: details.ps_challenge?.accuracy_rate || 0,
+                    testcases: details.ps_challenge?.testcases || [],
+                  };
+                } else {
+                  // 챌린지 상세 정보 가져오기 실패 시 기본 정보만 사용
+                  return {
+                    id: challenge.id,
+                    challengeNumber: challenge.challenge_id,
+                    title: `Challenge #${challenge.challenge_id}`,
+                    description: challenge.prompt || "프롬프트 없음",
+                    difficulty: "알 수 없음",
+                    prompt: challenge.prompt,
+                    output: challenge.ps_share?.code || "코드 없음",
+                    likes: challenge.likes_count || 0,
+                    isCorrect: challenge.ps_share?.is_correct || false,
+                    createdAt: challenge.created_at,
+                    user: challenge.user,
+                  };
+                }
+              } catch (error) {
+                console.error(
+                  `챌린지 ${challenge.challenge_id} 상세 정보 로딩 에러:`,
+                  error
+                );
+                // 에러 발생 시 기본 정보만 사용
+                return {
+                  id: challenge.id,
+                  challengeNumber: challenge.challenge_id,
+                  title: `Challenge #${challenge.challenge_id}`,
+                  description: challenge.prompt || "프롬프트 없음",
+                  difficulty: "알 수 없음",
+                  prompt: challenge.prompt,
+                  output: challenge.ps_share?.code || "코드 없음",
+                  likes: challenge.likes_count || 0,
+                  isCorrect: challenge.ps_share?.is_correct || false,
+                  createdAt: challenge.created_at,
+                  user: challenge.user,
+                };
+              }
+            })
+          );
+
+          setCodingChallenges(challengesWithDetails);
+        } else {
+          // result.success가 false인 경우 coding error를 true로 바꿔서 error를 내보낸다
+          setCodingError(result.error);
+        }
+      } catch (error) {
+        // result를 받아오는 과정 자체가 오류인 경우
+        console.error("코딩 챌린지 로딩 에러:", error);
+        setCodingError("데이터를 불러오는 중 오류가 발생했습니다.");
+      } finally {
+        setIsLoadingCoding(false);
+      }
+    };
+
+    // 코딩 챌린지 탭이 활성화되었을 때만 데이터 로딩
+    if (activeTab === "코딩 챌린지") {
+      fetchCodingChallenges();
+    }
+  }, [activeTab]);
 
   // 샘플 데이터
   const questions = [
@@ -67,6 +169,8 @@ const MyPage = () => {
   ];
 
   // 피그마 디자인에 맞춰 18개의 코딩 챌린지 (6x3 그리드)
+  // 코딩 챌린지 예전 하드코딩
+  /* 
   const codingChallenges = Array(18)
     .fill(null)
     .map((_, index) => ({
@@ -83,7 +187,12 @@ const MyPage = () => {
       time: "68ms",
       manualEdits: "2회",
       likes: 10 + index,
-    }));
+    }));*/
+
+  // 실제 API에서 가져온 코딩 챌린지 데이터
+  const [codingChallenges, setCodingChallenges] = useState([]); // codingChallenges에 코딩 챌린지에 관련된 데이터들을 담아놓는 변수수
+  const [isLoadingCoding, setIsLoadingCoding] = useState(false);
+  const [codingError, setCodingError] = useState(null);
 
   // 피그마 디자인에 맞춰 12개의 이미지/영상 챌린지 (6x2 그리드)
   const imageChallenges = [
@@ -222,17 +331,17 @@ const MyPage = () => {
   ];
 
   const tabs = [
-    { id: "내가 올린 질문", label: "내가 올린 질문", icon: "❓" },
+    { id: "내가 올린 게시글", label: "내가 올린 게시글", icon: "❓" },
     { id: "코딩 챌린지", label: "코딩 챌린지", icon: "💻" },
     { id: "이미지/영상 챌린지", label: "이미지/영상 챌린지", icon: "🖼️" },
   ];
 
   const renderActiveContent = () => {
     switch (activeTab) {
-      case "내가 올린 질문":
+      case "내가 올린 게시글":
         return (
           <div className="mypage-content-section">
-            <h2 className="section-title">내가 올린 질문</h2>
+            <h2 className="section-title">내가 올린 게시글</h2>
             <div className="questions-list">
               {questions.map((question) => (
                 <div key={question.id} className="question-card">
@@ -269,15 +378,32 @@ const MyPage = () => {
           <div className="mypage-content-section">
             <h2 className="section-title">참여한 코딩 챌린지 목록</h2>
             <div className="coding-section">
-              <div className="coding-grid">
-                {codingChallenges.map((challenge) => (
-                  <MypageCodingCard
-                    key={challenge.id}
-                    {...challenge}
-                    onClick={() => handleCodingCardClick(challenge)}
-                  />
-                ))}
-              </div>
+              {isLoadingCoding ? (
+                <div className="loading-state">
+                  <p>코딩 챌린지 목록을 불러오는 중...</p>
+                </div>
+              ) : codingError ? (
+                <div className="error-state">
+                  <p>에러: {codingError}</p>
+                  <button onClick={() => window.location.reload()}>
+                    다시 시도
+                  </button>
+                </div>
+              ) : codingChallenges.length === 0 ? (
+                <div className="empty-state">
+                  <p>아직 참여한 코딩 챌린지가 없습니다.</p>
+                </div>
+              ) : (
+                <div className="coding-grid">
+                  {codingChallenges.map((challenge) => (
+                    <MypageCodingCard
+                      key={challenge.id}
+                      {...challenge}
+                      onClick={() => handleCodingCardClick(challenge)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -307,7 +433,7 @@ const MyPage = () => {
       default:
         return (
           <div className="mypage-content-section">
-            <h2 className="section-title">내가 올린 질문</h2>
+            <h2 className="section-title">내가 올린 게시글</h2>
             <div className="questions-list">
               {questions.map((question) => (
                 <div key={question.id} className="question-card">

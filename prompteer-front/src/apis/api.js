@@ -269,3 +269,62 @@ export const unregisterUser = async () => {
     }
   }
 };
+
+// 내가 완료한 PS 챌린지 목록 조회 API / 마이페이지 용
+export const getMyCompletedPsChallenges = async () => {
+  try {
+    const response = await instanceWithToken.get(
+      "users/me/completed-challenges/ps"
+    );
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: "로그인을 다시 해주세요.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "완료한 챌린지 목록을 가져올 수 없습니다.",
+      };
+    }
+  }
+};
+
+// 특정 챌린지 상세 정보 조회 API
+export const getChallengeDetails = async (challengeId) => {
+  try {
+    const response = await instanceWithToken.get(`challenges/${challengeId}`);
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 404) {
+      return {
+        success: false,
+        error: "챌린지를 찾을 수 없습니다.",
+      };
+    } else if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: "로그인을 다시 해주세요.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "챌린지 정보를 가져올 수 없습니다.",
+      };
+    }
+  }
+};

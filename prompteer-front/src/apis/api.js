@@ -470,3 +470,127 @@ export const getMyPosts = async () => {
     };
   }
 };
+
+// =============================================================================
+// Shares 관련 API들. 모든 Shares를 각 카테고리들 별로 불러온다다
+// =============================================================================
+
+// PS 챌린지 결과물 목록 조회 API
+export const getPsShares = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+
+    // 기본값 설정
+    queryParams.append("skip", params.skip || 0);
+    queryParams.append("limit", params.limit || 100); // 기본값 100개
+
+    const response = await instanceWithToken.get(
+      `shares/ps/?${queryParams.toString()}`
+    );
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: "로그인을 다시 해주세요.",
+      };
+    } else if (error.response?.status === 422) {
+      return {
+        success: false,
+        error: "잘못된 파라미터입니다.",
+        details: error.response.data.detail,
+      };
+    } else {
+      return {
+        success: false,
+        error: "PS 챌린지 결과물 목록을 가져올 수 없습니다.",
+      };
+    }
+  }
+};
+
+// 이미지 챌린지 결과물 목록 조회 API
+export const getImgShares = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+
+    // 기본값 설정
+    queryParams.append("skip", params.skip || 0);
+    queryParams.append("limit", params.limit || 100);
+
+    const response = await instanceWithToken.get(
+      `shares/img/?${queryParams.toString()}`
+    );
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: "로그인을 다시 해주세요.",
+      };
+    } else if (error.response?.status === 422) {
+      return {
+        success: false,
+        error: "잘못된 파라미터입니다.",
+        details: error.response.data.detail,
+      };
+    } else {
+      return {
+        success: false,
+        error: "이미지 챌린지 결과물 목록을 가져올 수 없습니다.",
+      };
+    }
+  }
+};
+
+// 비디오 챌린지 결과물 목록 조회 API
+export const getVideoShares = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+
+    // 기본값 설정
+    queryParams.append("skip", params.skip || 0);
+    queryParams.append("limit", params.limit || 100);
+
+    const response = await instanceWithToken.get(
+      `shares/video/?${queryParams.toString()}`
+    );
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: "로그인을 다시 해주세요.",
+      };
+    } else if (error.response?.status === 422) {
+      return {
+        success: false,
+        error: "잘못된 파라미터입니다.",
+        details: error.response.data.detail,
+      };
+    } else {
+      return {
+        success: false,
+        error: "비디오 챌린지 결과물 목록을 가져올 수 없습니다.",
+      };
+    }
+  }
+};

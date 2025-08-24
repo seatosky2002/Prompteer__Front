@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import FilterButton from '../../components/ui/FilterButton/index.jsx';
@@ -9,6 +9,8 @@ import './Board.css';
 
 const Board = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,6 +27,34 @@ const Board = () => {
 
   const tabs = ['전체', '질문', '프롬프트 공유'];
   const categories = ['전체', '코딩', '이미지', '영상'];
+
+  // URL 파라미터에서 초기 상태 설정
+  useEffect(() => {
+    const typeMapping = {
+      'question': '질문',
+      'share': '프롬프트 공유'
+    };
+    const tagMapping = {
+      'ps': '코딩',
+      'img': '이미지',
+      'video': '영상'
+    };
+
+    const urlType = searchParams.get('type');
+    const urlTag = searchParams.get('tag');
+
+    if (urlType && typeMapping[urlType]) {
+      setActiveTab(typeMapping[urlType]);
+    } else {
+      setActiveTab('전체');
+    }
+
+    if (urlTag && tagMapping[urlTag]) {
+      setActiveCategory(tagMapping[urlTag]);
+    } else {
+      setActiveCategory('전체');
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -78,11 +108,36 @@ const Board = () => {
     fetchPosts();
   }, [activeTab, activeCategory, currentPage]);
 
-  // 탭이나 카테고리 변경 시 페이지 리셋
+  // 탭이나 카테고리 변경 시 페이지 리셋 및 URL 업데이트
   useEffect(() => {
     setCurrentPage(1);
     setMaxVisitedPage(1); // 방문한 최대 페이지도 리셋
-  }, [activeTab, activeCategory]);
+    
+    // URL 파라미터 업데이트
+    const typeMapping = {
+      '질문': 'question',
+      '프롬프트 공유': 'share'
+    };
+    const tagMapping = {
+      '코딩': 'ps',
+      '이미지': 'img',
+      '영상': 'video'
+    };
+
+    const newParams = new URLSearchParams();
+    
+    if (activeTab !== '전체' && typeMapping[activeTab]) {
+      newParams.set('type', typeMapping[activeTab]);
+    }
+    
+    if (activeCategory !== '전체' && tagMapping[activeCategory]) {
+      newParams.set('tag', tagMapping[activeCategory]);
+    }
+    
+    // URL 업데이트 (페이지 새로고침 없이)
+    const newUrl = newParams.toString() ? `${location.pathname}?${newParams.toString()}` : location.pathname;
+    navigate(newUrl, { replace: true });
+  }, [activeTab, activeCategory, navigate, location.pathname]);
 
   const handleWriteClick = () => {
     navigate('/board/write');
@@ -117,7 +172,9 @@ const Board = () => {
                     <FilterButton
                       key={tab}
                       isActive={activeTab === tab}
-                      onClick={() => setActiveTab(tab)}
+                      onClick={() => {
+                        setActiveTab(tab);
+                      }}
                     >
                       {tab}
                     </FilterButton>
@@ -132,7 +189,9 @@ const Board = () => {
                 <CategoryFilter
                   categories={categories}
                   activeCategory={activeCategory}
-                  onCategoryChange={setActiveCategory}
+                  onCategoryChange={(category) => {
+                    setActiveCategory(category);
+                  }}
                 />
               </div>
             </div>

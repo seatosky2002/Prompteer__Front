@@ -273,25 +273,45 @@ const SharedPostDetail = () => {
 
   // 탭 클릭 핸들러
   const handleTabClick = (tab) => {
-    if (tab === '전체') {
-      navigate('/board');
-    } else if (tab === '질문') {
-      navigate('/board?type=question');
-    } else if (tab === '프롬프트 공유') {
-      navigate('/board?type=share');
+    const typeMapping = { '질문': 'question', '프롬프트 공유': 'share' };
+    const tagMapping = { '코딩': 'ps', '이미지': 'img', '영상': 'video' };
+
+    const params = new URLSearchParams();
+    
+    // 타입 필터 설정
+    if (tab !== '전체' && typeMapping[tab]) {
+      params.set('type', typeMapping[tab]);
     }
+    
+    // 기존 카테고리 필터 유지
+    if (activeCategory !== '전체' && tagMapping[activeCategory]) {
+      params.set('tag', tagMapping[activeCategory]);
+    }
+    
+    const queryString = params.toString();
+    navigate(queryString ? `/board?${queryString}` : '/board');
     setActiveTab(tab);
   };
 
   // 카테고리 클릭 핸들러  
   const handleCategoryClick = (category) => {
-    if (category === '코딩') {
-      navigate('/board?tag=ps');
-    } else if (category === '이미지') {
-      navigate('/board?tag=img');
-    } else if (category === '영상') {
-      navigate('/board?tag=video');
+    const typeMapping = { '질문': 'question', '프롬프트 공유': 'share' };
+    const tagMapping = { '코딩': 'ps', '이미지': 'img', '영상': 'video' };
+
+    const params = new URLSearchParams();
+    
+    // 카테고리 필터 설정
+    if (category !== '전체' && tagMapping[category]) {
+      params.set('tag', tagMapping[category]);
     }
+    
+    // 기존 타입 필터 유지
+    if (activeTab !== '전체' && typeMapping[activeTab]) {
+      params.set('type', typeMapping[activeTab]);
+    }
+    
+    const queryString = params.toString();
+    navigate(queryString ? `/board?${queryString}` : '/board');
     setActiveCategory(category);
   };
 
@@ -530,160 +550,7 @@ const SharedPostDetail = () => {
                         </div>
                       </div>
 
-                      {/* 기존 이미지/영상 섹션 (필요시 유지) */}
-                      {false && challengeData?.tag === 'img' ? (
-                        <div className="shared-post-image-section">
-                          <h4 className="section-title">생성된 이미지</h4>
-                          {shareData.img_share?.img_url ? (
-                            <div className="generated-image-container">
-                              <img 
-                                src={(() => {
-                                  const url = shareData.img_share.img_url;
-                                  console.log('Raw image URL from API:', url);
-                                  
-                                  if (url.startsWith('http')) {
-                                    return url;
-                                  }
-                                  
-                                  // URL 정리: media/media/ 중복 제거
-                                  let cleanUrl = url;
-                                  
-                                  // media/media/ 중복 제거 로직 개선
-                                  if (url.includes('media/media/')) {
-                                    // media/media/shares/... -> media/shares/...
-                                    cleanUrl = url.replace('media/media/', 'media/');
-                                  } else if (!url.startsWith('media/') && !url.startsWith('/')) {
-                                    // shares/img_shares/... -> media/shares/img_shares/...
-                                    cleanUrl = `media/${url}`;
-                                  } else if (url.startsWith('media/')) {
-                                    cleanUrl = url;
-                                  }
-                                  
-                                  // / 로 시작하지 않으면 추가
-                                  if (!cleanUrl.startsWith('/')) {
-                                    cleanUrl = `/${cleanUrl}`;
-                                  }
-                                  
-                                  const finalUrl = `http://localhost:8000${cleanUrl}`;
-                                  console.log('Final image URL:', finalUrl);
-                                  return finalUrl;
-                                })()}
-                                alt="생성된 이미지"
-                                className="generated-image"
-                                onLoad={(e) => {
-                                  console.log('✅ Image loaded successfully:', e.target.src);
-                                }}
-                                onError={(e) => {
-                                  console.error('❌ Image failed to load:', e.target.src);
-                                  console.log('Original URL from API:', shareData.img_share.img_url);
-                                  
-                                  // 여러 URL 시도
-                                  const originalUrl = shareData.img_share.img_url;
-                                  const alternativeUrls = [
-                                    `http://localhost:8000/media${originalUrl}`,
-                                    `http://localhost:8000/static${originalUrl}`,
-                                    `http://localhost:8000${originalUrl}`,
-                                    originalUrl
-                                  ];
-                                  
-                                  console.log('Trying alternative URLs:', alternativeUrls);
-                                  
-                                  e.target.parentElement.innerHTML = `
-                                    <div class="image-error-fallback">
-                                      <span>이미지를 불러올 수 없습니다</span>
-                                      <p>시도한 경로: ${e.target.src}</p>
-                                      <p>원본 URL: ${originalUrl}</p>
-                                    </div>
-                                  `;
-                                }}
-                              />
-                            </div>
-                          ) : (
-                            <div className="generated-image-container">
-                              <div className="image-error-fallback">
-                                <span>이미지가 없습니다</span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ) : challengeData?.tag === 'video' ? (
-                        <div className="shared-post-video-section">
-                          <h4 className="section-title">생성된 영상</h4>
-                          {shareData.video_share?.video_url ? (
-                            <div className="generated-video-container">
-                              <video 
-                                src={(() => {
-                                  const url = shareData.video_share.video_url;
-                                  console.log('Raw video URL from API:', url);
-                                  
-                                  if (url.startsWith('http')) {
-                                    return url;
-                                  }
-                                  
-                                  // URL 정리: media/media/ 중복 제거
-                                  let cleanUrl = url;
-                                  
-                                  // media/media/ 중복 제거 로직 개선
-                                  if (url.includes('media/media/')) {
-                                    // media/media/shares/... -> media/shares/...
-                                    cleanUrl = url.replace('media/media/', 'media/');
-                                  } else if (!url.startsWith('media/') && !url.startsWith('/')) {
-                                    // shares/video_shares/... -> media/shares/video_shares/...
-                                    cleanUrl = `media/${url}`;
-                                  } else if (url.startsWith('media/')) {
-                                    cleanUrl = url;
-                                  }
-                                  
-                                  // / 로 시작하지 않으면 추가
-                                  if (!cleanUrl.startsWith('/')) {
-                                    cleanUrl = `/${cleanUrl}`;
-                                  }
-                                  
-                                  const finalUrl = `http://localhost:8000${cleanUrl}`;
-                                  console.log('Final video URL:', finalUrl);
-                                  return finalUrl;
-                                })()}
-                                controls
-                                className="generated-video"
-                                onLoadStart={(e) => {
-                                  console.log('✅ Video loading started:', e.target.src);
-                                }}
-                                onError={(e) => {
-                                  console.error('❌ Video failed to load:', e.target.src);
-                                  console.log('Original URL from API:', shareData.video_share.video_url);
-                                  
-                                  // 여러 URL 시도
-                                  const originalUrl = shareData.video_share.video_url;
-                                  const alternativeUrls = [
-                                    `http://localhost:8000/media${originalUrl}`,
-                                    `http://localhost:8000/static${originalUrl}`,
-                                    `http://localhost:8000${originalUrl}`,
-                                    originalUrl
-                                  ];
-                                  
-                                  console.log('Trying alternative URLs:', alternativeUrls);
-                                  
-                                  e.target.parentElement.innerHTML = `
-                                    <div class="video-error-fallback">
-                                      <span>영상을 불러올 수 없습니다</span>
-                                      <p>시도한 경로: ${e.target.src}</p>
-                                      <p>원본 URL: ${originalUrl}</p>
-                                    </div>
-                                  `;
-                                }}
-                              >
-                                Your browser does not support the video tag.
-                              </video>
-                            </div>
-                          ) : (
-                            <div className="generated-video-container">
-                              <div className="video-error-fallback">
-                                <span>영상이 없습니다</span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ) : null}
+
                     </div>
                   </div>
                 </div>

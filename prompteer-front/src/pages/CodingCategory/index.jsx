@@ -17,6 +17,7 @@ const CodingCategory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [featuredChallenge, setFeaturedChallenge] = useState(null);
 
   // 로그인 상태 체크
   useEffect(() => {
@@ -128,6 +129,39 @@ const CodingCategory = () => {
     fetchChallenges();
   }, []);
 
+  // 추천 챌린지 가져오기
+  useEffect(() => {
+    const fetchFeaturedChallenge = async () => {
+      try {
+        // 첫 번째 챌린지나 특정 추천 챌린지를 가져오기
+        const response = await fetch("http://localhost:8000/challenges/ps/");
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.length > 0) {
+            // 첫 번째 챌린지를 추천으로 설정 (나중에 추천 로직 개선 가능)
+            const featured = data[0];
+            setFeaturedChallenge({
+              id: featured.id,
+              title: featured.title || '제목 없음',
+              challengeNumber: featured.id
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch featured challenge:', error);
+        // 에러 시 기본값 설정
+        setFeaturedChallenge({
+          id: 1,
+          title: '코딩 챌린지',
+          challengeNumber: 1
+        });
+      }
+    };
+
+    fetchFeaturedChallenge();
+  }, []);
+
   // 필터링 및 정렬
   const getFilteredAndSortedChallenges = () => {
     let filtered = challenges;
@@ -159,8 +193,13 @@ const CodingCategory = () => {
   };
 
   const handleChallengeNow = () => {
-    // 추천 챌린지 #3으로 고정 이동
-    navigate("/coding/problem/3");
+    // 추천 챌린지로 이동 (API에서 가져온 데이터 사용)
+    if (featuredChallenge?.id) {
+      navigate(`/coding/problem/${featuredChallenge.id}`);
+    } else {
+      // 추천 챌린지가 없으면 첫 번째 챌린지로 이동
+      navigate("/coding/problem/1");
+    }
   };
 
   return (
@@ -176,8 +215,12 @@ const CodingCategory = () => {
             <div className="featured-details">
               <div className="status-badge">추천</div>
               <div className="featured-info">
-                <h3 className="challenge-number">Challenge #3</h3>
-                <p className="challenge-name">Longest Substring Without Repeating Characters</p>
+                <h3 className="challenge-number">
+                  Challenge #{featuredChallenge?.challengeNumber || 1}
+                </h3>
+                <p className="challenge-name">
+                  {featuredChallenge?.title || '로딩 중...'}
+                </p>
               </div>
               <button
                 className="challenge-now-btn"

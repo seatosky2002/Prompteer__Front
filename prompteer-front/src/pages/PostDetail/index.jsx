@@ -244,13 +244,30 @@ const PostDetail = () => {
     const tagMapping = { '코딩': 'ps', '이미지': 'img', '영상': 'video' };
 
     const params = new URLSearchParams();
-    if (filterType === 'type' && value !== '전체') {
-      params.set('type', typeMapping[value]);
-    } else if (filterType === 'tag' && value !== '전체') {
-      params.set('tag', tagMapping[value]);
+    
+    // 현재 활성화된 필터 유지하면서 새로운 필터 적용
+    if (filterType === 'type') {
+      // 타입 필터 변경
+      if (value !== '전체' && typeMapping[value]) {
+        params.set('type', typeMapping[value]);
+      }
+      // 기존 카테고리 필터 유지
+      if (activeCategory !== '전체' && tagMapping[activeCategory]) {
+        params.set('tag', tagMapping[activeCategory]);
+      }
+    } else if (filterType === 'tag') {
+      // 카테고리 필터 변경
+      if (value !== '전체' && tagMapping[value]) {
+        params.set('tag', tagMapping[value]);
+      }
+      // 기존 타입 필터 유지
+      if (activeTab !== '전체' && typeMapping[activeTab]) {
+        params.set('type', typeMapping[activeTab]);
+      }
     }
     
-    navigate(`/board?${params.toString()}`);
+    const queryString = params.toString();
+    navigate(queryString ? `/board?${queryString}` : '/board');
   };
 
   const handleProblemView = () => {

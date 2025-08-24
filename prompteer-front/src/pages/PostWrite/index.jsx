@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import { API_ENDPOINTS } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import FilterButton from '../../components/ui/FilterButton/index.jsx';
@@ -208,7 +209,7 @@ const PostWrite = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/posts/', {
+      const response = await fetch(API_ENDPOINTS.POSTS + '/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

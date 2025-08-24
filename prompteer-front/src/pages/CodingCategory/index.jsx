@@ -81,7 +81,7 @@ const CodingCategory = () => {
         setLoading(true);
 
         // 직접 API 호출
-        const response = await fetch("http://localhost:8000/challenges/ps/");
+        const response = await fetch("/api/challenges/ps/");
         console.log("API Response status:", response.status);
 
         if (!response.ok) {
@@ -134,7 +134,7 @@ const CodingCategory = () => {
     const fetchFeaturedChallenge = async () => {
       try {
         // 첫 번째 챌린지나 특정 추천 챌린지를 가져오기
-        const response = await fetch("http://localhost:8000/challenges/ps/");
+        const response = await fetch("/api/challenges/ps/");
         
         if (response.ok) {
           const data = await response.json();

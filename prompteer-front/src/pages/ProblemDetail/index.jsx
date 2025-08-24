@@ -41,7 +41,7 @@ const ProblemDetail = () => {
       try {
         setLoading(true);
         // PS 카테고리의 프롬프트 공유 게시글들을 가져옴
-        const response = await fetch('http://localhost:8000/posts/?types=share&tags=ps');
+        const response = await fetch('/api/posts/?types=share&tags=ps');
         if (response.ok) {
           const data = await response.json();
           setPsSharePosts(data);

@@ -19,7 +19,7 @@ const CodingDetailPrompt = ({ isOpen, onClose, challengeData }) => {
         <div className="modal-content">
           {/* 4개 요소 가로 배치 */}
           <div className="content-sectionss">
-            {/* 성능 정보 - 왼쪽 */}
+            {/* 성능 정보 - 왼쪽 
             <div className="performance-section">
               <div className="performance-info">
                 <div className="performance-item">
@@ -41,13 +41,12 @@ const CodingDetailPrompt = ({ isOpen, onClose, challengeData }) => {
                   </span>
                 </div>
               </div>
-            </div>
+            </div>*/}
 
             {/* 프롬프트 패널 - 중앙 왼쪽 */}
             <div className="prompt-panel">
               <div className="panel-content">
-                {challengeData?.prompt ||
-                  "BFS 알고리즘을 사용해서 그래프의 최단 경로를 찾는 문제입니다. 주어진 그래프에서 시작점에서 도착점까지의 최단 거리를 계산하세요."}
+                {challengeData?.prompt || "프롬프트를 불러오지 못했습니다."}
               </div>
             </div>
 
@@ -55,7 +54,7 @@ const CodingDetailPrompt = ({ isOpen, onClose, challengeData }) => {
             <div className="output-panel">
               <div className="panel-content">
                 <pre className="output-code">
-                  {challengeData?.output || "> 1\n> 6\n> 3\n> 30"}
+                  {challengeData?.output || "실행 결과를 불러오지 못했습니다."}
                 </pre>
               </div>
             </div>
@@ -63,7 +62,7 @@ const CodingDetailPrompt = ({ isOpen, onClose, challengeData }) => {
             {/* 좋아요 - 오른쪽 */}
             <div className="likes-section">
               <span className="heart-icon">❤️</span>
-              <span className="likes-count">{challengeData?.likes || 10}</span>
+              <span className="likes-count">{challengeData?.likes}</span>
             </div>
           </div>
         </div>

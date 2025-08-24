@@ -8,12 +8,12 @@ const API_BASE_URL = "http://localhost:8000/";
 
 // 누구나 접근 가능한 API들
 export const instance = axios.create({
-  baseURL: API_BASE_URL
+  baseURL: API_BASE_URL,
 });
 
 // 로그인 해야지 접근 가능한 API들
 export const instanceWithToken = axios.create({
-  baseURL: API_BASE_URL
+  baseURL: API_BASE_URL,
 });
 
 // request interceptor. 모든 '요청'에 토큰 추가
@@ -56,6 +56,7 @@ instanceWithToken.interceptors.response.use(
       console.warn("Token expired or invalid. Redirecting to login...");
       localStorage.removeItem("access_token");
       localStorage.removeItem("token_type");
+      alert("로그인을 해주세요");
       window.location.href = "/login";
       return Promise.reject(new Error("Authentication failed"));
     } else {

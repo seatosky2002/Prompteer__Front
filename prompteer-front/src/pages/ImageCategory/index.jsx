@@ -6,6 +6,7 @@ import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { searchChallenges } from '../../services/challengeApi.js';
 import { getCurrentUser } from '../../apis/api.js';
+import { convertImagePathToUrl, getImageProps } from '../../utils/imageUrlHelper';
 import './ImageCategory.css';
 
 const ImageCategory = () => {
@@ -95,28 +96,14 @@ const ImageCategory = () => {
         const transformedData = data.map((challenge) => {
           let referenceImageUrl = null;
           
-          // Reference 이미지 URL 처리 (Share 이미지와 동일한 패턴 적용)
+          // Reference 이미지 URL 처리
           if (challenge.img_challenge?.references && challenge.img_challenge.references.length > 0) {
             const reference = challenge.img_challenge.references[0];
             console.log(`Challenge ${challenge.id} reference:`, reference);
             
             if (reference.file_path) {
-              let processedUrl = reference.file_path;
-              console.log(`Challenge ${challenge.id} original file_path:`, processedUrl);
-              
-              // 절대 경로면 상대 경로로 변환
-              if (processedUrl.startsWith('/')) {
-                processedUrl = processedUrl.substring(1);
-              }
-              
-              // media/media/ 중복 제거 (Share 이미지와 동일한 로직)
-              if (processedUrl.includes('media/media/')) {
-                processedUrl = processedUrl.replace('media/media/', 'media/');
-              }
-              
-              // Share 이미지와 동일한 패턴: /api/경로 형태로 구성
-              referenceImageUrl = `/api/${processedUrl}`;
-              console.log(`Challenge ${challenge.id} reference image:`, referenceImageUrl);
+              referenceImageUrl = convertImagePathToUrl(reference.file_path);
+              console.log(`Challenge ${challenge.id} reference image converted:`, reference.file_path, '→', referenceImageUrl);
             }
           }
           
@@ -205,17 +192,9 @@ const ImageCategory = () => {
               // console.log(`Raw imageUrl from API:`, imageUrl);
 
               if (imageUrl) {
-                // API에서 반환된 경로에서 첫 번째 'media/' 제거
-                let processedUrl = imageUrl;
-                if (processedUrl.startsWith("media/")) {
-                  processedUrl = processedUrl.substring(6); // 'media/' 제거
-                }
-
-                
-                const fullImageUrl = processedUrl.startsWith('http') ? processedUrl : `/api/${processedUrl}`;
-
-                mediaMap[challenge.id] = fullImageUrl;
-                // console.log(`Set image for challenge ${challenge.id}:`, fullImageUrl);
+                const convertedUrl = convertImagePathToUrl(imageUrl);
+                mediaMap[challenge.id] = convertedUrl;
+                console.log(`Set image for challenge ${challenge.id}:`, imageUrl, '→', convertedUrl);
               } else {
                 // 좋아요가 없으면 랜덤 선택
                 const randomShare =
@@ -226,19 +205,11 @@ const ImageCategory = () => {
                   randomShare.image ||
                   randomShare.img;
                 if (randomImageUrl) {
-                  // API에서 반환된 경로에서 첫 번째 'media/' 제거
-                  let processedUrl = randomImageUrl;
-                  if (processedUrl.startsWith("media/")) {
-                    processedUrl = processedUrl.substring(6); // 'media/' 제거
-                  }
-
-                  
-                  const fullRandomImageUrl = processedUrl.startsWith('http') ? processedUrl : `/api/${processedUrl}`;
-
-                  mediaMap[challenge.id] = fullRandomImageUrl;
-                  // console.log(`Set random image for challenge ${challenge.id}:`, fullRandomImageUrl);
+                  const convertedRandomUrl = convertImagePathToUrl(randomImageUrl);
+                  mediaMap[challenge.id] = convertedRandomUrl;
+                  console.log(`Set random image for challenge ${challenge.id}:`, randomImageUrl, '→', convertedRandomUrl);
                 } else {
-                  // console.log(`No image URL found for challenge ${challenge.id} in share:`, randomShare);
+                  console.log(`No image URL found for challenge ${challenge.id} in share:`, randomShare);
                 }
               }
             } else {
@@ -438,22 +409,8 @@ const ImageCategory = () => {
                     {(challenge.referenceImage || challengeMedia[challenge.id]) && (
                       <img
                         className="challenge-image"
-                        src={challenge.referenceImage || challengeMedia[challenge.id]}
+                        {...getImageProps(challenge.referenceImage || challengeMedia[challenge.id])}
                         alt={`Challenge ${challenge.id}`}
-                        onError={(e) => {
-                          console.error(`Image load error for challenge ${challenge.id}:`, e.target.src);
-                          // Reference 이미지 실패 시 Share 이미지로 fallback
-                          if (challenge.referenceImage && e.target.src.includes(challenge.referenceImage.split('/').pop())) {
-                            if (challengeMedia[challenge.id]) {
-                              e.target.src = challengeMedia[challenge.id];
-                              console.log(`Fallback to share image for challenge ${challenge.id}:`, challengeMedia[challenge.id]);
-                            } else {
-                              e.target.style.display = "none";
-                            }
-                          } else {
-                            e.target.style.display = "none";
-                          }
-                        }}
                       />
                     )}
                     {/* Frame 21 - Category Badge (Top Right) */}

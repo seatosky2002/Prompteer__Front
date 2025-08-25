@@ -30,6 +30,33 @@
   box-sizing: border-box;
 }
 
+/* 참조 비디오 섹션 스타일 */
+.reference-video-section {
+  margin-bottom: 24px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.reference-video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+  max-height: 200px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 2px solid #e9ecef;
+}
+
+.reference-video {
+  max-width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
 /* Main 레이아웃 - 코딩 문제와 동일한 3등분 구조 */
 .main-layout {
   display: flex;

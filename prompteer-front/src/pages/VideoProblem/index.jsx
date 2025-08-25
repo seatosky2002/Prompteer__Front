@@ -4,6 +4,7 @@ import { API_ENDPOINTS, API_BASE_URL } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { getCurrentUser } from '../../apis/api.js';
+import { convertImagePathToUrl, getImageProps } from '../../utils/imageUrlHelper';
 import './VideoProblem.css';
 
 const VideoProblem = () => {
@@ -76,10 +77,21 @@ const VideoProblem = () => {
         const data = await response.json();
         console.log('✅ 비디오 챌린지 데이터 로드 성공:', data);
         
+        // 참조 비디오 URL 처리
+        let referenceVideoUrl = null;
+        if (data.video_challenge?.references && data.video_challenge.references.length > 0) {
+          const reference = data.video_challenge.references[0];
+          if (reference.file_path) {
+            referenceVideoUrl = convertImagePathToUrl(reference.file_path);
+            console.log('Reference video converted:', reference.file_path, '→', referenceVideoUrl);
+          }
+        }
+        
         const transformedData = {
           title: data.title || '제목 없음',
           category: data.tag === 'video' ? '영상' : data.tag || '카테고리 없음',
           difficulty: data.level === 'Easy' ? '초급' : data.level === 'Medium' ? '중급' : data.level === 'Hard' ? '고급' : data.level || '중급',
+          referenceVideo: referenceVideoUrl,
           sections: [
             {
               title: '📝 상황 설명',
@@ -164,12 +176,8 @@ const VideoProblem = () => {
           let rawUrl = share.video_share?.video_url || share.video_url || share.url;
 
           if (rawUrl) {
-            // media/media/ 중복 제거
-            let cleanUrl = rawUrl;
-            if (rawUrl.includes('media/media/')) {
-              cleanUrl = rawUrl.replace('media/media/', 'media/');
-            }
-            videoUrl = `${API_BASE_URL}/${cleanUrl}`;
+            videoUrl = convertImagePathToUrl(rawUrl);
+            console.log(`Video ${index} URL converted:`, rawUrl, '→', videoUrl);
           }
           
           // 현재 사용자가 이 공유에 좋아요를 눌렀는지 확인
@@ -282,18 +290,11 @@ const VideoProblem = () => {
       console.log('📹 URL 타입:', typeof videoUrl);
       console.log('📹 URL 내용 상세:', videoUrl);
       
-      // URL 처리
+      // URL 처리 - 유틸리티 함수 사용
       console.log('🔧 URL 처리 시작:');
       console.log('  - 원본 URL:', videoUrl);
       
-      // media/media/ 중복 제거
-      let cleanUrl = videoUrl;
-      if (videoUrl.includes('media/media/')) {
-        cleanUrl = videoUrl.replace('media/media/', 'media/');
-        console.log('  - media/media/ 중복 제거 후:', cleanUrl);
-      }
-      
-      const fullVideoUrl = `${API_BASE_URL}/${cleanUrl}`;
+      const fullVideoUrl = convertImagePathToUrl(videoUrl);
       console.log('✅ 최종 생성된 비디오 URL:', fullVideoUrl);
       console.log('🎯 비디오 상태 업데이트 중...');
       
@@ -462,6 +463,25 @@ const VideoProblem = () => {
                 </div>
 
                 <div className="problem-content">
+                  {/* 참조 비디오 섹션 */}
+                  {problemData.referenceVideo && (
+                    <div className="problem-section reference-video-section">
+                      <div className="section-header">
+                        <h3 className="section-title">🎬 참조 비디오</h3>
+                      </div>
+                      <div className="section-content">
+                        <div className="reference-video-container">
+                          <video 
+                            {...getImageProps(problemData.referenceVideo)}
+                            controls
+                            className="reference-video"
+                            preload="metadata"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   {problemData.sections.map((section, index) => (
                     <div key={index} className="problem-section">
                       <div className="section-header">
@@ -513,7 +533,11 @@ const VideoProblem = () => {
                       <div className="generated-result">
                         <div className="generated-video-placeholder">
                           {generatedVideoUrl ? (
-                            <video src={generatedVideoUrl} controls style={{ maxWidth: '100%', maxHeight: '100%' }} />
+                            <video 
+                              {...getImageProps(generatedVideoUrl)} 
+                              controls 
+                              style={{ maxWidth: '100%', maxHeight: '100%' }} 
+                            />
                           ) : (
                             <div className="video-placeholder">생성된 비디오</div>
                           )}
@@ -587,12 +611,8 @@ const VideoProblem = () => {
                         >
                           {share.video ? (
                             <video 
-                              src={share.video} 
+                              {...getImageProps(share.video)}
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              onError={(e) => {
-                                e.target.style.display = 'none';
-                                e.target.nextSibling.style.display = 'flex';
-                              }}
                             />
                           ) : null}
                           <div className="video-placeholder-text" style={{ display: share.video ? 'none' : 'flex' }}>
@@ -638,7 +658,11 @@ const VideoProblem = () => {
             <div className="modal-content">
               <div className="modal-video-section">
                 <div className="modal-video-placeholder">
-                  <video src={selectedVideo.video} controls style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  <video 
+                    {...getImageProps(selectedVideo.video)} 
+                    controls 
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                  />
                 </div>
               </div>
               <div className="modal-prompt-section">

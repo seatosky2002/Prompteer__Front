@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import { API_ENDPOINTS, API_BASE_URL } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { getCurrentUser } from '../../apis/api.js';
+import { convertImagePathToUrl, handleImageError, getImageProps } from '../../utils/imageUrlHelper';
 import './ImageProblem.css';
 
 const ImageProblem = () => {
@@ -78,33 +80,23 @@ const ImageProblem = () => {
         console.log('Data ID:', data.id);
         console.log('Data keys:', Object.keys(data));
         
+        // 참조 이미지 URL 처리
+        let referenceImageUrl = null;
+        if (data.img_challenge?.references && data.img_challenge.references.length > 0) {
+          const reference = data.img_challenge.references[0];
+          if (reference.file_path) {
+            referenceImageUrl = convertImagePathToUrl(reference.file_path);
+            console.log('Reference image converted:', reference.file_path, '→', referenceImageUrl);
+          }
+        }
+
         // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
         const transformedData = {
           title: data.title || '제목 없음',
           category: data.tag === 'img' ? '이미지' : data.tag === 'video' ? '영상' : data.tag === 'ps' ? 'PS' : data.tag || '카테고리 없음',
           difficulty: data.level === 'Easy' ? '초급' : data.level === 'Medium' ? '중급' : data.level === 'Hard' ? '고급' : data.level || '중급',
-          sections: [
-            {
-              title: '📝 상황 설명',
-              content: data.content || '문제 상황을 불러올 수 없습니다.'
-            },
-            {
-              title: '🏞️ 장면',
-              content: data.content ? data.content.split('.')[0] + '.' : '장면을 불러올 수 없습니다.'
-            },
-            {
-              title: '🎨 스타일 & 주요 요소',
-              content: data.content || '스타일과 주요 요소를 불러올 수 없습니다.'
-            },
-            {
-              title: '📜 목표',
-              content: '주요 시각 요소와 분위기를 모두 포함한 프롬프트를 작성하세요. 단순 나열이 아닌 자연스럽고 상세한 서술형 프롬프트를 작성할 것.'
-            },
-            {
-              title: '🖍️ 채점방식',
-              content: '채점 방식: 커뮤니티 평가 100%'
-            }
-          ]
+          referenceImage: referenceImageUrl,
+          content: data.content || '문제 내용을 불러올 수 없습니다.'
         };
         
         setProblemData(transformedData);
@@ -118,28 +110,7 @@ const ImageProblem = () => {
           title: `Challenge #${id}\n데이터 로딩 실패`,
           category: '이미지',
           difficulty: '중급',
-          sections: [
-            {
-              title: '📝 상황 설명',
-              content: '서버에서 데이터를 불러올 수 없습니다.'
-            },
-            {
-              title: '🏞️ 장면',
-              content: '장면을 불러올 수 없습니다.'
-            },
-            {
-              title: '🎨 스타일 & 주요 요소',
-              content: '스타일과 주요 요소를 불러올 수 없습니다.'
-            },
-            {
-              title: '📜 목표',
-              content: '주요 시각 요소와 분위기를 모두 포함한 프롬프트를 작성하세요.'
-            },
-            {
-              title: '🖍️ 채점방식',
-              content: '채점 방식: 커뮤니티 평가 100%'
-            }
-          ]
+          content: '서버에서 데이터를 불러올 수 없습니다.'
         });
       } finally {
         setLoading(false);
@@ -177,8 +148,20 @@ const ImageProblem = () => {
         }
         
         const data = await response.json();
-        console.log('Shared images data:', data);
-        console.log('First share structure:', data[0] ? JSON.stringify(data[0], null, 2) : 'No data');
+        console.log('📊 공유 이미지 데이터 수신:', data);
+        console.log('📊 데이터 개수:', data.length);
+        console.log('📊 첫 번째 공유 구조:', data[0] ? JSON.stringify(data[0], null, 2) : 'No data');
+        
+        // 모든 공유의 이미지 URL 정보 로깅
+        data.forEach((share, index) => {
+          console.log(`📊 Share ${index} 원본 데이터:`, {
+            id: share.id,
+            img_share: share.img_share,
+            img_url: share.img_url,
+            image_url: share.image_url,
+            url: share.url
+          });
+        });
         
         if (data.length === 0) {
           console.log('No shared images found for this challenge');
@@ -212,40 +195,23 @@ const ImageProblem = () => {
           
           // 이미지 URL을 찾는 로직 개선
           let imageUrl = null;
+          let rawImgUrl = null;
+          
+          // 다양한 필드에서 이미지 URL 찾기
           if (share.img_share?.img_url) {
-            const imgUrl = share.img_share.img_url;
-            console.log(`Original img_url: ${imgUrl}`);
-            
-            // media/media/... 형태의 URL을 media/... 형태로 변환
-            if (imgUrl.startsWith('media/media/')) {
-              // 'media/media/' 부분을 'media/'로 변경
-              imageUrl = `/api/media/${imgUrl.substring(12)}`;
-              console.log(`Converted URL: ${imageUrl}`);
-            } else {
-              imageUrl = `/api/${imgUrl}`;
-              console.log(`Direct URL: ${imageUrl}`);
-            }
+            rawImgUrl = share.img_share.img_url;
           } else if (share.img_url) {
-            const imgUrl = share.img_url;
-            if (imgUrl.startsWith('media/media/')) {
-              imageUrl = `/api/media/${imgUrl.substring(12)}`;
-            } else {
-              imageUrl = `/api/${imgUrl}`;
-            }
+            rawImgUrl = share.img_url;
           } else if (share.image_url) {
-            const imgUrl = share.image_url;
-            if (imgUrl.startsWith('media/media/')) {
-              imageUrl = `/api/media/${imgUrl.substring(12)}`;
-            } else {
-              imageUrl = `/api/${imgUrl}`;
-            }
+            rawImgUrl = share.image_url;
           } else if (share.url) {
-            const imgUrl = share.url;
-            if (imgUrl.startsWith('media/media/')) {
-              imageUrl = `/api/media/${imgUrl.substring(12)}`;
-            } else {
-              imageUrl = `/api/${imgUrl}`;
-            }
+            rawImgUrl = share.url;
+          }
+          
+          if (rawImgUrl) {
+            console.log(`Original img_url: ${rawImgUrl}`);
+            imageUrl = convertImagePathToUrl(rawImgUrl);
+            console.log(`🔄 URL 변환 결과: ${rawImgUrl} → ${imageUrl}`);
           }
           
           console.log(`Share ${index} image URL:`, imageUrl);
@@ -290,50 +256,9 @@ const ImageProblem = () => {
           console.log('🔥 500 에러 - 백엔드 서버 오류');
         }
         
-        console.log('🔄 임시 데이터로 대체');
-        // 에러 시 기본 데이터 사용 (실제 백엔드 이미지 URL 사용)
-        setSharedImages([
-          {
-            id: 1,
-            prompt: '일상 풍경을 묘사한 프롬프트',
-            image: `${API_BASE_URL}/media/shares/img_shares/1_generated_image_1755844087.png`,
-            likes: [],
-            likes_count: 15,
-            isLiked: false,
-            user: { username: 'user1' },
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 2,
-            prompt: '자연스러운 풍경 묘사',
-            image: `${API_ENDPOINTS.MEDIA}/shares/img_shares/1_generated_image_1755845877.png`,
-            likes: [],
-            likes_count: 12,
-            isLiked: false,
-            user: { username: 'user2' },
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 3,
-            prompt: '도시 풍경 묘사',
-            image: `${API_ENDPOINTS.MEDIA}/shares/img_shares/1_generated_image_1755846010.png`,
-            likes: [],
-            likes_count: 8,
-            isLiked: false,
-            user: { username: 'user3' },
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 4,
-            prompt: '자연과 도시의 조화',
-            image: `${API_ENDPOINTS.MEDIA}/shares/img_shares/1_generated_image_1755846584.png`,
-            likes: [],
-            likes_count: 20,
-            isLiked: false,
-            user: { username: 'user4' },
-            created_at: new Date().toISOString()
-          }
-        ]);
+        console.log('❌ 이미지 공유 데이터를 불러올 수 없습니다.');
+        // 에러 시 빈 배열로 설정
+        setSharedImages([]);
       } finally {
         setLoadingImages(false);
       }
@@ -383,28 +308,14 @@ const ImageProblem = () => {
 
       const imageUrl = await response.json();
       console.log('✅ 이미지 생성 성공! 백엔드 응답:', imageUrl);
+      console.log('백엔드 응답 타입:', typeof imageUrl);
+      console.log('백엔드 응답 상세:', JSON.stringify(imageUrl, null, 2));
       
-      // URL 처리 로직
-      let cleanUrl = imageUrl;
-      if (imageUrl.startsWith('http')) {
-        // 이미 완전한 URL이면 그대로 사용
-        cleanUrl = imageUrl;
-      } else {
-        // 상대 경로인 경우 API_BASE_URL과 결합
-        // /api/로 시작하는 경우 /api를 제거
-        if (imageUrl.startsWith('/api/')) {
-          cleanUrl = imageUrl.substring(4); // '/api/' 제거
-        }
-        // media/media/ 중복 제거
-        if (cleanUrl.includes('media/media/')) {
-          cleanUrl = cleanUrl.replace('media/media/', 'media/');
-        }
-        cleanUrl = `${API_BASE_URL}/${cleanUrl}`;
-      }
+      // 백엔드에서 받은 경로를 HTTP URL로 변환
+      const convertedUrl = convertImagePathToUrl(imageUrl);
+      console.log('🔄 URL 변환 결과:', imageUrl, '→', convertedUrl);
       
-      const fullImageUrl = cleanUrl;
-      console.log('🖼️ 최종 이미지 URL:', fullImageUrl);
-      setGeneratedImageUrl(fullImageUrl);
+      setGeneratedImageUrl(convertedUrl);
       setIsGenerated(true);
     } catch (error) {
       console.error('❌ 이미지 생성 실패:', error);
@@ -577,16 +488,28 @@ const ImageProblem = () => {
                 </div>
 
                 <div className="problem-content">
-                  {problemData.sections.map((section, index) => (
-                    <div key={index} className="problem-section">
+                  {/* 참조 이미지 섹션 */}
+                  {problemData.referenceImage && (
+                    <div className="problem-section reference-image-section">
                       <div className="section-header">
-                        <h3 className="section-title">{section.title}</h3>
+                        <h3 className="section-title">🖼️ 참조 이미지</h3>
                       </div>
                       <div className="section-content">
-                        <p className="section-text">{section.content}</p>
+                        <div className="reference-image-container">
+                          <img 
+                            {...getImageProps(problemData.referenceImage)}
+                            alt="참조 이미지"
+                            className="reference-image"
+                          />
+                        </div>
                       </div>
                     </div>
-                  ))}
+                  )}
+                  
+                  {/* 마크다운 콘텐츠 렌더링 */}
+                  <div className="markdown-content">
+                    <ReactMarkdown>{problemData.content}</ReactMarkdown>
+                  </div>
                 </div>
               </div>
 
@@ -631,20 +554,11 @@ const ImageProblem = () => {
                         <div className="generated-image-placeholder">
                           {generatedImageUrl ? (
                             <img 
-                              src={generatedImageUrl} 
+                              {...getImageProps(generatedImageUrl)}
                               alt="Generated" 
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                               onLoad={() => {
                                 console.log('✅ Generated image loaded successfully:', generatedImageUrl);
-                              }}
-                              onError={(e) => {
-                                console.error('❌ Generated image failed to load:', generatedImageUrl);
-                                e.target.parentElement.innerHTML = `
-                                  <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 200px; background: #F8F9FA; border: 2px dashed #DEE2E6; border-radius: 8px; color: #6C757D;">
-                                    <span>생성된 이미지를 불러올 수 없습니다</span>
-                                    <p style="font-size: 12px; color: #ADB5BD; margin: 5px 0; word-break: break-all;">${generatedImageUrl}</p>
-                                  </div>
-                                `;
                               }}
                             />
                           ) : (
@@ -723,45 +637,9 @@ const ImageProblem = () => {
                         >
                           {share.image ? (
                             <img 
-                              src={(() => {
-                                const url = share.image;
-                                console.log('Processing shared image URL:', url);
-                                
-                                // 이미 http로 시작하는 완전한 URL인 경우 그대로 사용
-                                if (url.startsWith('http')) {
-                                  return url;
-                                }
-                                
-                                // URL 처리 로직
-                                let cleanUrl = url;
-                                if (url.startsWith('http')) {
-                                  // 이미 완전한 URL이면 그대로 사용
-                                  cleanUrl = url;
-                                } else {
-                                  // 상대 경로인 경우 API_BASE_URL과 결합
-                                  // /api/로 시작하는 경우 /api를 제거
-                                  if (url.startsWith('/api/')) {
-                                    cleanUrl = url.substring(4); // '/api/' 제거
-                                  }
-                                  // media/media/ 중복 제거
-                                  if (cleanUrl.includes('media/media/')) {
-                                    cleanUrl = cleanUrl.replace('media/media/', 'media/');
-                                  }
-                                  cleanUrl = `${API_BASE_URL}/${cleanUrl}`;
-                                }
-                                
-                                const finalUrl = cleanUrl;
-                                console.log('Final shared image URL:', finalUrl);
-                                return finalUrl;
-                              })()}
+                              {...getImageProps(share.image)}
                               alt={`Shared submission ${i + 1}`} 
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              onError={(e) => {
-                                console.error(`Failed to load image for share ${share.id}:`, e.target.src);
-                                console.log('Original share.image:', share.image);
-                                e.target.style.display = 'none';
-                                e.target.nextSibling.style.display = 'flex';
-                              }}
                             />
                           ) : null}
                           <div className="image-placeholder-text" style={{ display: share.image ? 'none' : 'flex' }}>
@@ -808,7 +686,7 @@ const ImageProblem = () => {
             <div className="modal-content">
               <div className="modal-image-section">
                 <div className="modal-image-placeholder">
-                  <img src={selectedImage.image} alt="Selected submission" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  <img {...getImageProps(selectedImage.image)} alt="Selected submission" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </div>
               </div>
               <div className="modal-prompt-section">

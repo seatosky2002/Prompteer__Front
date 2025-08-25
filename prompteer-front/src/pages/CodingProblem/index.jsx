@@ -280,10 +280,7 @@ const CodingProblem = () => {
         const likesSorted = sortedData.sort((a, b) => (b.likes || 0) - (a.likes || 0));
         console.log('Likes sorted:', likesSorted.map(item => ({ id: item.id, likes: item.likes })));
         return likesSorted;
-      case 'attempts':
-        const attemptsSorted = sortedData.sort((a, b) => (b.attempts || 0) - (a.attempts || 0));
-        console.log('Attempts sorted:', attemptsSorted.map(item => ({ id: item.id, attempts: item.attempts })));
-        return attemptsSorted;
+
       case 'random':
         return sortedData.sort(() => Math.random() - 0.5);
       default:
@@ -821,12 +818,7 @@ ${editorCode}
                     >
                       랜덤 순
                     </button>
-                    <button 
-                      className={`sort-btn ${sortBy === 'attempts' ? 'active' : ''}`}
-                      onClick={() => setSortBy('attempts')}
-                    >
-                      수동 수정 횟수 순
-                    </button>
+
                   </div>
                 </div>
               </div>

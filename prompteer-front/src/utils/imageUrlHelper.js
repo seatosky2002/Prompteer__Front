@@ -105,21 +105,9 @@ export const handleImageError = (e, originalPath) => {
 
   switch (retryCount) {
     case 1:
-      // 첫 번째 대안: Reference 이미지면 api/api 경로, 아니면 API 경로
-      let altUrl1;
-      if (cleanPath.includes('challenges/img_references') || cleanPath.includes('challenges/video_references')) {
-        if (cleanPath.startsWith('challenges/')) {
-          altUrl1 = `${API_BASE_URL}/api/media/${cleanPath}`;
-        } else {
-          // 파일명만 있는 경우 전체 경로 구성
-          const filename = cleanPath.split('/').pop();
-          const refType = cleanPath.includes('img') || filename.includes('img') ? 'img_references' : 'video_references';
-          altUrl1 = `${API_BASE_URL}/api/media/challenges/${refType}/${filename}`;
-        }
-      } else {
-        altUrl1 = `${API_BASE_URL}/media/${cleanPath}`;
-      }
-      console.log(`Trying API path: ${altUrl1}`);
+      // 첫 번째 대안: 정적 마운트 경로 /api/api/media/ 사용 (더블 api)
+      const altUrl1 = `${API_BASE_URL}/api/api/media/${cleanPath}`;
+      console.log(`Trying static mount path (double api): ${altUrl1}`);
       e.target.src = altUrl1;
       break;
 
@@ -138,11 +126,11 @@ export const handleImageError = (e, originalPath) => {
       break;
 
     case 4:
-      // 네 번째 대안: 파일명만으로 시도 (shares 경우)
+      // 네 번째 대안: 정적 마운트 경로로 shares 시도
       if (cleanPath.includes('img_shares') || cleanPath.includes('video_shares')) {
         const shareType = cleanPath.includes('img_shares') ? 'img_shares' : 'video_shares';
-        const altUrl4 = `https://likelion.site/media/shares/${shareType}/${filename}`;
-        console.log(`Trying shares path: ${altUrl4}`);
+        const altUrl4 = `${API_BASE_URL}/api/media/shares/${shareType}/${filename}`;
+        console.log(`Trying static mount shares path: ${altUrl4}`);
         e.target.src = altUrl4;
       } else {
         // shares가 아니면 바로 실패 처리

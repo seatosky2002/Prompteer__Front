@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_ENDPOINTS, API_BASE_URL } from "../../config/api";
@@ -6,6 +7,7 @@ import Footer from "../../components/common/Footer/index.jsx";
 import { searchChallenges } from "../../services/challengeApi.js";
 import { getCurrentUser } from "../../apis/api.js";
 import "./VideoCategory.css";
+
 
 const VideoCategory = () => {
   const navigate = useNavigate();
@@ -104,6 +106,7 @@ const VideoCategory = () => {
         }
 
         // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
+
         const transformedData = data.map((challenge) => ({
           id: challenge.id,
           title: challenge.title || "제목 없음",
@@ -116,6 +119,7 @@ const VideoCategory = () => {
         }));
 
         console.log("Transformed video challenges:", transformedData);
+
         setChallenges(transformedData);
         setError(null);
       } catch (err) {
@@ -203,6 +207,7 @@ const VideoCategory = () => {
               console.log(`Full share object:`, mostLikedShare);
 
               if (videoUrl) {
+
                 // API에서 반환된 경로 처리
                 let processedUrl = videoUrl;
 
@@ -226,6 +231,7 @@ const VideoCategory = () => {
                   `Set video for challenge ${challenge.id}:`,
                   fullVideoUrl
                 );
+
               } else {
                 // 좋아요가 없으면 랜덤 선택
                 const randomShare =
@@ -238,6 +244,7 @@ const VideoCategory = () => {
                 );
 
                 if (randomVideoUrl) {
+
                   // API에서 반환된 경로 처리
                   let processedUrl = randomVideoUrl;
 
@@ -264,6 +271,7 @@ const VideoCategory = () => {
                     `Set random video for challenge ${challenge.id}:`,
                     fullRandomVideoUrl
                   );
+
                 } else {
                   console.log(
                     `No video URL found for challenge ${challenge.id} in random share:`,
@@ -478,11 +486,13 @@ const VideoCategory = () => {
                 >
                   {/* Frame 17 - Main Card with Background Image */}
                   <div className="frame-17">
+
                     {/* Video Content */}
                     {challengeMedia[challenge.id] ? (
                       <video
+
                         className="challenge-video"
-                        src={challengeMedia[challenge.id]}
+                        {...getImageProps(challenge.referenceVideo || challengeMedia[challenge.id])}
                         muted
                         loop
                         playsInline
@@ -496,6 +506,7 @@ const VideoCategory = () => {
                         onMouseLeave={(e) => {
                           e.target.pause();
                         }}
+
                         onError={(e) => {
                           console.error("Video load error:", e.target.src, e);
                           e.target.style.display = "none";
@@ -511,6 +522,7 @@ const VideoCategory = () => {
                             "Video can play:",
                             challengeMedia[challenge.id]
                           );
+
                         }}
                       />
                     ) : (

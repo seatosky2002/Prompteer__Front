@@ -768,8 +768,7 @@ ${editorCode}
                               ) : (
                                 <>
                                   메모리: 34024 KB<br />
-                                  시간: 68 ms<br />
-                                  수동 수정: 3회
+                                  시간: 68 ms
                                 </>
                               )}
                             </div>
@@ -845,9 +844,7 @@ ${editorCode}
                             <div className="stat-item">
                               <div className="stat-text">소요 시간<br />{work.time}ms</div>
                             </div>
-                            <div className="stat-item">
-                              <div className="stat-text">수동 수정<br />{work.attempts}회</div>
-                            </div>
+
                           </div>
                           <div className="work-content">
                             <div className="work-prompt truncate-text">

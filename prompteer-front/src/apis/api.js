@@ -485,9 +485,7 @@ export const getPsSharesPublic = async (params = {}) => {
     queryParams.append("skip", params.skip || 0);
     queryParams.append("limit", params.limit || 100); // 기본값 100개
 
-    const response = await instance.get(
-      `shares/ps/?${queryParams.toString()}`
-    );
+    const response = await instance.get(`shares/ps/?${queryParams.toString()}`);
 
     if (response.status === 200) {
       return {
@@ -572,9 +570,9 @@ export const getPsChallengesPublic = async (params = {}) => {
     }
   } catch (error) {
     console.warn("Public PS challenges API failed:", error);
-    return { 
-      success: false, 
-      error: "PS 챌린지 목록을 가져올 수 없습니다." 
+    return {
+      success: false,
+      error: "PS 챌린지 목록을 가져올 수 없습니다.",
     };
   }
 };
@@ -826,6 +824,137 @@ export const getVideoChallenges = async (params = {}) => {
       return {
         success: false,
         error: "비디오 챌린지 목록을 가져올 수 없습니다.",
+      };
+    }
+  }
+};
+
+// =============================================================================
+// 게시물 관련 API들
+// =============================================================================
+
+// 특정 게시물 조회 API
+export const getPostById = async (postId) => {
+  try {
+    const response = await instance.get(`posts/${postId}`);
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 404) {
+      return {
+        success: false,
+        error: "게시물을 찾을 수 없습니다.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "게시물 데이터를 불러오는데 실패했습니다.",
+      };
+    }
+  }
+};
+
+// 특정 챌린지 조회 API (공용)
+export const getChallengeById = async (challengeId) => {
+  try {
+    const response = await instance.get(`challenges/${challengeId}`);
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 404) {
+      return {
+        success: false,
+        error: "챌린지를 찾을 수 없습니다.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "챌린지 데이터를 불러올 수 없습니다.",
+      };
+    }
+  }
+};
+
+// 게시물 좋아요 토글 API
+export const togglePostLike = async (postId, isLiked) => {
+  try {
+    const method = isLiked ? "DELETE" : "POST";
+    const response = await instanceWithToken.request({
+      method: method,
+      url: `posts/${postId}/like`,
+    });
+
+    if (
+      response.status === 200 ||
+      response.status === 201 ||
+      response.status === 204
+    ) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: "로그인이 필요합니다.",
+      };
+    } else if (error.response?.status === 409) {
+      // 이미 좋아요를 누른 경우
+      return {
+        success: true,
+        data: { message: "Already processed" },
+      };
+    } else {
+      return {
+        success: false,
+        error: "좋아요 처리 중 오류가 발생했습니다.",
+      };
+    }
+  }
+};
+
+// 댓글 작성 API
+export const createComment = async (postId, content) => {
+  try {
+    const response = await instanceWithToken.post(`posts/${postId}/comments`, {
+      content: content,
+      post_id: parseInt(postId),
+    });
+
+    if (response.status === 200 || response.status === 201) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: "로그인이 필요합니다.",
+      };
+    } else if (error.response?.status === 422) {
+      return {
+        success: false,
+        error: "댓글 내용을 확인해주세요.",
+        details: error.response.data.detail,
+      };
+    } else {
+      return {
+        success: false,
+        error: "댓글 작성에 실패했습니다.",
       };
     }
   }

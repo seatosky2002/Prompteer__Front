@@ -9,6 +9,7 @@ import { getCurrentUser } from '../../apis/api.js';
 import { convertImagePathToUrl, getImageProps } from '../../utils/imageUrlHelper';
 import './ImageCategory.css';
 
+
 const ImageCategory = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -83,7 +84,6 @@ const ImageCategory = () => {
         // /challenges/img/ 엔드포인트에서 직접 이미지 챌린지 데이터 가져오기
 
         const response = await fetch(API_ENDPOINTS.CHALLENGES_IMG);
-        
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -95,18 +95,50 @@ const ImageCategory = () => {
         // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
         const transformedData = data.map((challenge) => {
           let referenceImageUrl = null;
-          
-          // Reference 이미지 URL 처리
-          if (challenge.img_challenge?.references && challenge.img_challenge.references.length > 0) {
+
+
+          // Reference 이미지 URL 처리 (Share 이미지와 동일한 패턴 적용)
+          if (
+            challenge.img_challenge?.references &&
+            challenge.img_challenge.references.length > 0
+          ) {
+
             const reference = challenge.img_challenge.references[0];
             console.log(`Challenge ${challenge.id} reference:`, reference);
-            
+
             if (reference.file_path) {
-              referenceImageUrl = convertImagePathToUrl(reference.file_path);
-              console.log(`Challenge ${challenge.id} reference image converted:`, reference.file_path, '→', referenceImageUrl);
+
+              let processedUrl = reference.file_path;
+              console.log(
+                `Challenge ${challenge.id} original file_path:`,
+                processedUrl
+              );
+
+              // 절대 경로면 상대 경로로 변환
+              if (processedUrl.startsWith("/")) {
+                processedUrl = processedUrl.substring(1);
+              }
+
+              // API prefix 중복 필요: /api/api/media/... 형태로 구성
+              if (processedUrl.includes("media/media/")) {
+                // media/media/ -> media/로 변경 후 /api/api/ prefix 추가
+                processedUrl = processedUrl.replace("media/media/", "media/");
+                referenceImageUrl = `/api/api/${processedUrl}`;
+              } else if (processedUrl.startsWith("media/")) {
+                // 단일 media/ 경우 /api/api/ prefix 추가
+                referenceImageUrl = `/api/api/${processedUrl}`;
+              } else {
+                // 기타 경우 /api/api/ prefix 추가
+                referenceImageUrl = `/api/api/${processedUrl}`;
+              }
+              console.log(
+                `Challenge ${challenge.id} reference image:`,
+                referenceImageUrl
+              );
+
             }
           }
-          
+
           return {
             id: challenge.id,
             title: challenge.title || "제목 없음",
@@ -116,7 +148,7 @@ const ImageCategory = () => {
             difficulty: getDifficultyText(challenge.level),
             participants: Math.floor(Math.random() * 1500) + 300, // 임시 참가자 수
             type: "image",
-            referenceImage: referenceImageUrl
+            referenceImage: referenceImageUrl,
           };
         });
 
@@ -159,8 +191,9 @@ const ImageCategory = () => {
 
       for (const challenge of imageChallenges) {
         try {
-
-          const response = await fetch(`/api/shares/img/?challenge_id=${challenge.id}&limit=10`);
+          const response = await fetch(
+            `/api/shares/img/?challenge_id=${challenge.id}&limit=10`
+          );
 
           // console.log(`Fetching images for challenge ${challenge.id}, response status:`, response.status);
 
@@ -192,9 +225,27 @@ const ImageCategory = () => {
               // console.log(`Raw imageUrl from API:`, imageUrl);
 
               if (imageUrl) {
-                const convertedUrl = convertImagePathToUrl(imageUrl);
-                mediaMap[challenge.id] = convertedUrl;
-                console.log(`Set image for challenge ${challenge.id}:`, imageUrl, '→', convertedUrl);
+              // API prefix 중복 필요: /api/api/media/... 형태로 구성
+                let processedUrl = imageUrl;
+                let fullImageUrl;
+
+                if (processedUrl.startsWith("http")) {
+                  fullImageUrl = processedUrl;
+                } else if (processedUrl.includes("media/media/")) {
+                  // media/media/ -> media/로 변경 후 /api/api/ prefix 추가
+                  processedUrl = processedUrl.replace("media/media/", "media/");
+                  fullImageUrl = `/api/api/${processedUrl}`;
+                } else if (processedUrl.startsWith("media/")) {
+                  // 단일 media/ 경우 /api/api/ prefix 추가
+                  fullImageUrl = `/api/api/${processedUrl}`;
+                } else {
+                  // 기타 경우 /api/api/ prefix 추가
+                  fullImageUrl = `/api/api/${processedUrl}`;
+                }
+
+                mediaMap[challenge.id] = fullImageUrl;
+                // console.log(`Set image for challenge ${challenge.id}:`, fullImageUrl);
+
               } else {
                 // 좋아요가 없으면 랜덤 선택
                 const randomShare =
@@ -205,9 +256,31 @@ const ImageCategory = () => {
                   randomShare.image ||
                   randomShare.img;
                 if (randomImageUrl) {
-                  const convertedRandomUrl = convertImagePathToUrl(randomImageUrl);
-                  mediaMap[challenge.id] = convertedRandomUrl;
-                  console.log(`Set random image for challenge ${challenge.id}:`, randomImageUrl, '→', convertedRandomUrl);
+
+                  // API prefix 중복 필요: /api/api/media/... 형태로 구성
+                  let processedUrl = randomImageUrl;
+                  let fullRandomImageUrl;
+
+                  if (processedUrl.startsWith("http")) {
+                    fullRandomImageUrl = processedUrl;
+                  } else if (processedUrl.includes("media/media/")) {
+                    // media/media/ -> media/로 변경 후 /api/api/ prefix 추가
+                    processedUrl = processedUrl.replace(
+                      "media/media/",
+                      "media/"
+                    );
+                    fullRandomImageUrl = `/api/api/${processedUrl}`;
+                  } else if (processedUrl.startsWith("media/")) {
+                    // 단일 media/ 경우 /api/api/ prefix 추가
+                    fullRandomImageUrl = `/api/api/${processedUrl}`;
+                  } else {
+                    // 기타 경우 /api/api/ prefix 추가
+                    fullRandomImageUrl = `/api/api/${processedUrl}`;
+                  }
+
+                  mediaMap[challenge.id] = fullRandomImageUrl;
+                  // console.log(`Set random image for challenge ${challenge.id}:`, fullRandomImageUrl);
+
                 } else {
                   console.log(`No image URL found for challenge ${challenge.id} in share:`, randomShare);
                 }
@@ -406,11 +479,42 @@ const ImageCategory = () => {
                   {/* Frame 17 - Main Card with Background Image */}
                   <div className="frame-17">
                     {/* Image Content - Reference 이미지 우선, Share 이미지를 fallback으로 사용 */}
-                    {(challenge.referenceImage || challengeMedia[challenge.id]) && (
+                    {(challenge.referenceImage ||
+                      challengeMedia[challenge.id]) && (
                       <img
                         className="challenge-image"
-                        {...getImageProps(challenge.referenceImage || challengeMedia[challenge.id])}
+
+                        src={
+                          challenge.referenceImage ||
+                          challengeMedia[challenge.id]
+                        }
                         alt={`Challenge ${challenge.id}`}
+                        onError={(e) => {
+                          console.error(
+                            `Image load error for challenge ${challenge.id}:`,
+                            e.target.src
+                          );
+                          // Reference 이미지 실패 시 Share 이미지로 fallback
+                          if (
+                            challenge.referenceImage &&
+                            e.target.src.includes(
+                              challenge.referenceImage.split("/").pop()
+                            )
+                          ) {
+                            if (challengeMedia[challenge.id]) {
+                              e.target.src = challengeMedia[challenge.id];
+                              console.log(
+                                `Fallback to share image for challenge ${challenge.id}:`,
+                                challengeMedia[challenge.id]
+                              );
+                            } else {
+                              e.target.style.display = "none";
+                            }
+                          } else {
+                            e.target.style.display = "none";
+                          }
+                        }}
+
                       />
                     )}
                     {/* Frame 21 - Category Badge (Top Right) */}

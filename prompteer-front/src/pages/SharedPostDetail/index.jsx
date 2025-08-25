@@ -1,15 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
-import Header from '../../components/common/Header/index.jsx';
-import Footer from '../../components/common/Footer/index.jsx';
-import FilterButton from '../../components/ui/FilterButton/index.jsx';
-import CategoryFilter from '../../components/ui/CategoryFilter/index.jsx';
-import CommentCard from '../../components/ui/CommentCard/index.jsx';
-import { getCurrentUser } from '../../apis/api.js';
-import './SharedPostDetail.css';
+import Header from "../../components/common/Header/index.jsx";
+import Footer from "../../components/common/Footer/index.jsx";
+import FilterButton from "../../components/ui/FilterButton/index.jsx";
+import CategoryFilter from "../../components/ui/CategoryFilter/index.jsx";
+import CommentCard from "../../components/ui/CommentCard/index.jsx";
+import {
+  getCurrentUser,
+  getPostById,
+  getChallengeById,
+  togglePostLike,
+  createComment,
+} from "../../apis/api.js";
+import "./SharedPostDetail.css";
 
 const SharedPostDetail = () => {
   const { id } = useParams();
@@ -22,7 +28,7 @@ const SharedPostDetail = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState('');
+  const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -35,7 +41,7 @@ const SharedPostDetail = () => {
   // 로그인 상태 체크
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const token = localStorage.getItem('access_token');
+      const token = localStorage.getItem("access_token");
 
       if (!token) {
         setIsLoggedIn(false);
@@ -64,54 +70,54 @@ const SharedPostDetail = () => {
     };
 
     checkLoginStatus();
-    
+
     const handleFocus = () => {
       checkLoginStatus();
     };
 
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, []);
-
-
 
   // API로부터 post 데이터 가져오기
   useEffect(() => {
     const fetchPostData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/posts/${id}`);
-        
-        if (!response.ok) {
-          throw new Error('게시물 데이터를 불러오는데 실패했습니다.');
+        const result = await getPostById(id);
+
+        if (!result.success) {
+          throw new Error(result.error);
         }
-        
-        const post = await response.json();
-        console.log('Post data:', post);
+
+        const post = result.data;
+        console.log("Post data:", post);
         setShareData(post); // 기존 변수명 유지
-        
+
         // 좋아요 정보 설정
         setLikesCount(post.likes_count || 0);
-        
+
         // 현재 사용자가 좋아요를 눌렀는지 확인
         const currentUserId = getCurrentUserId();
         if (currentUserId && post.likes) {
-          const userLiked = post.likes.some(like => like.user_id === currentUserId);
+          const userLiked = post.likes.some(
+            (like) => like.user_id === currentUserId
+          );
           setIsLiked(userLiked);
         }
-        
+
         // 댓글 데이터 설정
         if (post.comments) {
           setComments(post.comments);
-          console.log('Comments from post:', post.comments);
+          console.log("Comments from post:", post.comments);
         }
-        
+
         // 챌린지 데이터도 가져오기
         if (post.challenge_id) {
           await fetchChallengeData(post.challenge_id);
         }
       } catch (err) {
-        console.error('Error fetching post:', err);
+        console.error("Error fetching post:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -124,30 +130,26 @@ const SharedPostDetail = () => {
   // 챌린지 데이터 가져오기
   const fetchChallengeData = async (challengeId) => {
     try {
-      const response = await fetch(`/api/challenges/${challengeId}`);
-      
-      if (!response.ok) {
-        console.warn('챌린지 데이터를 불러올 수 없습니다.');
+      const result = await getChallengeById(challengeId);
+
+      if (!result.success) {
+        console.warn("챌린지 데이터를 불러올 수 없습니다:", result.error);
         return;
       }
-      
-      const challenge = await response.json();
-      console.log('Challenge data:', challenge);
+
+      const challenge = result.data;
+      console.log("Challenge data:", challenge);
       setChallengeData(challenge);
     } catch (err) {
-      console.error('Error fetching challenge:', err);
+      console.error("Error fetching challenge:", err);
     }
   };
 
+  const [activeTab, setActiveTab] = useState("프롬프트 공유");
+  const [activeCategory, setActiveCategory] = useState("이미지");
 
-  
-  const [activeTab, setActiveTab] = useState('프롬프트 공유');
-  const [activeCategory, setActiveCategory] = useState('이미지');
-
-  const tabs = ['전체', '질문', '프롬프트 공유'];
-  const categories = ['전체', '코딩', '이미지', '영상'];
-
-
+  const tabs = ["전체", "질문", "프롬프트 공유"];
+  const categories = ["전체", "코딩", "이미지", "영상"];
 
   const toggleProblemExpanded = () => {
     setIsProblemExpanded(!isProblemExpanded);
@@ -155,70 +157,60 @@ const SharedPostDetail = () => {
 
   // 좋아요 토글 함수
   const handleLikeToggle = async () => {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      alert('좋아요를 누르려면 로그인이 필요합니다.');
+    if (!isLoggedIn) {
+      alert("좋아요를 누르려면 로그인이 필요합니다.");
       return;
     }
 
     try {
-      const method = isLiked ? 'DELETE' : 'POST';
-      const response = await fetch(`/api/posts/${id}/like`, {
-        method: method,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const result = await togglePostLike(id, isLiked);
 
-      if (!response.ok) {
-        if (response.status === 409) {
-          // 이미 좋아요를 누른 경우 (POST 요청 시)
-          console.log('Already liked this post');
-          return;
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!result.success) {
+        alert(result.error);
+        return;
       }
 
       // 상태 업데이트
       setIsLiked(!isLiked);
-      setLikesCount(prev => isLiked ? Math.max(0, prev - 1) : prev + 1);
-      
-      console.log(`${isLiked ? 'Unliked' : 'Liked'} post ${id}`);
+      setLikesCount((prev) => (isLiked ? Math.max(0, prev - 1) : prev + 1));
+
+      console.log(`${isLiked ? "Unliked" : "Liked"} post ${id}`);
     } catch (error) {
-      console.error('Error toggling like:', error);
-      alert('좋아요 처리 중 오류가 발생했습니다.');
+      console.error("Error toggling like:", error);
+      alert("좋아요 처리 중 오류가 발생했습니다.");
     }
   };
 
   // 게시글 데이터 새로고침 (댓글 포함)
   const refreshPostData = async () => {
     try {
-      const response = await fetch(`/api/posts/${id}`);
-      
-      if (!response.ok) {
-        console.warn('게시글 데이터를 새로고침할 수 없습니다.');
+      const result = await getPostById(id);
+
+      if (!result.success) {
+        console.warn("게시글 데이터를 새로고침할 수 없습니다:", result.error);
         return;
       }
-      
-      const post = await response.json();
+
+      const post = result.data;
       setShareData(post);
-      
+
       // 댓글 데이터 업데이트
       if (post.comments) {
         setComments(post.comments);
-        console.log('Updated comments:', post.comments);
+        console.log("Updated comments:", post.comments);
       }
-      
+
       // 좋아요 정보도 업데이트
       setLikesCount(post.likes_count || 0);
       const currentUserId = getCurrentUserId();
       if (currentUserId && post.likes) {
-        const userLiked = post.likes.some(like => like.user_id === currentUserId);
+        const userLiked = post.likes.some(
+          (like) => like.user_id === currentUserId
+        );
         setIsLiked(userLiked);
       }
     } catch (err) {
-      console.error('Error refreshing post data:', err);
+      console.error("Error refreshing post data:", err);
     }
   };
 
@@ -228,44 +220,31 @@ const SharedPostDetail = () => {
       return;
     }
 
-    const accessToken = localStorage.getItem('access_token');
-    if (!accessToken) {
-      alert('댓글을 작성하려면 로그인이 필요합니다.');
+    if (!isLoggedIn) {
+      alert("댓글을 작성하려면 로그인이 필요합니다.");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`/api/posts/${id}/comments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          content: newComment.trim(),
-          post_id: parseInt(id)
-        }),
-      });
+      const result = await createComment(id, newComment.trim());
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || '댓글 작성에 실패했습니다.');
+      if (!result.success) {
+        alert(result.error);
+        return;
       }
 
-      const newCommentData = await response.json();
-      console.log('New comment created:', newCommentData);
-      
+      console.log("New comment created:", result.data);
+
       // 게시글 데이터 새로고침 (댓글 포함)
       await refreshPostData();
-      
+
       // 입력 필드 초기화
-      setNewComment('');
-      
+      setNewComment("");
     } catch (error) {
-      console.error('Comment creation error:', error);
-      alert(error.message);
+      console.error("Comment creation error:", error);
+      alert("댓글 작성 중 오류가 발생했습니다.");
     } finally {
       setIsSubmitting(false);
     }
@@ -273,51 +252,51 @@ const SharedPostDetail = () => {
 
   // 탭 클릭 핸들러
   const handleTabClick = (tab) => {
-    const typeMapping = { '질문': 'question', '프롬프트 공유': 'share' };
-    const tagMapping = { '코딩': 'ps', '이미지': 'img', '영상': 'video' };
+    const typeMapping = { 질문: "question", "프롬프트 공유": "share" };
+    const tagMapping = { 코딩: "ps", 이미지: "img", 영상: "video" };
 
     const params = new URLSearchParams();
-    
+
     // 타입 필터 설정
-    if (tab !== '전체' && typeMapping[tab]) {
-      params.set('type', typeMapping[tab]);
+    if (tab !== "전체" && typeMapping[tab]) {
+      params.set("type", typeMapping[tab]);
     }
-    
+
     // 기존 카테고리 필터 유지
-    if (activeCategory !== '전체' && tagMapping[activeCategory]) {
-      params.set('tag', tagMapping[activeCategory]);
+    if (activeCategory !== "전체" && tagMapping[activeCategory]) {
+      params.set("tag", tagMapping[activeCategory]);
     }
-    
+
     const queryString = params.toString();
-    navigate(queryString ? `/board?${queryString}` : '/board');
+    navigate(queryString ? `/board?${queryString}` : "/board");
     setActiveTab(tab);
   };
 
-  // 카테고리 클릭 핸들러  
+  // 카테고리 클릭 핸들러
   const handleCategoryClick = (category) => {
-    const typeMapping = { '질문': 'question', '프롬프트 공유': 'share' };
-    const tagMapping = { '코딩': 'ps', '이미지': 'img', '영상': 'video' };
+    const typeMapping = { 질문: "question", "프롬프트 공유": "share" };
+    const tagMapping = { 코딩: "ps", 이미지: "img", 영상: "video" };
 
     const params = new URLSearchParams();
-    
+
     // 카테고리 필터 설정
-    if (category !== '전체' && tagMapping[category]) {
-      params.set('tag', tagMapping[category]);
+    if (category !== "전체" && tagMapping[category]) {
+      params.set("tag", tagMapping[category]);
     }
-    
+
     // 기존 타입 필터 유지
-    if (activeTab !== '전체' && typeMapping[activeTab]) {
-      params.set('type', typeMapping[activeTab]);
+    if (activeTab !== "전체" && typeMapping[activeTab]) {
+      params.set("type", typeMapping[activeTab]);
     }
-    
+
     const queryString = params.toString();
-    navigate(queryString ? `/board?${queryString}` : '/board');
+    navigate(queryString ? `/board?${queryString}` : "/board");
     setActiveCategory(category);
   };
 
   // 게시물 작성 버튼 클릭 핸들러
   const handlePostWriteClick = () => {
-    navigate('/board/write');
+    navigate("/board/write");
   };
 
   if (loading) {
@@ -407,12 +386,16 @@ const SharedPostDetail = () => {
                     <div className="shared-post-card-header">
                       <div className="shared-post-card-title-section">
                         <h2 className="shared-post-card-title">
-                          {shareData?.title || '프롬프트 공유'}
+                          {shareData?.title || "프롬프트 공유"}
                         </h2>
                         <div className="shared-post-card-meta">
-                          <span className="shared-post-card-author">작성자: {shareData.user?.nickname || '익명'}</span>
+                          <span className="shared-post-card-author">
+                            작성자: {shareData.user?.nickname || "익명"}
+                          </span>
                           <span className="shared-post-card-date">
-                            {new Date(shareData.created_at).toLocaleDateString()}
+                            {new Date(
+                              shareData.created_at
+                            ).toLocaleDateString()}
                           </span>
                         </div>
                       </div>
@@ -423,47 +406,65 @@ const SharedPostDetail = () => {
                       <div className="challenge-header">
                         <div className="challenge-title-with-heart">
                           <h3 className="challenge-title">
-                            {challengeData?.title || `Challenge #${shareData.challenge_id}`}
+                            {challengeData?.title ||
+                              `Challenge #${shareData.challenge_id}`}
                           </h3>
                           {/* 좋아요 섹션 - Challenge Title 오른쪽으로 이동 */}
                           <div className="shared-post-like-section">
-                            <button 
-                              className={`like-button ${isLiked ? 'liked' : ''}`}
+                            <button
+                              className={`like-button ${
+                                isLiked ? "liked" : ""
+                              }`}
                               onClick={handleLikeToggle}
                             >
-                              <span className="heart-icon">{isLiked ? '❤️' : '🤍'}</span>
+                              <span className="heart-icon">
+                                {isLiked ? "❤️" : "🤍"}
+                              </span>
                               <span className="like-count">{likesCount}</span>
                             </button>
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="problem-view-section">
                         <div className="problem-view-card">
                           {isProblemExpanded && (
                             <div className="problem-expanded-content">
-
-                              
                               <div className="problem-section">
                                 <h4 className="section-title">[문제 설명]</h4>
                                 <div className="section-content">
-                                  {challengeData?.content || '이미지 생성 프롬프트 공유입니다.'}
+                                  {challengeData?.content ||
+                                    "이미지 생성 프롬프트 공유입니다."}
                                 </div>
                               </div>
                             </div>
                           )}
-                          
-                          <div className="problem-view-header" onClick={toggleProblemExpanded}>
+
+                          <div
+                            className="problem-view-header"
+                            onClick={toggleProblemExpanded}
+                          >
                             <div className="problem-view-content">
-                              <span className="problem-view-text">문제 보기</span>
+                              <span className="problem-view-text">
+                                문제 보기
+                              </span>
                             </div>
                             <div className="problem-view-icon">
-                              <svg width="14" height="9" viewBox="0 0 14 9" fill="none">
-                                <path 
-                                  d={isProblemExpanded ? "M13 8L7 2L1 8" : "M1 1L7 7L13 1"} 
-                                  stroke="#000000" 
-                                  strokeWidth="2" 
-                                  strokeLinecap="round" 
+                              <svg
+                                width="14"
+                                height="9"
+                                viewBox="0 0 14 9"
+                                fill="none"
+                              >
+                                <path
+                                  d={
+                                    isProblemExpanded
+                                      ? "M13 8L7 2L1 8"
+                                      : "M1 1L7 7L13 1"
+                                  }
+                                  stroke="#000000"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
                                   strokeLinejoin="round"
                                 />
                               </svg>
@@ -471,56 +472,82 @@ const SharedPostDetail = () => {
                           </div>
                         </div>
                       </div>
-                      
-
 
                       {/* 포스트 내용 섹션 */}
                       <div className="shared-post-content-section">
                         <h4 className="section-title">공유 내용</h4>
                         <div className="post-content-container">
                           {shareData?.content ? (
-                            <ReactMarkdown 
+                            <ReactMarkdown
                               remarkPlugins={[remarkGfm]}
                               components={{
-                                img: ({node, ...props}) => (
-                                  <img 
-                                    {...props} 
-                                    style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
+                                img: ({ node, ...props }) => (
+                                  <img
+                                    {...props}
+                                    style={{
+                                      maxWidth: "100%",
+                                      height: "auto",
+                                      borderRadius: "8px",
+                                    }}
                                     onError={(e) => {
-                                      console.error('❌ Markdown image failed to load:', e.target.src);
-                                      e.target.style.display = 'none';
+                                      console.error(
+                                        "❌ Markdown image failed to load:",
+                                        e.target.src
+                                      );
+                                      e.target.style.display = "none";
                                     }}
                                   />
                                 ),
-                                a: ({node, href, children, ...props}) => {
+                                a: ({ node, href, children, ...props }) => {
                                   // 비디오 파일 링크인지 확인
-                                  if (href && (href.includes('.mp4') || href.includes('video') || children?.[0] === '영상 파일')) {
-                                    console.log('Video link detected:', href);
-                                    
-                                    // media/media/ 중복 제거
+                                  if (
+                                    href &&
+                                    (href.includes(".mp4") ||
+                                      href.includes("video") ||
+                                      children?.[0] === "영상 파일")
+                                  ) {
+                                    console.log("Video link detected:", href);
+
+                                    // API prefix 중복 필요: /api/api/media/... 형태로 구성
                                     let cleanUrl = href;
-                                    if (href.includes('media/media/')) {
-                                      cleanUrl = href.replace('media/media/', 'media/');
+                                    if (href.includes("media/media/")) {
+                                      cleanUrl = href.replace(
+                                        "media/media/",
+                                        "media/"
+                                      );
                                     }
-                                    
-                                    // 상대 경로를 절대 경로로 변환
-                                    if (!cleanUrl.startsWith('http')) {
-                                      cleanUrl = `/api/${cleanUrl}`;
+
+                                    // 상대 경로를 절대 경로로 변환 (API prefix 중복 적용)
+                                    if (!cleanUrl.startsWith("http")) {
+                                      if (cleanUrl.startsWith("media/")) {
+                                        cleanUrl = `/api/api/${cleanUrl}`;
+                                      } else {
+                                        cleanUrl = `/api/api/${cleanUrl}`;
+                                      }
                                     }
-                                    
+
                                     return (
-                                      <div style={{ margin: '20px 0', textAlign: 'center' }}>
-                                        <video 
+                                      <div
+                                        style={{
+                                          margin: "20px 0",
+                                          textAlign: "center",
+                                        }}
+                                      >
+                                        <video
                                           src={cleanUrl}
                                           controls
-                                          style={{ 
-                                            maxWidth: '100%', 
-                                            height: 'auto', 
-                                            borderRadius: '8px',
-                                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                                          style={{
+                                            maxWidth: "100%",
+                                            height: "auto",
+                                            borderRadius: "8px",
+                                            boxShadow:
+                                              "0 4px 12px rgba(0, 0, 0, 0.1)",
                                           }}
                                           onError={(e) => {
-                                            console.error('❌ Markdown video failed to load:', cleanUrl);
+                                            console.error(
+                                              "❌ Markdown video failed to load:",
+                                              cleanUrl
+                                            );
                                             e.target.parentElement.innerHTML = `
                                               <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 200px; background: #F8F9FA; border: 2px dashed #DEE2E6; border-radius: 8px; color: #6C757D;">
                                                 <span>영상을 불러올 수 없습니다</span>
@@ -534,10 +561,14 @@ const SharedPostDetail = () => {
                                       </div>
                                     );
                                   }
-                                  
+
                                   // 일반 링크는 그대로 처리
-                                  return <a href={href} {...props}>{children}</a>;
-                                }
+                                  return (
+                                    <a href={href} {...props}>
+                                      {children}
+                                    </a>
+                                  );
+                                },
                               }}
                             >
                               {shareData.content}
@@ -549,8 +580,6 @@ const SharedPostDetail = () => {
                           )}
                         </div>
                       </div>
-
-
                     </div>
                   </div>
                 </div>
@@ -561,7 +590,7 @@ const SharedPostDetail = () => {
                 <div className="comments-header">
                   <h3 className="comments-title">댓글 ({comments.length})</h3>
                 </div>
-                
+
                 <div className="figma-comments-container">
                   {comments.length === 0 ? (
                     <div className="no-comments">
@@ -574,13 +603,13 @@ const SharedPostDetail = () => {
                           {comment.content}
                         </div>
                         <div className="figma-comment-author">
-                          {comment.user?.nickname || '익명'}
+                          {comment.user?.nickname || "익명"}
                         </div>
                       </div>
                     ))
                   )}
                 </div>
-                
+
                 <div className="comment-write-section">
                   {/* Figma 디자인에 맞는 댓글 작성 영역 */}
                   <div className="figma-comment-container">
@@ -590,7 +619,7 @@ const SharedPostDetail = () => {
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         onKeyPress={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
+                          if (e.key === "Enter" && !e.shiftKey) {
                             e.preventDefault();
                             handleCommentSubmit();
                           }
@@ -600,12 +629,12 @@ const SharedPostDetail = () => {
                         disabled={isSubmitting}
                       />
                     </div>
-                    <button 
-                      className="figma-comment-submit-btn" 
+                    <button
+                      className="figma-comment-submit-btn"
                       onClick={handleCommentSubmit}
                       disabled={!newComment.trim() || isSubmitting}
                     >
-                      {isSubmitting ? '작성 중...' : '댓글 작성'}
+                      {isSubmitting ? "작성 중..." : "댓글 작성"}
                     </button>
                   </div>
                 </div>

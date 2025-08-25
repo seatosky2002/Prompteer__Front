@@ -178,6 +178,26 @@ const MyPage = () => {
 
                 if (challengeDetails.success) {
                   const details = challengeDetails.data;
+                  // 이미지 URL 처리
+                  let processedImageUrl = "이미지 없음";
+                  if (challenge.img_share?.img_url) {
+                    const rawUrl = challenge.img_share.img_url;
+                    // API prefix 중복 필요: /api/api/media/... 형태로 구성
+                    if (rawUrl.startsWith("http")) {
+                      processedImageUrl = rawUrl;
+                    } else if (rawUrl.includes("media/media/")) {
+                      // media/media/ -> media/로 변경 후 /api/api/ prefix 추가
+                      const cleanUrl = rawUrl.replace("media/media/", "media/");
+                      processedImageUrl = `/api/api/${cleanUrl}`;
+                    } else if (rawUrl.startsWith("media/")) {
+                      // 단일 media/ 경우 /api/api/ prefix 추가
+                      processedImageUrl = `/api/api/${rawUrl}`;
+                    } else {
+                      // 기타 경우 /api/api/ prefix 추가
+                      processedImageUrl = `/api/api/${rawUrl}`;
+                    }
+                  }
+
                   return {
                     id: challenge.id,
                     challengeNumber: challenge.challenge_id,
@@ -187,7 +207,7 @@ const MyPage = () => {
                     difficulty: details.level || "알 수 없음",
                     type: "이미지",
                     prompt: challenge.prompt,
-                    imageUrl: challenge.img_share?.img_url || "이미지 없음",
+                    imageUrl: processedImageUrl,
                     likes: challenge.likes_count || 0,
                     createdAt: challenge.created_at,
                     user: challenge.user,
@@ -195,7 +215,22 @@ const MyPage = () => {
                     references: details.img_challenge?.references || [],
                   };
                 } else {
-                  // 여기까지 올일 없음. 이미지 Result는 받아오는데 챌린지 디테일만 못받는 경우라서.
+                  // 이미지 URL 처리 (에러 케이스)
+                  let processedImageUrl = "이미지 없음";
+                  if (challenge.img_share?.img_url) {
+                    const rawUrl = challenge.img_share.img_url;
+                    if (rawUrl.startsWith("http")) {
+                      processedImageUrl = rawUrl;
+                    } else if (rawUrl.includes("media/media/")) {
+                      const cleanUrl = rawUrl.replace("media/media/", "media/");
+                      processedImageUrl = `/api/api/${cleanUrl}`;
+                    } else if (rawUrl.startsWith("media/")) {
+                      processedImageUrl = `/api/api/${rawUrl}`;
+                    } else {
+                      processedImageUrl = `/api/api/${rawUrl}`;
+                    }
+                  }
+
                   return {
                     id: challenge.id,
                     challengeNumber: challenge.challenge_id,
@@ -204,7 +239,7 @@ const MyPage = () => {
                     difficulty: "알 수 없음",
                     type: "이미지",
                     prompt: challenge.prompt,
-                    imageUrl: challenge.img_share?.img_url || "이미지 없음",
+                    imageUrl: processedImageUrl,
                     likes: challenge.likes_count || 0,
                     createdAt: challenge.created_at,
                     user: challenge.user,
@@ -216,6 +251,23 @@ const MyPage = () => {
                   `이미지 챌린지 ${challenge.challenge_id} 상세 정보 로딩 에러:`,
                   error
                 );
+
+                // 이미지 URL 처리 (catch 케이스)
+                let processedImageUrl = "이미지 없음";
+                if (challenge.img_share?.img_url) {
+                  const rawUrl = challenge.img_share.img_url;
+                  if (rawUrl.startsWith("http")) {
+                    processedImageUrl = rawUrl;
+                  } else if (rawUrl.includes("media/media/")) {
+                    const cleanUrl = rawUrl.replace("media/media/", "media/");
+                    processedImageUrl = `/api/api/${cleanUrl}`;
+                  } else if (rawUrl.startsWith("media/")) {
+                    processedImageUrl = `/api/api/${rawUrl}`;
+                  } else {
+                    processedImageUrl = `/api/api/${rawUrl}`;
+                  }
+                }
+
                 return {
                   id: challenge.id,
                   challengeNumber: challenge.challenge_id,
@@ -224,7 +276,7 @@ const MyPage = () => {
                   difficulty: "알 수 없음",
                   type: "이미지",
                   prompt: challenge.prompt,
-                  imageUrl: challenge.img_share?.img_url || "이미지 없음",
+                  imageUrl: processedImageUrl,
                   likes: challenge.likes_count || 0,
                   createdAt: challenge.created_at,
                   user: challenge.user,
@@ -246,6 +298,27 @@ const MyPage = () => {
 
                 if (challengeDetails.success) {
                   const details = challengeDetails.data;
+
+                  // 비디오 URL 처리
+                  let processedVideoUrl = "영상 없음";
+                  if (challenge.video_share?.video_url) {
+                    const rawUrl = challenge.video_share.video_url;
+                    // API prefix 중복 필요: /api/api/media/... 형태로 구성
+                    if (rawUrl.startsWith("http")) {
+                      processedVideoUrl = rawUrl;
+                    } else if (rawUrl.includes("media/media/")) {
+                      // media/media/ -> media/로 변경 후 /api/api/ prefix 추가
+                      const cleanUrl = rawUrl.replace("media/media/", "media/");
+                      processedVideoUrl = `/api/api/${cleanUrl}`;
+                    } else if (rawUrl.startsWith("media/")) {
+                      // 단일 media/ 경우 /api/api/ prefix 추가
+                      processedVideoUrl = `/api/api/${rawUrl}`;
+                    } else {
+                      // 기타 경우 /api/api/ prefix 추가
+                      processedVideoUrl = `/api/api/${rawUrl}`;
+                    }
+                  }
+
                   return {
                     id: challenge.id,
                     challengeNumber: challenge.challenge_id,
@@ -255,7 +328,7 @@ const MyPage = () => {
                     difficulty: details.level || "알 수 없음",
                     type: "영상",
                     prompt: challenge.prompt,
-                    imageUrl: challenge.video_share?.video_url || "영상 없음",
+                    imageUrl: processedVideoUrl,
                     likes: challenge.likes_count || 0,
                     createdAt: challenge.created_at,
                     user: challenge.user,
@@ -263,7 +336,22 @@ const MyPage = () => {
                     references: details.video_challenge?.references || [],
                   };
                 } else {
-                  // 여기까지 올일 없음. 이미지 Result는 받아오는데 챌린지 디테일만 못받는 경우라서.
+                  // 비디오 URL 처리 (에러 케이스)
+                  let processedVideoUrl = "영상 없음";
+                  if (challenge.video_share?.video_url) {
+                    const rawUrl = challenge.video_share.video_url;
+                    if (rawUrl.startsWith("http")) {
+                      processedVideoUrl = rawUrl;
+                    } else if (rawUrl.includes("media/media/")) {
+                      const cleanUrl = rawUrl.replace("media/media/", "media/");
+                      processedVideoUrl = `/api/api/${cleanUrl}`;
+                    } else if (rawUrl.startsWith("media/")) {
+                      processedVideoUrl = `/api/api/${rawUrl}`;
+                    } else {
+                      processedVideoUrl = `/api/api/${rawUrl}`;
+                    }
+                  }
+
                   return {
                     id: challenge.id,
                     challengeNumber: challenge.challenge_id,
@@ -272,7 +360,7 @@ const MyPage = () => {
                     difficulty: "알 수 없음",
                     type: "영상",
                     prompt: challenge.prompt,
-                    imageUrl: challenge.video_share?.video_url || "영상 없음",
+                    imageUrl: processedVideoUrl,
                     likes: challenge.likes_count || 0,
                     createdAt: challenge.created_at,
                     user: challenge.user,
@@ -283,6 +371,23 @@ const MyPage = () => {
                   `비디오 챌린지 ${challenge.challenge_id} 상세 정보 로딩 에러:`,
                   error
                 );
+
+                // 비디오 URL 처리 (catch 케이스)
+                let processedVideoUrl = "영상 없음";
+                if (challenge.video_share?.video_url) {
+                  const rawUrl = challenge.video_share.video_url;
+                  if (rawUrl.startsWith("http")) {
+                    processedVideoUrl = rawUrl;
+                  } else if (rawUrl.includes("media/media/")) {
+                    const cleanUrl = rawUrl.replace("media/media/", "media/");
+                    processedVideoUrl = `/api/api/${cleanUrl}`;
+                  } else if (rawUrl.startsWith("media/")) {
+                    processedVideoUrl = `/api/api/${rawUrl}`;
+                  } else {
+                    processedVideoUrl = `/api/api/${rawUrl}`;
+                  }
+                }
+
                 return {
                   id: challenge.id,
                   challengeNumber: challenge.challenge_id,
@@ -291,7 +396,7 @@ const MyPage = () => {
                   difficulty: "알 수 없음",
                   type: "영상",
                   prompt: challenge.prompt,
-                  imageUrl: challenge.video_share?.video_url || "영상 없음",
+                  imageUrl: processedVideoUrl,
                   likes: challenge.likes_count || 0,
                   createdAt: challenge.created_at,
                   user: challenge.user,

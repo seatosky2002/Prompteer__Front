@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { API_ENDPOINTS, API_BASE_URL } from '../../config/api';
-import Header from '../../components/common/Header/index.jsx';
-import Footer from '../../components/common/Footer/index.jsx';
-import { searchChallenges } from '../../services/challengeApi.js';
-import { getCurrentUser } from '../../apis/api.js';
-import { convertImagePathToUrl, getImageProps } from '../../utils/imageUrlHelper';
-import './VideoCategory.css';
+
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS, API_BASE_URL } from "../../config/api";
+import Header from "../../components/common/Header/index.jsx";
+import Footer from "../../components/common/Footer/index.jsx";
+import { searchChallenges } from "../../services/challengeApi.js";
+import { getCurrentUser } from "../../apis/api.js";
+import "./VideoCategory.css";
+
 
 const VideoCategory = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('video'); // 'image' or 'video'
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("video"); // 'image' or 'video'
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,7 +22,7 @@ const VideoCategory = () => {
   // 로그인 상태 체크
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const token = localStorage.getItem('access_token');
+      const token = localStorage.getItem("access_token");
 
       if (!token) {
         setIsLoggedIn(false);
@@ -46,14 +47,14 @@ const VideoCategory = () => {
     };
 
     checkLoginStatus();
-    
+
     // 페이지 포커스 시 로그인 상태 재확인
     const handleFocus = () => {
       checkLoginStatus();
     };
 
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, []);
 
   // 난이도 텍스트 변환 함수
@@ -78,62 +79,55 @@ const VideoCategory = () => {
     const fetchChallenges = async () => {
       try {
         setLoading(true);
-        
-        console.log('Fetching video challenges from API...');
+
+        console.log("Fetching video challenges from API...");
         // /challenges/video/ 엔드포인트에서 직접 비디오 챌린지 데이터 가져오기
-        const response = await fetch(API_ENDPOINTS.CHALLENGES_VIDEO + '?limit=50');
-        
-        console.log('Video challenges response status:', response.status);
-        
+        const response = await fetch(
+          API_ENDPOINTS.CHALLENGES_VIDEO + "?limit=50"
+        );
+
+        console.log("Video challenges response status:", response.status);
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        console.log('Video challenges API response:', data);
-        console.log('Number of video challenges found:', data.length);
-        
+        console.log("Video challenges API response:", data);
+        console.log("Number of video challenges found:", data.length);
+
         if (data.length === 0) {
-          console.warn('No video challenges found in database');
-          setError('비디오 챌린지가 없습니다. 먼저 비디오 챌린지를 생성해주세요.');
+          console.warn("No video challenges found in database");
+          setError(
+            "비디오 챌린지가 없습니다. 먼저 비디오 챌린지를 생성해주세요."
+          );
           setChallenges([]);
           return;
         }
-        
+
         // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
-        const transformedData = data.map((challenge) => {
-          let referenceImageUrl = null;
-          
-          // Reference 비디오 URL 처리 (첫 번째 프레임을 이미지로 활용 가능)
-          if (challenge.video_challenge?.references && challenge.video_challenge.references.length > 0) {
-            const reference = challenge.video_challenge.references[0];
-            console.log(`Challenge ${challenge.id} reference:`, reference);
-            
-            if (reference.file_path) {
-              referenceImageUrl = convertImagePathToUrl(reference.file_path);
-              console.log(`Challenge ${challenge.id} reference video converted:`, reference.file_path, '→', referenceImageUrl);
-            }
-          }
-          
-          return {
-            id: challenge.id,
-            title: challenge.title || '제목 없음',
-            description: challenge.content || challenge.description || '설명 없음',
-            category: challenge.tag || '영상',
-            difficulty: getDifficultyText(challenge.level),
-            participants: Math.floor(Math.random() * 1500) + 300, // 임시 참가자 수
-            type: 'video',
-            referenceVideo: referenceImageUrl
-          };
-        });
-        
-        console.log('Transformed video challenges:', transformedData);
+
+        const transformedData = data.map((challenge) => ({
+          id: challenge.id,
+          title: challenge.title || "제목 없음",
+          description:
+            challenge.content || challenge.description || "설명 없음",
+          category: challenge.tag || "영상",
+          difficulty: getDifficultyText(challenge.level),
+          participants: Math.floor(Math.random() * 1500) + 300, // 임시 참가자 수
+          type: "video",
+        }));
+
+        console.log("Transformed video challenges:", transformedData);
+
         setChallenges(transformedData);
         setError(null);
       } catch (err) {
-        console.error('Failed to fetch video challenges:', err);
-        setError(`비디오 챌린지 데이터를 불러오는데 실패했습니다: ${err.message}`);
-        
+        console.error("Failed to fetch video challenges:", err);
+        setError(
+          `비디오 챌린지 데이터를 불러오는데 실패했습니다: ${err.message}`
+        );
+
         // 에러 시 빈 배열로 설정
         setChallenges([]);
       } finally {
@@ -148,36 +142,44 @@ const VideoCategory = () => {
   useEffect(() => {
     const fetchPopularVideos = async () => {
       if (challenges.length === 0) {
-        console.log('No challenges available, skipping video fetch');
+        console.log("No challenges available, skipping video fetch");
         return;
       }
 
       // 비디오 챌린지만 필터링
-      const videoChallenges = challenges.filter(challenge => 
-        challenge.type === 'video' || 
-        challenge.category === '영상' ||
-        (challenge.challenge_type && challenge.challenge_type.includes('video'))
+      const videoChallenges = challenges.filter(
+        (challenge) =>
+          challenge.type === "video" ||
+          challenge.category === "영상" ||
+          (challenge.challenge_type &&
+            challenge.challenge_type.includes("video"))
       );
 
-      console.log('Fetching popular videos for challenges:', videoChallenges);
-      console.log('Video challenges IDs:', videoChallenges.map(c => c.id));
-      
+      console.log("Fetching popular videos for challenges:", videoChallenges);
+      console.log(
+        "Video challenges IDs:",
+        videoChallenges.map((c) => c.id)
+      );
+
       const mediaMap = {};
       let totalVideosFound = 0;
-      
+
       for (const challenge of videoChallenges) {
         try {
           const videoShareUrl = `${API_BASE_URL}/shares/video/?challenge_id=${challenge.id}&limit=10`;
           console.log(`Fetching videos from: ${videoShareUrl}`);
-          
+
           const response = await fetch(videoShareUrl);
-          console.log(`Fetching videos for challenge ${challenge.id}, response status:`, response.status);
-          
+          console.log(
+            `Fetching videos for challenge ${challenge.id}, response status:`,
+            response.status
+          );
+
           if (response.ok) {
             const shares = await response.json();
             console.log(`Shares for challenge ${challenge.id}:`, shares);
             console.log(`Number of shares found:`, shares.length);
-            
+
             if (shares && shares.length > 0) {
               totalVideosFound += shares.length;
               // 좋아요가 가장 많은 비디오 찾기
@@ -186,61 +188,132 @@ const VideoCategory = () => {
                 const likesB = (b.likes || []).length;
                 return likesB - likesA;
               });
-              
+
               const mostLikedShare = sortedShares[0];
-              console.log(`Most liked share for challenge ${challenge.id}:`, mostLikedShare);
-              
+              console.log(
+                `Most liked share for challenge ${challenge.id}:`,
+                mostLikedShare
+              );
+
               // video_share 내부의 video_url 확인
-              const videoUrl = mostLikedShare.video_share?.video_url || 
-                             mostLikedShare.video_url;
-              
-              console.log(`Raw videoUrl for challenge ${challenge.id}:`, videoUrl);
+              const videoUrl =
+                mostLikedShare.video_share?.video_url ||
+                mostLikedShare.video_url;
+
+              console.log(
+                `Raw videoUrl for challenge ${challenge.id}:`,
+                videoUrl
+              );
               console.log(`Full share object:`, mostLikedShare);
-              
+
               if (videoUrl) {
-                const convertedUrl = convertImagePathToUrl(videoUrl);
-                mediaMap[challenge.id] = convertedUrl;
-                console.log(`Set video for challenge ${challenge.id}:`, videoUrl, '→', convertedUrl);
+
+                // API에서 반환된 경로 처리
+                let processedUrl = videoUrl;
+
+                // API prefix 중복 필요: /api/api/media/... 형태로 구성
+                let fullVideoUrl;
+                if (processedUrl.startsWith("http")) {
+                  fullVideoUrl = processedUrl;
+                } else if (processedUrl.includes("media/media/")) {
+                  // media/media/ -> media/로 변경 후 /api/api/ prefix 추가
+                  processedUrl = processedUrl.replace("media/media/", "media/");
+                  fullVideoUrl = `${API_BASE_URL}/api/${processedUrl}`;
+                } else if (processedUrl.startsWith("media/")) {
+                  // 단일 media/ 경우 /api/api/ prefix 추가
+                  fullVideoUrl = `${API_BASE_URL}/api/${processedUrl}`;
+                } else {
+                  // 기타 경우 /api/api/ prefix 추가
+                  fullVideoUrl = `${API_BASE_URL}/api/${processedUrl}`;
+                }
+                mediaMap[challenge.id] = fullVideoUrl;
+                console.log(
+                  `Set video for challenge ${challenge.id}:`,
+                  fullVideoUrl
+                );
+
               } else {
                 // 좋아요가 없으면 랜덤 선택
-                const randomShare = shares[Math.floor(Math.random() * shares.length)];
-                const randomVideoUrl = randomShare.video_share?.video_url || 
-                                     randomShare.video_url;
-                console.log(`Random videoUrl for challenge ${challenge.id}:`, randomVideoUrl);
-                
+                const randomShare =
+                  shares[Math.floor(Math.random() * shares.length)];
+                const randomVideoUrl =
+                  randomShare.video_share?.video_url || randomShare.video_url;
+                console.log(
+                  `Random videoUrl for challenge ${challenge.id}:`,
+                  randomVideoUrl
+                );
+
                 if (randomVideoUrl) {
-                  const convertedRandomUrl = convertImagePathToUrl(randomVideoUrl);
-                  mediaMap[challenge.id] = convertedRandomUrl;
-                  console.log(`Set random video for challenge ${challenge.id}:`, randomVideoUrl, '→', convertedRandomUrl);
+
+                  // API에서 반환된 경로 처리
+                  let processedUrl = randomVideoUrl;
+
+                  // API prefix 중복 필요: /api/api/media/... 형태로 구성
+                  let fullRandomVideoUrl;
+                  if (processedUrl.startsWith("http")) {
+                    fullRandomVideoUrl = processedUrl;
+                  } else if (processedUrl.includes("media/media/")) {
+                    // media/media/ -> media/로 변경 후 /api/api/ prefix 추가
+                    processedUrl = processedUrl.replace(
+                      "media/media/",
+                      "media/"
+                    );
+                    fullRandomVideoUrl = `${API_BASE_URL}/api/${processedUrl}`;
+                  } else if (processedUrl.startsWith("media/")) {
+                    // 단일 media/ 경우 /api/api/ prefix 추가
+                    fullRandomVideoUrl = `${API_BASE_URL}/api/${processedUrl}`;
+                  } else {
+                    // 기타 경우 /api/api/ prefix 추가
+                    fullRandomVideoUrl = `${API_BASE_URL}/api/${processedUrl}`;
+                  }
+                  mediaMap[challenge.id] = fullRandomVideoUrl;
+                  console.log(
+                    `Set random video for challenge ${challenge.id}:`,
+                    fullRandomVideoUrl
+                  );
+
                 } else {
-                  console.log(`No video URL found for challenge ${challenge.id} in random share:`, randomShare);
+                  console.log(
+                    `No video URL found for challenge ${challenge.id} in random share:`,
+                    randomShare
+                  );
                 }
               }
             } else {
               console.log(`No shares found for challenge ${challenge.id}`);
             }
           } else {
-            console.error(`Failed to fetch videos for challenge ${challenge.id}, status:`, response.status);
+            console.error(
+              `Failed to fetch videos for challenge ${challenge.id}, status:`,
+              response.status
+            );
           }
         } catch (error) {
-          console.error(`Failed to fetch videos for challenge ${challenge.id}:`, error);
+          console.error(
+            `Failed to fetch videos for challenge ${challenge.id}:`,
+            error
+          );
         }
       }
-      
-      console.log('=== VIDEO FETCH SUMMARY ===');
+
+      console.log("=== VIDEO FETCH SUMMARY ===");
       console.log(`Total challenges processed: ${videoChallenges.length}`);
       console.log(`Total videos found: ${totalVideosFound}`);
-      console.log(`Videos successfully loaded: ${Object.keys(mediaMap).length}`);
-      console.log('Final mediaMap:', mediaMap);
-      console.log('=== END SUMMARY ===');
-      
+      console.log(
+        `Videos successfully loaded: ${Object.keys(mediaMap).length}`
+      );
+      console.log("Final mediaMap:", mediaMap);
+      console.log("=== END SUMMARY ===");
+
       if (Object.keys(mediaMap).length === 0 && videoChallenges.length > 0) {
-        console.warn('No videos were loaded for any challenges. This might indicate:');
-        console.warn('1. No video shares exist in the database');
-        console.warn('2. Video URLs are malformed');
-        console.warn('3. API endpoint issues');
+        console.warn(
+          "No videos were loaded for any challenges. This might indicate:"
+        );
+        console.warn("1. No video shares exist in the database");
+        console.warn("2. Video URLs are malformed");
+        console.warn("3. API endpoint issues");
       }
-      
+
       setChallengeMedia(mediaMap);
     };
 
@@ -257,17 +330,21 @@ const VideoCategory = () => {
     }
 
     // 이미지/영상 타입별 정렬
-    if (sortBy === 'image') {
-      filtered = filtered.filter(challenge => 
-        challenge.type === 'image' || 
-        challenge.category === '이미지' ||
-        (challenge.challenge_type && challenge.challenge_type.includes('image'))
+    if (sortBy === "image") {
+      filtered = filtered.filter(
+        (challenge) =>
+          challenge.type === "image" ||
+          challenge.category === "이미지" ||
+          (challenge.challenge_type &&
+            challenge.challenge_type.includes("image"))
       );
-    } else if (sortBy === 'video') {
-      filtered = filtered.filter(challenge => 
-        challenge.type === 'video' || 
-        challenge.category === '영상' ||
-        (challenge.challenge_type && challenge.challenge_type.includes('video'))
+    } else if (sortBy === "video") {
+      filtered = filtered.filter(
+        (challenge) =>
+          challenge.type === "video" ||
+          challenge.category === "영상" ||
+          (challenge.challenge_type &&
+            challenge.challenge_type.includes("video"))
       );
     }
 
@@ -280,10 +357,11 @@ const VideoCategory = () => {
 
   // 추천 챌린지 가져오기 (비디오 타입 중 첫 번째)
   const getFeaturedChallenge = () => {
-    const videoChallenges = challenges.filter(challenge => 
-      challenge.type === 'video' || 
-      challenge.category === '영상' ||
-      (challenge.challenge_type && challenge.challenge_type.includes('video'))
+    const videoChallenges = challenges.filter(
+      (challenge) =>
+        challenge.type === "video" ||
+        challenge.category === "영상" ||
+        (challenge.challenge_type && challenge.challenge_type.includes("video"))
     );
     return videoChallenges.length > 0 ? videoChallenges[0] : null;
   };
@@ -293,7 +371,7 @@ const VideoCategory = () => {
     if (featuredChallenge) {
       navigate(`/video/challenge/${featuredChallenge.id}`);
     } else {
-      navigate('/video/challenge/1');
+      navigate("/video/challenge/1");
     }
   };
 
@@ -314,8 +392,12 @@ const VideoCategory = () => {
                   const featuredChallenge = getFeaturedChallenge();
                   return featuredChallenge ? (
                     <>
-                      <h3 className="challenge-number">Challenge #{featuredChallenge.id}</h3>
-                      <p className="challenge-name">{featuredChallenge.title || '영상 챌린지'}</p>
+                      <h3 className="challenge-number">
+                        Challenge #{featuredChallenge.id}
+                      </h3>
+                      <p className="challenge-name">
+                        {featuredChallenge.title || "영상 챌린지"}
+                      </p>
                     </>
                   ) : (
                     <>
@@ -325,7 +407,10 @@ const VideoCategory = () => {
                   );
                 })()}
               </div>
-              <button className="challenge-now-btn" onClick={handleChallengeNow}>
+              <button
+                className="challenge-now-btn"
+                onClick={handleChallengeNow}
+              >
                 지금 도전하기 →
               </button>
             </div>
@@ -367,14 +452,14 @@ const VideoCategory = () => {
               {/* Filter Frame - Figma: Frame 106 */}
               <div className="filter-frame">
                 <button
-                  className={`filter-btn ${sortBy === 'image' ? 'active' : ''}`}
-                  onClick={() => navigate('/category/image')}
+                  className={`filter-btn ${sortBy === "image" ? "active" : ""}`}
+                  onClick={() => navigate("/category/image")}
                 >
                   이미지
                 </button>
                 <button
-                  className={`filter-btn ${sortBy === 'video' ? 'active' : ''}`}
-                  onClick={() => setSortBy('video')}
+                  className={`filter-btn ${sortBy === "video" ? "active" : ""}`}
+                  onClick={() => setSortBy("video")}
                 >
                   영상
                 </button>
@@ -401,9 +486,11 @@ const VideoCategory = () => {
                 >
                   {/* Frame 17 - Main Card with Background Image */}
                   <div className="frame-17">
-                    {/* Video Content - Reference 비디오 우선, Share 비디오를 fallback으로 사용 */}
-                    {(challenge.referenceVideo || challengeMedia[challenge.id]) ? (
-                      <video 
+
+                    {/* Video Content */}
+                    {challengeMedia[challenge.id] ? (
+                      <video
+
                         className="challenge-video"
                         {...getImageProps(challenge.referenceVideo || challengeMedia[challenge.id])}
                         muted
@@ -411,24 +498,44 @@ const VideoCategory = () => {
                         playsInline
                         preload="metadata"
                         onMouseEnter={(e) => {
-                          console.log('Video hover play:', e.target.src);
-                          e.target.play().catch(err => console.log('Play failed:', err));
+                          console.log("Video hover play:", e.target.src);
+                          e.target
+                            .play()
+                            .catch((err) => console.log("Play failed:", err));
                         }}
                         onMouseLeave={(e) => {
                           e.target.pause();
                         }}
+
+                        onError={(e) => {
+                          console.error("Video load error:", e.target.src, e);
+                          e.target.style.display = "none";
+                        }}
                         onLoadStart={() => {
-                          console.log('Video load started:', challenge.referenceVideo || challengeMedia[challenge.id]);
+                          console.log(
+                            "Video load started:",
+                            challengeMedia[challenge.id]
+                          );
                         }}
                         onCanPlay={() => {
-                          console.log('Video can play:', challenge.referenceVideo || challengeMedia[challenge.id]);
+                          console.log(
+                            "Video can play:",
+                            challengeMedia[challenge.id]
+                          );
+
                         }}
                       />
                     ) : (
                       <div className="video-placeholder">
                         <div className="video-placeholder-content">
-                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M8 5V19L19 12L8 5Z" fill="#6C757D"/>
+                          <svg
+                            width="48"
+                            height="48"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M8 5V19L19 12L8 5Z" fill="#6C757D" />
                           </svg>
                           <p>비디오 로딩 중...</p>
                         </div>
@@ -436,23 +543,31 @@ const VideoCategory = () => {
                     )}
                     {/* Frame 21 - Category Badge (Top Right) */}
                     <div className="frame-21">
-                      <span className="category-text">{challenge.category}</span>
+                      <span className="category-text">
+                        {challenge.category}
+                      </span>
                     </div>
                   </div>
-                  
+
                   {/* Frame 108 - Bottom Text Section */}
                   <div className="frame-108">
                     {/* Frame 107 - Text Content */}
                     <div className="frame-107">
-                      <div className="challenge-id">Challenge #{challenge.id}</div>
+                      <div className="challenge-id">
+                        Challenge #{challenge.id}
+                      </div>
                       <h3 className="challenge-title">
-                        {challenge.title || '제목 없음'}
+                        {challenge.title || "제목 없음"}
                       </h3>
                     </div>
-                    
+
                     {/* Frame 27 - Difficulty Badge */}
-                    <div className={`frame-27 difficulty-${challenge.difficulty}`}>
-                      <span className="difficulty-text">{challenge.difficulty}</span>
+                    <div
+                      className={`frame-27 difficulty-${challenge.difficulty}`}
+                    >
+                      <span className="difficulty-text">
+                        {challenge.difficulty}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -461,11 +576,13 @@ const VideoCategory = () => {
           )}
         </div>
 
-        {!loading && !error && getFilteredAndSortedChallenges().length === 0 && (
-          <div className="no-results">
-            <p>검색 결과가 없습니다.</p>
-          </div>
-        )}
+        {!loading &&
+          !error &&
+          getFilteredAndSortedChallenges().length === 0 && (
+            <div className="no-results">
+              <p>검색 결과가 없습니다.</p>
+            </div>
+          )}
       </main>
 
       <Footer />

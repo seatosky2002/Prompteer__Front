@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { API_ENDPOINTS } from '../../config/api';
+import { API_ENDPOINTS, API_BASE_URL } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { getCurrentUser } from '../../apis/api.js';
@@ -66,7 +66,7 @@ const ImageProblem = () => {
     const fetchChallengeData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:3000/challenges/${id}`);
+        const response = await fetch(`${API_BASE_URL}/challenges/${id}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -158,11 +158,22 @@ const ImageProblem = () => {
       
       setLoadingImages(true);
       try {
-        console.log('Fetching shared images for challenge:', id);
-        const response = await fetch(`/api/shares/img/?challenge_id=${id}`);
+        const apiUrl = `${API_BASE_URL}/shares/img/?challenge_id=${id}`;
+        console.log('🖼️ 이미지 공유 데이터 요청 시작');
+        console.log('  - Challenge ID:', id);
+        console.log('  - API URL:', apiUrl);
+        console.log('  - API_BASE_URL:', API_BASE_URL);
+        
+        const response = await fetch(apiUrl);
+        console.log('📡 API 응답 받음:');
+        console.log('  - Status:', response.status);
+        console.log('  - Status Text:', response.statusText);
+        console.log('  - Headers:', Object.fromEntries(response.headers.entries()));
         
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorText = await response.text();
+          console.error('❌ API 에러 응답:', errorText);
+          throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
         }
         
         const data = await response.json();
@@ -261,13 +272,31 @@ const ImageProblem = () => {
         console.log('Transformed shared images:', transformedData);
         setSharedImages(transformedData);
       } catch (err) {
-        console.error('Failed to fetch shared images:', err);
+        console.log('💥 이미지 공유 데이터 로딩 실패!');
+        console.error('❌ 에러 상세:', err);
+        console.log('🔍 에러 분석:');
+        console.log('  - 에러 메시지:', err.message);
+        console.log('  - 에러 이름:', err.name);
+        console.log('  - 에러 스택:', err.stack);
+        
+        // 네트워크 에러인지 확인
+        if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+          console.log('🌐 네트워크 연결 문제로 추정');
+          console.log('  - API 서버 상태 확인 필요');
+          console.log('  - CORS 설정 확인 필요');
+        } else if (err.message.includes('404')) {
+          console.log('🔍 404 에러 - API 엔드포인트 확인 필요');
+        } else if (err.message.includes('500')) {
+          console.log('🔥 500 에러 - 백엔드 서버 오류');
+        }
+        
+        console.log('🔄 임시 데이터로 대체');
         // 에러 시 기본 데이터 사용 (실제 백엔드 이미지 URL 사용)
         setSharedImages([
           {
             id: 1,
             prompt: '일상 풍경을 묘사한 프롬프트',
-            image: `${API_ENDPOINTS.MEDIA}/shares/img_shares/1_generated_image_1755844087.png`,
+            image: `${API_BASE_URL}/media/shares/img_shares/1_generated_image_1755844087.png`,
             likes: [],
             likes_count: 15,
             isLiked: false,
@@ -326,8 +355,11 @@ const ImageProblem = () => {
     }
     
     setIsGenerating(true);
+    console.log(`🚀 이미지 생성 API 호출: ${API_BASE_URL}/challenges/img/${id}/generate`);
+    console.log(`📝 요청 데이터:`, { prompt: promptText, challengeId: id });
+    console.log(`🔑 토큰 존재:`, token ? '있음' : '없음');
     try {
-      const response = await fetch(`/api/challenges/img/${id}/generate`, {
+      const response = await fetch(`${API_BASE_URL}/challenges/img/${id}/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -344,11 +376,13 @@ const ImageProblem = () => {
       }
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error(`❌ API 응답 에러 (${response.status}):`, errorText);
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
 
       const imageUrl = await response.json();
-      console.log('Raw image URL from backend:', imageUrl);
+      console.log('✅ 이미지 생성 성공! 백엔드 응답:', imageUrl);
       
       // media/media/ 중복 제거
       let cleanUrl = imageUrl;
@@ -357,14 +391,18 @@ const ImageProblem = () => {
         cleanUrl = imageUrl.replace('media/media/', 'media/');
       }
       
-      const fullImageUrl = `/api/${cleanUrl}`;
-      console.log('Final generated image URL:', fullImageUrl);
+      const fullImageUrl = `${API_BASE_URL}/${cleanUrl}`;
+      console.log('🖼️ 최종 이미지 URL:', fullImageUrl);
       setGeneratedImageUrl(fullImageUrl);
       setIsGenerated(true);
     } catch (error) {
-      console.error('Failed to generate image:', error);
+      console.error('❌ 이미지 생성 실패:', error);
       if (error.message !== 'Unauthorized') {
-        alert('이미지 생성에 실패했습니다.');
+        if (error.message.includes('500')) {
+          alert('서버에서 이미지 생성 중 문제가 발생했습니다.\n\n가능한 원인:\n- AI 이미지 생성 서비스 일시적 오류\n- 프롬프트가 너무 복잡하거나 제한된 내용 포함\n- 서버 과부하\n\n잠시 후 다시 시도해주세요.');
+        } else {
+          alert('이미지 생성에 실패했습니다. 다시 시도해주세요.');
+        }
       }
     } finally {
       setIsGenerating(false);
@@ -410,7 +448,7 @@ const ImageProblem = () => {
       
       console.log(`Attempting to ${isLiked ? 'unlike' : 'like'} share ${shareId}`);
       
-      const response = await fetch(`/api/shares/${shareId}/like`, {
+      const response = await fetch(`${API_BASE_URL}/shares/${shareId}/like`, {
         method: method,
         headers: {
           'Authorization': `Bearer ${token}`,

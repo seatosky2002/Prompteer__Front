@@ -1,7 +1,7 @@
 // API 설정 파일
 // 모든 API 호출에서 사용할 기본 URL 설정
 
-// 환경별 API 기본 URL (직접 도메인 사용으로 CORS 테스트)
+// 환경별 API 기본 URL (프로덕션 환경)
 export const API_BASE_URL = "https://likelion.site/api";
 
 // 자주 사용되는 API 엔드포인트들

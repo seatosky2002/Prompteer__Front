@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { API_ENDPOINTS } from '../../config/api';
+import { API_ENDPOINTS, API_BASE_URL } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { getCurrentUser } from '../../apis/api.js';
@@ -66,13 +66,15 @@ const VideoProblem = () => {
     const fetchChallengeData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/challenges/${id}`);
+        console.log(`🚀 비디오 챌린지 API 호출: ${API_BASE_URL}/challenges/${id}`);
+        const response = await fetch(`${API_BASE_URL}/challenges/${id}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
+        console.log('✅ 비디오 챌린지 데이터 로드 성공:', data);
         
         const transformedData = {
           title: data.title || '제목 없음',
@@ -105,36 +107,8 @@ const VideoProblem = () => {
         setProblemData(transformedData);
         setError(null);
       } catch (err) {
-        console.error('Failed to fetch challenge data:', err);
+        console.error('❌ 비디오 챌린지 데이터 로딩 실패:', err);
         setError('챌린지 데이터를 불러오는데 실패했습니다.');
-        
-        setProblemData({
-          title: `Challenge #${id}\n데이터 로딩 실패`,
-          category: '영상',
-          difficulty: '중급',
-          sections: [
-            {
-              title: '📝 상황 설명',
-              content: '서버에서 데이터를 불러올 수 없습니다.'
-            },
-            {
-              title: '🏞️ 장면',
-              content: '장면을 불러올 수 없습니다.'
-            },
-            {
-              title: '🎨 스타일 & 주요 요소',
-              content: '스타일과 주요 요소를 불러올 수 없습니다.'
-            },
-            {
-              title: '📜 목표',
-              content: '주요 시각 요소와 분위기를 모두 포함한 프롬프트를 작성하세요.'
-            },
-            {
-              title: '🖍️ 채점방식',
-              content: '채점 방식: 커뮤니티 평가 100%'
-            }
-          ]
-        });
       } finally {
         setLoading(false);
       }
@@ -152,7 +126,7 @@ const VideoProblem = () => {
       
       setLoadingVideos(true);
       try {
-        const response = await fetch(`/api/shares/video/?challenge_id=${id}`);
+        const response = await fetch(`${API_BASE_URL}/shares/video/?challenge_id=${id}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -191,9 +165,9 @@ const VideoProblem = () => {
 
           if (rawUrl) {
             if (rawUrl.startsWith('media/media/')) {
-              videoUrl = `/api/media/${rawUrl.substring(12)}`;
+              videoUrl = `${API_BASE_URL}/media/${rawUrl.substring(12)}`;
             } else {
-              videoUrl = `/api/${rawUrl}`;
+              videoUrl = `${API_BASE_URL}/${rawUrl}`;
             }
           }
           
@@ -229,20 +203,45 @@ const VideoProblem = () => {
   }, [id, isGenerated]);
 
   const handleGenerate = async () => {
+    console.log('🎬 비디오 생성 시작');
+    console.log('🔧 현재 설정:');
+    console.log('  - Challenge ID:', id);
+    console.log('  - API_BASE_URL:', API_BASE_URL);
+    console.log('  - 프롬프트 길이:', promptText.length);
+    console.log('  - 프롬프트 내용:', promptText);
+    
     if (!promptText.trim()) {
+      console.log('❌ 프롬프트가 비어있음');
       alert('프롬프트를 입력해주세요!');
       return;
     }
 
     const token = localStorage.getItem('access_token');
+    console.log('🔐 토큰 확인:');
+    console.log('  - 토큰 존재:', !!token);
+    console.log('  - 토큰 길이:', token ? token.length : 0);
+    console.log('  - 토큰 앞 10자:', token ? token.substring(0, 10) + '...' : 'null');
+    
     if (!token) {
+      console.log('❌ 토큰이 없음 - 로그인 필요');
       alert('비디오를 생성하려면 로그인이 필요합니다.');
       return;
     }
     
     setIsGenerating(true);
     try {
-      const response = await fetch(`/api/challenges/video/${id}/generate`, {
+      const apiUrl = `${API_BASE_URL}/challenges/video/${id}/generate`;
+      console.log(`🚀 비디오 생성 API 호출: ${apiUrl}`);
+      console.log('📝 요청 데이터:');
+      console.log('  - URL:', apiUrl);
+      console.log('  - Method: POST');
+      console.log('  - Headers:', {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token.substring(0, 10)}...`
+      });
+      console.log('  - Body:', JSON.stringify({ prompt: promptText }));
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -251,35 +250,88 @@ const VideoProblem = () => {
         body: JSON.stringify({ prompt: promptText }),
       });
 
+      console.log('📡 응답 받음:');
+      console.log('  - Status:', response.status);
+      console.log('  - Status Text:', response.statusText);
+      console.log('  - Headers:', Object.fromEntries(response.headers.entries()));
+
       if (response.status === 401) {
+        console.log('❌ 401 인증 실패');
         alert('인증에 실패했습니다. 다시 로그인해주세요.');
         throw new Error('Unauthorized');
       }
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.log(`❌ HTTP 에러 발생: ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        console.error(`❌ API 응답 에러 (${response.status}):`, errorText);
+        console.log('🔍 전체 에러 응답:', {
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url,
+          headers: Object.fromEntries(response.headers.entries()),
+          body: errorText
+        });
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
 
+      console.log('✅ 성공적으로 응답 받음');
       const videoUrl = await response.json();
-      console.log('Raw video URL from backend:', videoUrl);
+      console.log('📹 백엔드에서 받은 비디오 URL:', videoUrl);
+      console.log('📹 URL 타입:', typeof videoUrl);
+      console.log('📹 URL 내용 상세:', videoUrl);
       
       // media/media/ 중복 제거
       let cleanUrl = videoUrl;
+      console.log('🔧 URL 처리 시작:');
+      console.log('  - 원본 URL:', videoUrl);
+      
       if (videoUrl.includes('media/media/')) {
-        // media/media/shares/... -> media/shares/...
+        console.log('  - media/media/ 중복 발견, 제거 중...');
         cleanUrl = videoUrl.replace('media/media/', 'media/');
+        console.log('  - 중복 제거 후:', cleanUrl);
+      } else {
+        console.log('  - media/media/ 중복 없음');
       }
       
-      const fullVideoUrl = `/api/${cleanUrl}`;
-      console.log('Final generated video URL:', fullVideoUrl);
+      const fullVideoUrl = `${API_BASE_URL}/${cleanUrl}`;
+      console.log('✅ 최종 생성된 비디오 URL:', fullVideoUrl);
+      console.log('🎯 비디오 상태 업데이트 중...');
+      
       setGeneratedVideoUrl(fullVideoUrl);
       setIsGenerated(true);
+      
+      console.log('✅ 비디오 생성 완료!');
     } catch (error) {
-      console.error('Failed to generate video:', error);
+      console.log('💥 에러 발생!');
+      console.error('❌ 비디오 생성 실패:', error);
+      console.log('🔍 에러 상세 정보:');
+      console.log('  - 에러 메시지:', error.message);
+      console.log('  - 에러 이름:', error.name);
+      console.log('  - 에러 스택:', error.stack);
+      console.log('  - 에러 전체 객체:', error);
+      
       if (error.message !== 'Unauthorized') {
-        alert('비디오 생성에 실패했습니다.');
+        console.log('🚨 사용자에게 에러 알림 표시');
+        if (error.message.includes('500')) {
+          console.log('  - 500 서버 에러로 판단');
+          
+          // Gemini API 관련 에러 체크
+          if (error.message.includes('enhancePrompt') || error.message.includes('INVALID_ARGUMENT')) {
+            console.log('  - Gemini API 설정 문제로 판단');
+            alert('AI 비디오 생성 서비스 설정에 문제가 있습니다.\n\n이는 백엔드 서버의 AI 모델 설정 문제로,\n개발팀에서 수정 중입니다.\n\n잠시 후 다시 시도해주세요.');
+          } else {
+            alert('서버에서 비디오 생성 중 문제가 발생했습니다.\n\n가능한 원인:\n- AI 비디오 생성 서비스 일시적 오류\n- 프롬프트가 너무 복잡하거나 제한된 내용 포함\n- 서버 과부하\n\n잠시 후 다시 시도해주세요.');
+          }
+        } else {
+          console.log('  - 일반 에러로 판단');
+          alert('비디오 생성에 실패했습니다. 다시 시도해주세요.');
+        }
+      } else {
+        console.log('  - 인증 에러로 판단, 알림 표시 안함');
       }
     } finally {
+      console.log('🔄 비디오 생성 상태 리셋');
       setIsGenerating(false);
     }
   };
@@ -317,7 +369,7 @@ const VideoProblem = () => {
       const isLiked = currentShare?.isLiked || false;
       const method = isLiked ? 'DELETE' : 'POST';
       
-      const response = await fetch(`/api/shares/${shareId}/like`, {
+      const response = await fetch(`${API_BASE_URL}/shares/${shareId}/like`, {
         method: method,
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_ENDPOINTS } from '../../config/api';
+import { API_ENDPOINTS, API_BASE_URL } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { searchChallenges } from '../../services/challengeApi.js';
@@ -150,7 +150,7 @@ const VideoCategory = () => {
       
       for (const challenge of videoChallenges) {
         try {
-          const videoShareUrl = `/api/shares/video/?challenge_id=${challenge.id}&limit=10`;
+          const videoShareUrl = `${API_BASE_URL}/shares/video/?challenge_id=${challenge.id}&limit=10`;
           console.log(`Fetching videos from: ${videoShareUrl}`);
           
           const response = await fetch(videoShareUrl);
@@ -191,7 +191,7 @@ const VideoCategory = () => {
                   processedUrl = processedUrl.substring(6); // 'media/' 제거
                 }
                 
-                const fullVideoUrl = processedUrl.startsWith('http') ? processedUrl : `/api/${processedUrl}`;
+                const fullVideoUrl = processedUrl.startsWith('http') ? processedUrl : `${API_BASE_URL}/${processedUrl}`;
                 mediaMap[challenge.id] = fullVideoUrl;
                 console.log(`Set video for challenge ${challenge.id}:`, fullVideoUrl);
               } else {
@@ -212,7 +212,7 @@ const VideoCategory = () => {
                     processedUrl = processedUrl.substring(6); // 'media/' 제거
                   }
                   
-                  const fullRandomVideoUrl = processedUrl.startsWith('http') ? processedUrl : `/api/${processedUrl}`;
+                  const fullRandomVideoUrl = processedUrl.startsWith('http') ? processedUrl : `${API_BASE_URL}/${processedUrl}`;
                   mediaMap[challenge.id] = fullRandomVideoUrl;
                   console.log(`Set random video for challenge ${challenge.id}:`, fullRandomVideoUrl);
                 } else {

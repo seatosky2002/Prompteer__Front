@@ -138,7 +138,7 @@ const Board = () => {
     // URL 업데이트 (페이지 새로고침 없이)
     const newUrl = newParams.toString() ? `${location.pathname}?${newParams.toString()}` : location.pathname;
     navigate(newUrl, { replace: true });
-  }, [activeTab, activeCategory, navigate, location.pathname]);
+  }, [activeTab, activeCategory]); // navigate와 location.pathname 제거
 
   const handleWriteClick = () => {
     navigate('/board/write');

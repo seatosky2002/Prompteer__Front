@@ -406,13 +406,22 @@ const ImageCategory = () => {
                   {/* Frame 17 - Main Card with Background Image */}
                   <div className="frame-17">
                     {/* Image Content - Reference 이미지 우선, Share 이미지를 fallback으로 사용 */}
-                    {(challenge.referenceImage || challengeMedia[challenge.id]) && (
-                      <img
-                        className="challenge-image"
-                        {...getImageProps(challenge.referenceImage || challengeMedia[challenge.id])}
-                        alt={`Challenge ${challenge.id}`}
-                      />
-                    )}
+                    {(() => {
+                      const imageUrl = challenge.referenceImage || challengeMedia[challenge.id];
+                      console.log(`Challenge ${challenge.id} - Reference: ${challenge.referenceImage}, Share: ${challengeMedia[challenge.id]}, Using: ${imageUrl}`);
+                      
+                      return imageUrl ? (
+                        <img
+                          className="challenge-image"
+                          {...getImageProps(imageUrl)}
+                          alt={`Challenge ${challenge.id}`}
+                        />
+                      ) : (
+                        <div className="no-image-placeholder">
+                          <span>이미지 없음</span>
+                        </div>
+                      );
+                    })()}
                     {/* Frame 21 - Category Badge (Top Right) */}
                     <div className="frame-21">
                       <span className="category-text">

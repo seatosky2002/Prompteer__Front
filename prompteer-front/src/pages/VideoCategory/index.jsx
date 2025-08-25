@@ -5,7 +5,7 @@ import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
 import { searchChallenges } from '../../services/challengeApi.js';
 import { getCurrentUser } from '../../apis/api.js';
-import { convertImagePathToUrl, getImageProps } from '../../utils/imageUrlHelper';
+import { convertImagePathToUrl, getImageProps, getVideoProps } from '../../utils/imageUrlHelper';
 import './VideoCategory.css';
 
 const VideoCategory = () => {
@@ -102,16 +102,16 @@ const VideoCategory = () => {
         
         // API 응답 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
         const transformedData = data.map((challenge) => {
-          let referenceImageUrl = null;
+          let referenceVideoUrl = null;
           
-          // Reference 비디오 URL 처리 (첫 번째 프레임을 이미지로 활용 가능)
+          // Reference 비디오 URL 처리
           if (challenge.video_challenge?.references && challenge.video_challenge.references.length > 0) {
             const reference = challenge.video_challenge.references[0];
             console.log(`Challenge ${challenge.id} reference:`, reference);
             
             if (reference.file_path) {
-              referenceImageUrl = convertImagePathToUrl(reference.file_path);
-              console.log(`Challenge ${challenge.id} reference video converted:`, reference.file_path, '→', referenceImageUrl);
+              referenceVideoUrl = convertImagePathToUrl(reference.file_path);
+              console.log(`Challenge ${challenge.id} reference video converted:`, reference.file_path, '→', referenceVideoUrl);
             }
           }
           
@@ -123,7 +123,7 @@ const VideoCategory = () => {
             difficulty: getDifficultyText(challenge.level),
             participants: Math.floor(Math.random() * 1500) + 300, // 임시 참가자 수
             type: 'video',
-            referenceVideo: referenceImageUrl
+            referenceVideo: referenceVideoUrl
           };
         });
         
@@ -399,41 +399,46 @@ const VideoCategory = () => {
                   className="video-component"
                   onClick={() => handleChallengeClick(challenge.id)}
                 >
-                  {/* Frame 17 - Main Card with Background Image */}
+                  {/* Frame 17 - Main Card with Background Video */}
                   <div className="frame-17">
                     {/* Video Content - Reference 비디오 우선, Share 비디오를 fallback으로 사용 */}
-                    {(challenge.referenceVideo || challengeMedia[challenge.id]) ? (
-                      <video 
-                        className="challenge-video"
-                        {...getImageProps(challenge.referenceVideo || challengeMedia[challenge.id])}
-                        muted
-                        loop
-                        playsInline
-                        preload="metadata"
-                        onMouseEnter={(e) => {
-                          console.log('Video hover play:', e.target.src);
-                          e.target.play().catch(err => console.log('Play failed:', err));
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.pause();
-                        }}
-                        onLoadStart={() => {
-                          console.log('Video load started:', challenge.referenceVideo || challengeMedia[challenge.id]);
-                        }}
-                        onCanPlay={() => {
-                          console.log('Video can play:', challenge.referenceVideo || challengeMedia[challenge.id]);
-                        }}
-                      />
-                    ) : (
-                      <div className="video-placeholder">
-                        <div className="video-placeholder-content">
-                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M8 5V19L19 12L8 5Z" fill="#6C757D"/>
-                          </svg>
-                          <p>비디오 로딩 중...</p>
+                    {(() => {
+                      const videoUrl = challenge.referenceVideo || challengeMedia[challenge.id];
+                      console.log(`Challenge ${challenge.id} - Reference: ${challenge.referenceVideo}, Share: ${challengeMedia[challenge.id]}, Using: ${videoUrl}`);
+                      
+                      return videoUrl ? (
+                        <video 
+                          className="challenge-video"
+                          {...getVideoProps(videoUrl)}
+                          muted
+                          loop
+                          playsInline
+                          preload="metadata"
+                          onMouseEnter={(e) => {
+                            console.log('Video hover play:', e.target.src);
+                            e.target.play().catch(err => console.log('Play failed:', err));
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.pause();
+                          }}
+                          onLoadStart={() => {
+                            console.log('Video load started:', videoUrl);
+                          }}
+                          onCanPlay={() => {
+                            console.log('Video can play:', videoUrl);
+                          }}
+                        />
+                      ) : (
+                        <div className="no-video-placeholder">
+                          <div className="video-placeholder-content">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M8 5V19L19 12L8 5Z" fill="#6C757D"/>
+                            </svg>
+                            <span>비디오 없음</span>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                     {/* Frame 21 - Category Badge (Top Right) */}
                     <div className="frame-21">
                       <span className="category-text">{challenge.category}</span>

@@ -11,7 +11,9 @@ import {
   getPsChallengesPublic,
   getImgChallengesPublic,
   getVideoChallengesPublic,
+  getChallengeDetails,
 } from "../../apis/api";
+import { convertImagePathToUrl } from "../../utils/imageUrlHelper";
 import "./MainPage.css";
 
 const MainPage = () => {
@@ -19,6 +21,7 @@ const MainPage = () => {
   const [topChallenges, setTopChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [challengeImages, setChallengeImages] = useState({});
 
   // 성능 최적화된 챌린지 데이터 가져오기 함수
   const fetchTopChallengesByCategory = async () => {
@@ -197,6 +200,97 @@ const MainPage = () => {
     fetchTopChallengesByCategory();
   }, []);
 
+  // 이미지/영상 챌린지의 미디어 가져오기
+  useEffect(() => {
+    const fetchChallengeImages = async () => {
+      if (topChallenges.length === 0) return;
+
+      const imageMap = {};
+
+      for (const challenge of topChallenges) {
+        if (challenge.isImageChallenge || challenge.isVideoChallenge) {
+          try {
+            // 1. 먼저 챌린지 상세 정보에서 reference image 가져오기
+            const challengeDetails = await getChallengeDetails(challenge.id);
+            
+            if (challengeDetails.success) {
+              const details = challengeDetails.data;
+              let referenceUrl = null;
+              
+              if (challenge.isImageChallenge && details.img_challenge?.references?.length > 0) {
+                const reference = details.img_challenge.references[0];
+                if (reference.file_path) {
+                  referenceUrl = convertImagePathToUrl(reference.file_path);
+                  console.log(`Challenge ${challenge.id} reference image:`, referenceUrl);
+                }
+              } else if (challenge.isVideoChallenge && details.video_challenge?.references?.length > 0) {
+                const reference = details.video_challenge.references[0];
+                if (reference.file_path) {
+                  referenceUrl = convertImagePathToUrl(reference.file_path);
+                  console.log(`Challenge ${challenge.id} reference video:`, referenceUrl);
+                }
+              }
+              
+              if (referenceUrl) {
+                imageMap[challenge.id] = referenceUrl;
+                continue; // reference image가 있으면 share image 가져올 필요 없음
+              }
+            }
+
+            // 2. reference image가 없으면 인기 있는 share image 가져오기
+            let shareEndpoint = '';
+            if (challenge.isImageChallenge) {
+              shareEndpoint = `/api/shares/img/?challenge_id=${challenge.id}&limit=10`;
+            } else if (challenge.isVideoChallenge) {
+              shareEndpoint = `/api/shares/video/?challenge_id=${challenge.id}&limit=10`;
+            }
+
+            if (shareEndpoint) {
+              const response = await fetch(shareEndpoint);
+              if (response.ok) {
+                const shares = await response.json();
+                if (shares && shares.length > 0) {
+                  // 좋아요가 가장 많은 미디어 찾기
+                  const sortedShares = shares.sort((a, b) => {
+                    const likesA = (a.likes || []).length;
+                    const likesB = (b.likes || []).length;
+                    return likesB - likesA;
+                  });
+
+                  const mostLikedShare = sortedShares[0];
+                  let mediaUrl = null;
+
+                  if (challenge.isImageChallenge) {
+                    mediaUrl = mostLikedShare.img_share?.img_url || 
+                              mostLikedShare.img_url || 
+                              mostLikedShare.image || 
+                              mostLikedShare.img;
+                  } else if (challenge.isVideoChallenge) {
+                    mediaUrl = mostLikedShare.video_share?.video_url || 
+                              mostLikedShare.video_url || 
+                              mostLikedShare.video;
+                  }
+
+                  if (mediaUrl) {
+                    const convertedUrl = convertImagePathToUrl(mediaUrl);
+                    imageMap[challenge.id] = convertedUrl;
+                    console.log(`Challenge ${challenge.id} share media:`, convertedUrl);
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            console.error(`Failed to fetch media for challenge ${challenge.id}:`, error);
+          }
+        }
+      }
+
+      setChallengeImages(imageMap);
+    };
+
+    fetchChallengeImages();
+  }, [topChallenges]);
+
   const categories = [
     {
       id: "algorithm",
@@ -303,13 +397,13 @@ const MainPage = () => {
                   {challenge.isImageChallenge ? (
                     <ImageChallengeCard
                       challenge={challenge} // 해당하는 챌린지를 컴포넌트에 넘기기
-                      imageUrl={null} // MainPage에서는 이미지 URL을 제공하지 않음
+                      imageUrl={challengeImages[challenge.id]} // 실제 이미지 URL 전달
                       onClick={handleChallengeClick}
                     />
                   ) : challenge.isVideoChallenge ? (
                     <ImageChallengeCard
                       challenge={challenge}
-                      imageUrl={null} // MainPage에서는 이미지 URL을 제공하지 않음
+                      imageUrl={challengeImages[challenge.id]} // 실제 비디오 URL 전달
                       onClick={handleChallengeClick}
                     />
                   ) : (

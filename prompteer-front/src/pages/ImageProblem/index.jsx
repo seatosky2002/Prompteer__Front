@@ -488,23 +488,7 @@ const ImageProblem = () => {
                 </div>
 
                 <div className="problem-content">
-                  {/* 참조 이미지 섹션 */}
-                  {problemData.referenceImage && (
-                    <div className="problem-section reference-image-section">
-                      <div className="section-header">
-                        <h3 className="section-title">🖼️ 참조 이미지</h3>
-                      </div>
-                      <div className="section-content">
-                        <div className="reference-image-container">
-                          <img 
-                            {...getImageProps(problemData.referenceImage)}
-                            alt="참조 이미지"
-                            className="reference-image"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
+
                   
                   {/* 마크다운 콘텐츠 렌더링 */}
                   <div className="markdown-content">

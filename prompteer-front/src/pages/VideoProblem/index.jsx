@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { API_ENDPOINTS, API_BASE_URL } from '../../config/api';
 import Header from '../../components/common/Header/index.jsx';
 import Footer from '../../components/common/Footer/index.jsx';
@@ -463,24 +465,7 @@ const VideoProblem = () => {
                 </div>
 
                 <div className="problem-content">
-                  {/* 참조 비디오 섹션 */}
-                  {problemData.referenceVideo && (
-                    <div className="problem-section reference-video-section">
-                      <div className="section-header">
-                        <h3 className="section-title">🎬 참조 비디오</h3>
-                      </div>
-                      <div className="section-content">
-                        <div className="reference-video-container">
-                          <video 
-                            {...getImageProps(problemData.referenceVideo)}
-                            controls
-                            className="reference-video"
-                            preload="metadata"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
+
                   
                   {problemData.sections.map((section, index) => (
                     <div key={index} className="problem-section">
@@ -488,7 +473,11 @@ const VideoProblem = () => {
                         <h3 className="section-title">{section.title}</h3>
                       </div>
                       <div className="section-content">
-                        <p className="section-text">{section.content}</p>
+                        <div className="markdown-body">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {section.content}
+                          </ReactMarkdown>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -621,7 +610,11 @@ const VideoProblem = () => {
                         </div>
                         <div className="video-info">
                           <div className="video-prompt">
-                            <p>{share.prompt}</p>
+                            <div className="markdown-body">
+                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {share.prompt}
+                              </ReactMarkdown>
+                            </div>
                           </div>
                           <div className="video-likes">
                             <span 
@@ -667,7 +660,11 @@ const VideoProblem = () => {
               </div>
               <div className="modal-prompt-section">
                 <div className="modal-prompt-content">
-                  <p className="modal-prompt-text">{selectedVideo.prompt}</p>
+                  <div className="markdown-body">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {selectedVideo.prompt}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               </div>
             </div>

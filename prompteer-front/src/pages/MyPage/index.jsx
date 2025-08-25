@@ -12,6 +12,7 @@ import {
   getChallengeDetails,
   getMyPosts,
 } from "../../apis/api.js";
+import { convertImagePathToUrl, getImageProps } from "../../utils/imageUrlHelper";
 import "./MyPage.css";
 
 const MyPage = () => {
@@ -20,6 +21,23 @@ const MyPage = () => {
   const [selectedChallenge, setSelectedChallenge] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [selectedImageChallenge, setSelectedImageChallenge] = useState(null);
+
+  // 난이도 텍스트 변환 함수
+  const getDifficultyText = (level) => {
+    if (!level) return "중급"; // 기본값
+
+    const levelLower = level.toLowerCase();
+    switch (levelLower) {
+      case "easy":
+        return "초급";
+      case "medium":
+        return "중급";
+      case "hard":
+        return "고급";
+      default:
+        return "중급"; // 기본값
+    }
+  };
 
   const handleCodingCardClick = (challenge) => {
     setSelectedChallenge(challenge);
@@ -78,7 +96,7 @@ const MyPage = () => {
                     title:
                       details.title || `Challenge #${challenge.challenge_id}`,
                     description: details.content || "내용 없음",
-                    difficulty: details.level || "알 수 없음",
+                    difficulty: getDifficultyText(details.level),
                     prompt: challenge.prompt,
                     output: challenge.ps_share?.code || "코드 없음",
                     likes: challenge.likes_count || 0,
@@ -97,7 +115,7 @@ const MyPage = () => {
                     challengeNumber: challenge.challenge_id,
                     title: `Challenge #${challenge.challenge_id}`,
                     description: challenge.prompt || "프롬프트 없음",
-                    difficulty: "알 수 없음",
+                    difficulty: "중급",
                     prompt: challenge.prompt,
                     output: challenge.ps_share?.code || "코드 없음",
                     likes: challenge.likes_count || 0,
@@ -117,7 +135,7 @@ const MyPage = () => {
                   challengeNumber: challenge.challenge_id,
                   title: `Challenge #${challenge.challenge_id}`,
                   description: challenge.prompt || "프롬프트 없음",
-                  difficulty: "알 수 없음",
+                  difficulty: "중급",
                   prompt: challenge.prompt,
                   output: challenge.ps_share?.code || "코드 없음",
                   likes: challenge.likes_count || 0,
@@ -178,13 +196,24 @@ const MyPage = () => {
 
                 if (challengeDetails.success) {
                   const details = challengeDetails.data;
+                  
+                  // Reference 이미지 URL 처리
+                  let referenceImageUrl = null;
+                  if (details.img_challenge?.references && details.img_challenge.references.length > 0) {
+                    const reference = details.img_challenge.references[0];
+                    if (reference.file_path) {
+                      referenceImageUrl = convertImagePathToUrl(reference.file_path);
+                      console.log(`Challenge ${challenge.challenge_id} reference image converted:`, reference.file_path, '→', referenceImageUrl);
+                    }
+                  }
+                  
                   return {
                     id: challenge.id,
                     challengeNumber: challenge.challenge_id,
                     title:
                       details.title || `Challenge #${challenge.challenge_id}`,
                     description: details.content || "내용 없음",
-                    difficulty: details.level || "알 수 없음",
+                    difficulty: getDifficultyText(details.level),
                     type: "이미지",
                     prompt: challenge.prompt,
                     imageUrl: challenge.img_share?.img_url || "이미지 없음",
@@ -193,6 +222,7 @@ const MyPage = () => {
                     user: challenge.user,
                     tag: details.tag,
                     references: details.img_challenge?.references || [],
+                    referenceImage: referenceImageUrl,
                   };
                 } else {
                   // 여기까지 올일 없음. 이미지 Result는 받아오는데 챌린지 디테일만 못받는 경우라서.
@@ -201,7 +231,7 @@ const MyPage = () => {
                     challengeNumber: challenge.challenge_id,
                     title: `Challenge #${challenge.challenge_id}`,
                     description: challenge.prompt || "프롬프트 없음",
-                    difficulty: "알 수 없음",
+                    difficulty: "중급",
                     type: "이미지",
                     prompt: challenge.prompt,
                     imageUrl: challenge.img_share?.img_url || "이미지 없음",
@@ -221,7 +251,7 @@ const MyPage = () => {
                   challengeNumber: challenge.challenge_id,
                   title: `Challenge #${challenge.challenge_id}`,
                   description: challenge.prompt || "프롬프트 없음",
-                  difficulty: "알 수 없음",
+                  difficulty: "중급",
                   type: "이미지",
                   prompt: challenge.prompt,
                   imageUrl: challenge.img_share?.img_url || "이미지 없음",
@@ -246,13 +276,24 @@ const MyPage = () => {
 
                 if (challengeDetails.success) {
                   const details = challengeDetails.data;
+                  
+                  // Reference 영상 URL 처리
+                  let referenceVideoUrl = null;
+                  if (details.video_challenge?.references && details.video_challenge.references.length > 0) {
+                    const reference = details.video_challenge.references[0];
+                    if (reference.file_path) {
+                      referenceVideoUrl = convertImagePathToUrl(reference.file_path);
+                      console.log(`Challenge ${challenge.challenge_id} reference video converted:`, reference.file_path, '→', referenceVideoUrl);
+                    }
+                  }
+                  
                   return {
                     id: challenge.id,
                     challengeNumber: challenge.challenge_id,
                     title:
                       details.title || `Challenge #${challenge.challenge_id}`,
                     description: details.content || "내용 없음",
-                    difficulty: details.level || "알 수 없음",
+                    difficulty: getDifficultyText(details.level),
                     type: "영상",
                     prompt: challenge.prompt,
                     imageUrl: challenge.video_share?.video_url || "영상 없음",
@@ -261,6 +302,7 @@ const MyPage = () => {
                     user: challenge.user,
                     tag: details.tag,
                     references: details.video_challenge?.references || [],
+                    referenceImage: referenceVideoUrl,
                   };
                 } else {
                   // 여기까지 올일 없음. 이미지 Result는 받아오는데 챌린지 디테일만 못받는 경우라서.
@@ -269,7 +311,7 @@ const MyPage = () => {
                     challengeNumber: challenge.challenge_id,
                     title: `Challenge #${challenge.challenge_id}`,
                     description: challenge.prompt || "프롬프트 없음",
-                    difficulty: "알 수 없음",
+                    difficulty: "중급",
                     type: "영상",
                     prompt: challenge.prompt,
                     imageUrl: challenge.video_share?.video_url || "영상 없음",
@@ -288,7 +330,7 @@ const MyPage = () => {
                   challengeNumber: challenge.challenge_id,
                   title: `Challenge #${challenge.challenge_id}`,
                   description: challenge.prompt || "프롬프트 없음",
-                  difficulty: "알 수 없음",
+                  difficulty: "중급",
                   type: "영상",
                   prompt: challenge.prompt,
                   imageUrl: challenge.video_share?.video_url || "영상 없음",
@@ -325,6 +367,110 @@ const MyPage = () => {
       fetchImageChallenges();
     }
   }, [activeTab]);
+
+  // 각 챌린지의 가장 인기 있는 이미지/영상 가져오기
+  useEffect(() => {
+    const fetchPopularMedia = async () => {
+      if (imageChallenges.length === 0) return;
+
+      console.log('Fetching popular media for challenges:', imageChallenges);
+      const mediaMap = {};
+
+      for (const challenge of imageChallenges) {
+        try {
+          let shareEndpoint = '';
+          let mediaField = '';
+          
+          // 타입에 따라 다른 엔드포인트 사용
+          if (challenge.type === "이미지") {
+            shareEndpoint = `/api/shares/img/?challenge_id=${challenge.challengeNumber}&limit=10`;
+            mediaField = 'img_url';
+          } else if (challenge.type === "영상") {
+            shareEndpoint = `/api/shares/video/?challenge_id=${challenge.challengeNumber}&limit=10`;
+            mediaField = 'video_url';
+          } else {
+            continue; // 알 수 없는 타입은 건너뛰기
+          }
+
+          console.log(`Fetching media for challenge ${challenge.challengeNumber} (${challenge.type})`);
+          const response = await fetch(shareEndpoint);
+
+          if (response.ok) {
+            const shares = await response.json();
+            console.log(`Shares for challenge ${challenge.challengeNumber}:`, shares);
+
+            if (shares && shares.length > 0) {
+              // 좋아요가 가장 많은 미디어 찾기
+              const sortedShares = shares.sort((a, b) => {
+                const likesA = (a.likes || []).length;
+                const likesB = (b.likes || []).length;
+                return likesB - likesA;
+              });
+
+              const mostLikedShare = sortedShares[0];
+              console.log(`Most liked share for challenge ${challenge.challengeNumber}:`, mostLikedShare);
+
+              // 미디어 URL 추출
+              let mediaUrl = null;
+              if (challenge.type === "이미지") {
+                mediaUrl = mostLikedShare.img_share?.img_url || 
+                          mostLikedShare.img_url || 
+                          mostLikedShare.image || 
+                          mostLikedShare.img;
+              } else if (challenge.type === "영상") {
+                mediaUrl = mostLikedShare.video_share?.video_url || 
+                          mostLikedShare.video_url || 
+                          mostLikedShare.video;
+              }
+
+              console.log(`Raw mediaUrl from API:`, mediaUrl);
+
+              if (mediaUrl) {
+                const convertedUrl = convertImagePathToUrl(mediaUrl);
+                mediaMap[challenge.id] = convertedUrl;
+                console.log(`Set media for challenge ${challenge.challengeNumber}:`, mediaUrl, '→', convertedUrl);
+              } else {
+                // 좋아요가 없으면 랜덤 선택
+                const randomShare = shares[Math.floor(Math.random() * shares.length)];
+                let randomMediaUrl = null;
+                
+                if (challenge.type === "이미지") {
+                  randomMediaUrl = randomShare.img_share?.img_url || 
+                                  randomShare.img_url || 
+                                  randomShare.image || 
+                                  randomShare.img;
+                } else if (challenge.type === "영상") {
+                  randomMediaUrl = randomShare.video_share?.video_url || 
+                                  randomShare.video_url || 
+                                  randomShare.video;
+                }
+                
+                if (randomMediaUrl) {
+                  const convertedRandomUrl = convertImagePathToUrl(randomMediaUrl);
+                  mediaMap[challenge.id] = convertedRandomUrl;
+                  console.log(`Set random media for challenge ${challenge.challengeNumber}:`, randomMediaUrl, '→', convertedRandomUrl);
+                } else {
+                  console.log(`No media URL found for challenge ${challenge.challengeNumber} in share:`, randomShare);
+                }
+              }
+            } else {
+              console.log(`No shares found for challenge ${challenge.challengeNumber}`);
+            }
+          }
+        } catch (error) {
+          console.error(
+            `Failed to fetch media for challenge ${challenge.challengeNumber}:`,
+            error
+          );
+        }
+      }
+
+      console.log('Final mediaMap:', mediaMap);
+      setChallengeMedia(mediaMap);
+    };
+
+    fetchPopularMedia();
+  }, [imageChallenges]);
 
   // 내가 올린 게시글 데이터 로딩
   useEffect(() => {
@@ -573,6 +719,9 @@ const MyPage = () => {
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
   const [postsError, setPostsError] = useState(null);
 
+  // 챌린지 미디어 데이터 (이미지/영상)
+  const [challengeMedia, setChallengeMedia] = useState({});
+
   const tabs = [
     { id: "내가 올린 게시글", label: "내가 올린 게시글", icon: "❓" },
     { id: "코딩 챌린지", label: "코딩 챌린지", icon: "💻" },
@@ -714,6 +863,7 @@ const MyPage = () => {
                       description={challenge.description}
                       type={challenge.type}
                       difficulty={challenge.difficulty}
+                      imageUrl={challenge.referenceImage || challengeMedia[challenge.id]}
                       onClick={() => handleImageCardClick(challenge)}
                     />
                   ))}

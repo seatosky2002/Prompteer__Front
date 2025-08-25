@@ -35,7 +35,18 @@ export const convertImagePathToUrl = (imagePath) => {
     cleanPath = cleanPath.substring(1);
   }
 
-  // API 경로를 통해 FastAPI로 요청 - nginx proxy 활용
+  // Reference 이미지인 경우 api/api 더블 경로 사용 (정적 이미지 접근)
+  if (cleanPath.includes('challenges/img_references') || cleanPath.includes('challenges/video_references')) {
+    // cleanPath가 이미 challenges로 시작하는지 확인
+    if (cleanPath.startsWith('challenges/')) {
+      return `/api/api/media/${cleanPath}`;
+    } else {
+      // challenges/ 경로가 없으면 추가
+      return `/api/api/media/challenges/img_references/${cleanPath.split('/').pop()}`;
+    }
+  }
+  
+  // 일반 미디어 파일은 기존 경로 사용
   return `/api/media/${cleanPath}`;
 };
 
@@ -94,8 +105,20 @@ export const handleImageError = (e, originalPath) => {
 
   switch (retryCount) {
     case 1:
-      // 첫 번째 대안: API 경로
-      const altUrl1 = `${API_BASE_URL}/media/${cleanPath}`;
+      // 첫 번째 대안: Reference 이미지면 api/api 경로, 아니면 API 경로
+      let altUrl1;
+      if (cleanPath.includes('challenges/img_references') || cleanPath.includes('challenges/video_references')) {
+        if (cleanPath.startsWith('challenges/')) {
+          altUrl1 = `${API_BASE_URL}/api/media/${cleanPath}`;
+        } else {
+          // 파일명만 있는 경우 전체 경로 구성
+          const filename = cleanPath.split('/').pop();
+          const refType = cleanPath.includes('img') || filename.includes('img') ? 'img_references' : 'video_references';
+          altUrl1 = `${API_BASE_URL}/api/media/challenges/${refType}/${filename}`;
+        }
+      } else {
+        altUrl1 = `${API_BASE_URL}/media/${cleanPath}`;
+      }
       console.log(`Trying API path: ${altUrl1}`);
       e.target.src = altUrl1;
       break;
@@ -165,5 +188,29 @@ export const getImageProps = (imagePath) => {
     src: convertedUrl,
     onError: (e) => handleImageError(e, imagePath),
     "data-original-path": imagePath
+  };
+};
+
+/**
+ * 비디오 컴포넌트에서 사용할 수 있는 통합 비디오 처리 함수
+ * 
+ * @param {string} videoPath - 백엔드에서 받은 비디오 경로
+ * @returns {object} - src와 onError 핸들러를 포함한 객체
+ */
+export const getVideoProps = (videoPath) => {
+  if (!videoPath) {
+    return {
+      src: "",
+      onError: () => {},
+      "data-original-path": ""
+    };
+  }
+
+  const convertedUrl = convertImagePathToUrl(videoPath); // 비디오도 동일한 경로 변환 로직 사용
+  
+  return {
+    src: convertedUrl,
+    onError: (e) => handleImageError(e, videoPath),
+    "data-original-path": videoPath
   };
 };

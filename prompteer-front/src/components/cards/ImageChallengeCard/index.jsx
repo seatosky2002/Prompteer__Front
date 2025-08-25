@@ -14,12 +14,16 @@ const ImageChallengeCard = ({ challenge, onClick, imageUrl }) => {
       {/* Frame 17 - Main Card with Background Image */}
       <div className="image-frame-17">
         {/* Image Content */}
-        {imageUrl && (
+        {imageUrl ? (
           <img
             className="image-challenge-image"
             {...getImageProps(imageUrl)}
             alt={`Challenge ${challenge.id || challenge.challengeId}`}
           />
+        ) : (
+          <div className="no-image-placeholder">
+            <span>이미지 로딩 중...</span>
+          </div>
         )}
         {/* Frame 21 - Category Badge (Top Right) */}
         <div className="image-frame-21">

@@ -508,7 +508,7 @@ const SharedPostDetail = () => {
                                   ) {
                                     console.log("Video link detected:", href);
 
-                                    // media/media/ 중복 제거
+                                    // API prefix 중복 필요: /api/api/media/... 형태로 구성
                                     let cleanUrl = href;
                                     if (href.includes("media/media/")) {
                                       cleanUrl = href.replace(
@@ -517,9 +517,13 @@ const SharedPostDetail = () => {
                                       );
                                     }
 
-                                    // 상대 경로를 절대 경로로 변환
+                                    // 상대 경로를 절대 경로로 변환 (API prefix 중복 적용)
                                     if (!cleanUrl.startsWith("http")) {
-                                      cleanUrl = `/api/${cleanUrl}`;
+                                      if (cleanUrl.startsWith("media/")) {
+                                        cleanUrl = `/api/api/${cleanUrl}`;
+                                      } else {
+                                        cleanUrl = `/api/api/${cleanUrl}`;
+                                      }
                                     }
 
                                     return (

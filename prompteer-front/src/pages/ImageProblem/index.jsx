@@ -851,13 +851,13 @@ const ImageProblem = () => {
                                   // 상대 경로인 경우 API_BASE_URL과 결합
                                   // API prefix 중복 필요하므로 /api/api/ 형태로 유지
                                   if (url.startsWith("/api/api/")) {
-                                    cleanUrl = `${API_BASE_URL}${url}`;
+                                    cleanUrl = `https://likelion.site${url}`;
                                   } else if (url.startsWith("/api/")) {
-                                    cleanUrl = `${API_BASE_URL}/api${url.substring(
+                                    cleanUrl = `${API_BASE_URL}${url.substring(
                                       4
                                     )}`;
                                   } else {
-                                    cleanUrl = `${API_BASE_URL}/api/${url}`;
+                                    cleanUrl = `${API_BASE_URL}${url}`;
                                   }
                                 }
 

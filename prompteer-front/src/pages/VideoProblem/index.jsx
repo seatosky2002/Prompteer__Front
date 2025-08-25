@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { API_ENDPOINTS, API_BASE_URL } from "../../config/api";
@@ -5,6 +6,7 @@ import Header from "../../components/common/Header/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
 import { getCurrentUser } from "../../apis/api.js";
 import "./VideoProblem.css";
+
 
 const VideoProblem = () => {
   const { id } = useParams();
@@ -78,6 +80,7 @@ const VideoProblem = () => {
         }
 
         const data = await response.json();
+
         console.log("✅ 비디오 챌린지 데이터 로드 성공:", data);
 
         const transformedData = {
@@ -91,6 +94,7 @@ const VideoProblem = () => {
               : data.level === "Hard"
               ? "고급"
               : data.level || "중급",
+
           sections: [
             {
               title: "📝 상황 설명",
@@ -182,6 +186,7 @@ const VideoProblem = () => {
             share.video_share?.video_url || share.video_url || share.url;
 
           if (rawUrl) {
+
             // API prefix 중복 필요: /api/api/media/... 형태로 구성
             let cleanUrl = rawUrl;
             if (rawUrl.includes("media/media/")) {
@@ -195,6 +200,7 @@ const VideoProblem = () => {
               // 기타 경우 /api/api/ prefix 추가
               videoUrl = `${API_BASE_URL}/api/${cleanUrl}`;
             }
+
           }
 
           // 현재 사용자가 이 공유에 좋아요를 눌렀는지 확인
@@ -319,6 +325,7 @@ const VideoProblem = () => {
 
       console.log("✅ 성공적으로 응답 받음");
       const videoUrl = await response.json();
+
       console.log("📹 백엔드에서 받은 비디오 URL:", videoUrl);
       console.log("📹 URL 타입:", typeof videoUrl);
       console.log("📹 URL 내용 상세:", videoUrl);
@@ -337,6 +344,7 @@ const VideoProblem = () => {
       const fullVideoUrl = `${API_BASE_URL}/api/${cleanUrl}`;
       console.log("✅ 최종 생성된 비디오 URL:", fullVideoUrl);
       console.log("🎯 비디오 상태 업데이트 중...");
+
 
       setGeneratedVideoUrl(fullVideoUrl);
       setIsGenerated(true);
@@ -514,6 +522,25 @@ const VideoProblem = () => {
                 </div>
 
                 <div className="problem-content">
+                  {/* 참조 비디오 섹션 */}
+                  {problemData.referenceVideo && (
+                    <div className="problem-section reference-video-section">
+                      <div className="section-header">
+                        <h3 className="section-title">🎬 참조 비디오</h3>
+                      </div>
+                      <div className="section-content">
+                        <div className="reference-video-container">
+                          <video 
+                            {...getImageProps(problemData.referenceVideo)}
+                            controls
+                            className="reference-video"
+                            preload="metadata"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   {problemData.sections.map((section, index) => (
                     <div key={index} className="problem-section">
                       <div className="section-header">
@@ -571,10 +598,12 @@ const VideoProblem = () => {
                       <div className="generated-result">
                         <div className="generated-video-placeholder">
                           {generatedVideoUrl ? (
+
                             <video
                               src={generatedVideoUrl}
                               controls
                               style={{ maxWidth: "100%", maxHeight: "100%" }}
+
                             />
                           ) : (
                             <div className="video-placeholder">
@@ -669,6 +698,7 @@ const VideoProblem = () => {
                           style={{ cursor: "pointer" }}
                         >
                           {share.video ? (
+
                             <video
                               src={share.video}
                               style={{
@@ -680,6 +710,7 @@ const VideoProblem = () => {
                                 e.target.style.display = "none";
                                 e.target.nextSibling.style.display = "flex";
                               }}
+
                             />
                           ) : null}
                           <div
@@ -732,6 +763,7 @@ const VideoProblem = () => {
             <div className="modal-content">
               <div className="modal-video-section">
                 <div className="modal-video-placeholder">
+
                   <video
                     src={selectedVideo.video}
                     controls
@@ -740,6 +772,7 @@ const VideoProblem = () => {
                       height: "100%",
                       objectFit: "contain",
                     }}
+
                   />
                 </div>
               </div>

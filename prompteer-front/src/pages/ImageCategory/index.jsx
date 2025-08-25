@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { API_ENDPOINTS } from "../../config/api";
-import Header from "../../components/common/Header/index.jsx";
-import Footer from "../../components/common/Footer/index.jsx";
-import { searchChallenges } from "../../services/challengeApi.js";
-import { getCurrentUser } from "../../apis/api.js";
-import "./ImageCategory.css";
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../../config/api';
+import Header from '../../components/common/Header/index.jsx';
+import Footer from '../../components/common/Footer/index.jsx';
+import { searchChallenges } from '../../services/challengeApi.js';
+import { getCurrentUser } from '../../apis/api.js';
+import { convertImagePathToUrl, getImageProps } from '../../utils/imageUrlHelper';
+import './ImageCategory.css';
+
 
 const ImageCategory = () => {
   const navigate = useNavigate();
@@ -93,15 +96,18 @@ const ImageCategory = () => {
         const transformedData = data.map((challenge) => {
           let referenceImageUrl = null;
 
+
           // Reference 이미지 URL 처리 (Share 이미지와 동일한 패턴 적용)
           if (
             challenge.img_challenge?.references &&
             challenge.img_challenge.references.length > 0
           ) {
+
             const reference = challenge.img_challenge.references[0];
             console.log(`Challenge ${challenge.id} reference:`, reference);
 
             if (reference.file_path) {
+
               let processedUrl = reference.file_path;
               console.log(
                 `Challenge ${challenge.id} original file_path:`,
@@ -129,6 +135,7 @@ const ImageCategory = () => {
                 `Challenge ${challenge.id} reference image:`,
                 referenceImageUrl
               );
+
             }
           }
 
@@ -218,7 +225,7 @@ const ImageCategory = () => {
               // console.log(`Raw imageUrl from API:`, imageUrl);
 
               if (imageUrl) {
-                // API prefix 중복 필요: /api/api/media/... 형태로 구성
+              // API prefix 중복 필요: /api/api/media/... 형태로 구성
                 let processedUrl = imageUrl;
                 let fullImageUrl;
 
@@ -238,6 +245,7 @@ const ImageCategory = () => {
 
                 mediaMap[challenge.id] = fullImageUrl;
                 // console.log(`Set image for challenge ${challenge.id}:`, fullImageUrl);
+
               } else {
                 // 좋아요가 없으면 랜덤 선택
                 const randomShare =
@@ -248,6 +256,7 @@ const ImageCategory = () => {
                   randomShare.image ||
                   randomShare.img;
                 if (randomImageUrl) {
+
                   // API prefix 중복 필요: /api/api/media/... 형태로 구성
                   let processedUrl = randomImageUrl;
                   let fullRandomImageUrl;
@@ -271,8 +280,9 @@ const ImageCategory = () => {
 
                   mediaMap[challenge.id] = fullRandomImageUrl;
                   // console.log(`Set random image for challenge ${challenge.id}:`, fullRandomImageUrl);
+
                 } else {
-                  // console.log(`No image URL found for challenge ${challenge.id} in share:`, randomShare);
+                  console.log(`No image URL found for challenge ${challenge.id} in share:`, randomShare);
                 }
               }
             } else {
@@ -473,6 +483,7 @@ const ImageCategory = () => {
                       challengeMedia[challenge.id]) && (
                       <img
                         className="challenge-image"
+
                         src={
                           challenge.referenceImage ||
                           challengeMedia[challenge.id]
@@ -503,6 +514,7 @@ const ImageCategory = () => {
                             e.target.style.display = "none";
                           }
                         }}
+
                       />
                     )}
                     {/* Frame 21 - Category Badge (Top Right) */}

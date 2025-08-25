@@ -1,4 +1,5 @@
 import React from "react";
+import { getImageProps } from "../../../utils/imageUrlHelper";
 import "./ImageDetailPrompt.css";
 
 // 이미지 챌린지 상세 프롬프트 기록(모달) 보여주는 컴포넌트
@@ -21,9 +22,7 @@ const ImageDetailPrompt = ({ isOpen, onClose, imageData }) => {
             <div className="image-section">
               <div className="image-container">
                 <img
-                  src={
-                    imageData?.imageUrl || "https://via.placeholder.com/450x681"
-                  }
+                  {...getImageProps(imageData?.imageUrl || "https://via.placeholder.com/450x681")}
                   alt={imageData?.title || "이미지/영상"}
                   className="challenge-image"
                 />

@@ -1,4 +1,5 @@
 import React from "react";
+import { getImageProps } from "../../../utils/imageUrlHelper";
 import "./ImageChallengeCard.css";
 
 const ImageChallengeCard = ({ challenge, onClick, imageUrl }) => {
@@ -16,11 +17,8 @@ const ImageChallengeCard = ({ challenge, onClick, imageUrl }) => {
         {imageUrl && (
           <img
             className="image-challenge-image"
-            src={imageUrl}
+            {...getImageProps(imageUrl)}
             alt={`Challenge ${challenge.id || challenge.challengeId}`}
-            onError={(e) => {
-              e.target.style.display = "none";
-            }}
           />
         )}
         {/* Frame 21 - Category Badge (Top Right) */}

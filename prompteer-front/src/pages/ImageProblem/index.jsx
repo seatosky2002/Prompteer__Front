@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { API_ENDPOINTS, API_BASE_URL } from "../../config/api";
-import Header from "../../components/common/Header/index.jsx";
-import Footer from "../../components/common/Footer/index.jsx";
-import { getCurrentUser } from "../../apis/api.js";
-import "./ImageProblem.css";
+
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import { API_ENDPOINTS, API_BASE_URL } from '../../config/api';
+import Header from '../../components/common/Header/index.jsx';
+import Footer from '../../components/common/Footer/index.jsx';
+import { getCurrentUser } from '../../apis/api.js';
+import { convertImagePathToUrl, handleImageError, getImageProps } from '../../utils/imageUrlHelper';
+import './ImageProblem.css';
+
 
 const ImageProblem = () => {
   const { id } = useParams();
@@ -75,6 +79,7 @@ const ImageProblem = () => {
         }
 
         const data = await response.json();
+
         console.log("Challenge data:", data);
         console.log("Data structure:", JSON.stringify(data, null, 2));
         console.log("Data ID:", data.id);
@@ -125,6 +130,7 @@ const ImageProblem = () => {
               content: "채점 방식: 커뮤니티 평가 100%",
             },
           ],
+
         };
 
         setProblemData(transformedData);
@@ -136,6 +142,7 @@ const ImageProblem = () => {
         // 에러 시 기본 데이터 사용
         setProblemData({
           title: `Challenge #${id}\n데이터 로딩 실패`,
+
           category: "이미지",
           difficulty: "중급",
           sections: [
@@ -161,6 +168,7 @@ const ImageProblem = () => {
               content: "채점 방식: 커뮤니티 평가 100%",
             },
           ],
+
         });
       } finally {
         setLoading(false);
@@ -203,11 +211,13 @@ const ImageProblem = () => {
         }
 
         const data = await response.json();
+
         console.log("Shared images data:", data);
         console.log(
           "First share structure:",
           data[0] ? JSON.stringify(data[0], null, 2) : "No data"
         );
+
 
         if (data.length === 0) {
           console.log("No shared images found for this challenge");
@@ -241,7 +251,11 @@ const ImageProblem = () => {
 
           // 이미지 URL을 찾는 로직 개선
           let imageUrl = null;
+          let rawImgUrl = null;
+          
+          // 다양한 필드에서 이미지 URL 찾기
           if (share.img_share?.img_url) {
+
             const imgUrl = share.img_share.img_url;
             console.log(`Original img_url: ${imgUrl}`);
 
@@ -285,6 +299,7 @@ const ImageProblem = () => {
             } else {
               imageUrl = `/api/api/${imgUrl}`;
             }
+
           }
 
           console.log(`Share ${index} image URL:`, imageUrl);
@@ -382,6 +397,7 @@ const ImageProblem = () => {
             created_at: new Date().toISOString(),
           },
         ]);
+
       } finally {
         setLoadingImages(false);
       }
@@ -437,6 +453,7 @@ const ImageProblem = () => {
       }
 
       const imageUrl = await response.json();
+
       console.log("✅ 이미지 생성 성공! 백엔드 응답:", imageUrl);
 
       // URL 처리 로직
@@ -459,6 +476,7 @@ const ImageProblem = () => {
       const fullImageUrl = cleanUrl;
       console.log("🖼️ 최종 이미지 URL:", fullImageUrl);
       setGeneratedImageUrl(fullImageUrl);
+
       setIsGenerated(true);
     } catch (error) {
       console.error("❌ 이미지 생성 실패:", error);
@@ -647,16 +665,28 @@ const ImageProblem = () => {
                 </div>
 
                 <div className="problem-content">
-                  {problemData.sections.map((section, index) => (
-                    <div key={index} className="problem-section">
+                  {/* 참조 이미지 섹션 */}
+                  {problemData.referenceImage && (
+                    <div className="problem-section reference-image-section">
                       <div className="section-header">
-                        <h3 className="section-title">{section.title}</h3>
+                        <h3 className="section-title">🖼️ 참조 이미지</h3>
                       </div>
                       <div className="section-content">
-                        <p className="section-text">{section.content}</p>
+                        <div className="reference-image-container">
+                          <img 
+                            {...getImageProps(problemData.referenceImage)}
+                            alt="참조 이미지"
+                            className="reference-image"
+                          />
+                        </div>
                       </div>
                     </div>
-                  ))}
+                  )}
+                  
+                  {/* 마크다운 콘텐츠 렌더링 */}
+                  <div className="markdown-content">
+                    <ReactMarkdown>{problemData.content}</ReactMarkdown>
+                  </div>
                 </div>
               </div>
 
@@ -706,6 +736,7 @@ const ImageProblem = () => {
                       <div className="generated-result">
                         <div className="generated-image-placeholder">
                           {generatedImageUrl ? (
+
                             <img
                               src={generatedImageUrl}
                               alt="Generated"
@@ -714,12 +745,14 @@ const ImageProblem = () => {
                                 height: "100%",
                                 objectFit: "cover",
                               }}
+
                               onLoad={() => {
                                 console.log(
                                   "✅ Generated image loaded successfully:",
                                   generatedImageUrl
                                 );
                               }}
+
                               onError={(e) => {
                                 console.error(
                                   "❌ Generated image failed to load:",
@@ -732,6 +765,7 @@ const ImageProblem = () => {
                                   </div>
                                 `;
                               }}
+
                             />
                           ) : (
                             <div className="image-placeholder">
@@ -829,6 +863,7 @@ const ImageProblem = () => {
                           style={{ cursor: "pointer" }}
                         >
                           {share.image ? (
+
                             <img
                               src={(() => {
                                 const url = share.image;
@@ -886,6 +921,7 @@ const ImageProblem = () => {
                                 e.target.style.display = "none";
                                 e.target.nextSibling.style.display = "flex";
                               }}
+
                             />
                           ) : null}
                           <div
@@ -939,6 +975,7 @@ const ImageProblem = () => {
             <div className="modal-content">
               <div className="modal-image-section">
                 <div className="modal-image-placeholder">
+
                   <img
                     src={selectedImage.image}
                     alt="Selected submission"
@@ -948,6 +985,7 @@ const ImageProblem = () => {
                       objectFit: "contain",
                     }}
                   />
+
                 </div>
               </div>
               <div className="modal-prompt-section">

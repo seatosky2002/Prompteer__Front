@@ -5,12 +5,12 @@ import Footer from "../../components/common/Footer";
 import CodingChallengeCard from "../../components/cards/CodingChallengeCard";
 import ImageChallengeCard from "../../components/cards/ImageChallengeCard";
 import {
-  getPsShares,
-  getImgShares,
-  getVideoShares,
-  getPsChallenges,
-  getImgChallenges,
-  getVideoChallenges,
+  getPsSharesPublic,
+  getImgSharesPublic,
+  getVideoSharesPublic,
+  getPsChallengesPublic,
+  getImgChallengesPublic,
+  getVideoChallengesPublic,
 } from "../../apis/api";
 import "./MainPage.css";
 
@@ -36,13 +36,13 @@ const MainPage = () => {
         try {
           // 병렬로 shares와 challenges 데이터 동시 호출
           const [sharesResult, challengesResult] = await Promise.all([
-            categoryInfo.api === "ps" ? getPsShares({ limit: 50 }) :
-            categoryInfo.api === "img" ? getImgShares({ limit: 50 }) :
-            getVideoShares({ limit: 50 }),
+            categoryInfo.api === "ps" ? getPsSharesPublic({ limit: 50 }) :
+            categoryInfo.api === "img" ? getImgSharesPublic({ limit: 50 }) :
+            getVideoSharesPublic({ limit: 50 }),
             
-            categoryInfo.api === "ps" ? getPsChallenges({ limit: 50 }) :
-            categoryInfo.api === "img" ? getImgChallenges({ limit: 50 }) :
-            getVideoChallenges({ limit: 50 })
+            categoryInfo.api === "ps" ? getPsChallengesPublic({ limit: 50 }) :
+            categoryInfo.api === "img" ? getImgChallengesPublic({ limit: 50 }) :
+            getVideoChallengesPublic({ limit: 50 })
           ]);
 
           if (!sharesResult?.success || !challengesResult?.success || 

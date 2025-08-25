@@ -230,8 +230,9 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 500px;
-  flex: 1;
+  width: 100%;
+  max-width: 500px;
+  height: 100%;
   order: 0;
   align-self: stretch;
 }
@@ -243,8 +244,10 @@
   flex-direction: column;
   justify-content: stretch;
   align-items: stretch;
-  width: 468px; /* 코딩 문제와 동일한 너비 */
-  flex: 1;
+  width: 100%;
+  max-width: 468px;
+  height: calc(100vh - 300px);
+  min-height: 600px;
   overflow: hidden;
   background: #FFFFFF;
   border: 1px solid #E9ECEF;
@@ -263,18 +266,18 @@
 
 .prompt-textarea {
   width: 100%;
-  height: 100% !important; /* 강제로 전체 높이 사용 */
   border: none;
   outline: none;
-  resize: none; /* 리사이즈 비활성화 */
+  resize: none;
   background: transparent;
   font-family: 'Fira Code', monospace;
   font-weight: 400;
   font-size: 15px;
   line-height: 1.7;
   color: #212529;
-  box-sizing: border-box; /* 패딩과 테두리를 포함한 크기 계산 */
-  min-height: 720px; /* 코딩 문제와 동일한 최소 높이 */
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 500px;
 }
 
 .prompt-textarea::placeholder {
@@ -287,31 +290,40 @@
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  align-items: flex-start;
-  padding: 17px 16px 16px;
+  align-items: center;
+  padding: 24px 16px;
   gap: 12px;
-  width: 468px; /* 코딩 문제와 동일한 너비 */
-  height: 73px;
+  width: 100%;
+  min-height: 80px;
   background: #FFFFFF;
-  border: none; /* border-top 제거 - 코딩 문제와 동일 */
+  border: none;
   flex: none;
   order: 2;
   flex-grow: 0;
+  border-top: 1px solid #E9ECEF;
 }
 
 /* Frame 55: 생성 버튼 */
 .generate-btn {
-  padding: 10px 20px 12px; /* 피그마와 일치 */
-  background: #1971C2; /* 피그마 색상과 일치 */
-  border-radius: 6px; /* rounded-md */
+  padding: 12px 24px;
+  background: #1971C2;
+  border-radius: 6px;
   border: none;
   display: flex;
-  flex-direction: column;
-  justify-content: center; /* justify-center */
-  align-items: center; /* items-center */
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  flex-shrink: 0; /* 버튼이 줄어들지 않도록 */
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  height: 44px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.generate-btn:hover {
+  background: #1864AB;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .generate-btn:disabled {

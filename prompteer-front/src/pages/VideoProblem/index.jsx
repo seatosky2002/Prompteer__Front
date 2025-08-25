@@ -164,11 +164,12 @@ const VideoProblem = () => {
           let rawUrl = share.video_share?.video_url || share.video_url || share.url;
 
           if (rawUrl) {
-            if (rawUrl.startsWith('media/media/')) {
-              videoUrl = `${API_BASE_URL}/media/${rawUrl.substring(12)}`;
-            } else {
-              videoUrl = `${API_BASE_URL}/${rawUrl}`;
+            // media/media/ 중복 제거
+            let cleanUrl = rawUrl;
+            if (rawUrl.includes('media/media/')) {
+              cleanUrl = rawUrl.replace('media/media/', 'media/');
             }
+            videoUrl = `${API_BASE_URL}/${cleanUrl}`;
           }
           
           // 현재 사용자가 이 공유에 좋아요를 눌렀는지 확인
@@ -281,17 +282,15 @@ const VideoProblem = () => {
       console.log('📹 URL 타입:', typeof videoUrl);
       console.log('📹 URL 내용 상세:', videoUrl);
       
-      // media/media/ 중복 제거
-      let cleanUrl = videoUrl;
+      // URL 처리
       console.log('🔧 URL 처리 시작:');
       console.log('  - 원본 URL:', videoUrl);
       
+      // media/media/ 중복 제거
+      let cleanUrl = videoUrl;
       if (videoUrl.includes('media/media/')) {
-        console.log('  - media/media/ 중복 발견, 제거 중...');
         cleanUrl = videoUrl.replace('media/media/', 'media/');
-        console.log('  - 중복 제거 후:', cleanUrl);
-      } else {
-        console.log('  - media/media/ 중복 없음');
+        console.log('  - media/media/ 중복 제거 후:', cleanUrl);
       }
       
       const fullVideoUrl = `${API_BASE_URL}/${cleanUrl}`;

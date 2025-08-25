@@ -384,14 +384,25 @@ const ImageProblem = () => {
       const imageUrl = await response.json();
       console.log('✅ 이미지 생성 성공! 백엔드 응답:', imageUrl);
       
-      // media/media/ 중복 제거
+      // URL 처리 로직
       let cleanUrl = imageUrl;
-      if (imageUrl.includes('media/media/')) {
-        // media/media/shares/... -> media/shares/...
-        cleanUrl = imageUrl.replace('media/media/', 'media/');
+      if (imageUrl.startsWith('http')) {
+        // 이미 완전한 URL이면 그대로 사용
+        cleanUrl = imageUrl;
+      } else {
+        // 상대 경로인 경우 API_BASE_URL과 결합
+        // /api/로 시작하는 경우 /api를 제거
+        if (imageUrl.startsWith('/api/')) {
+          cleanUrl = imageUrl.substring(4); // '/api/' 제거
+        }
+        // media/media/ 중복 제거
+        if (cleanUrl.includes('media/media/')) {
+          cleanUrl = cleanUrl.replace('media/media/', 'media/');
+        }
+        cleanUrl = `${API_BASE_URL}/${cleanUrl}`;
       }
       
-      const fullImageUrl = `${API_BASE_URL}/${cleanUrl}`;
+      const fullImageUrl = cleanUrl;
       console.log('🖼️ 최종 이미지 URL:', fullImageUrl);
       setGeneratedImageUrl(fullImageUrl);
       setIsGenerated(true);
@@ -721,19 +732,25 @@ const ImageProblem = () => {
                                   return url;
                                 }
                                 
-                                // media/media/ 중복 제거 로직
+                                // URL 처리 로직
                                 let cleanUrl = url;
-                                if (url.includes('media/media/')) {
-                                  // media/media/shares/... -> shares/...
-                                  cleanUrl = url.substring(url.indexOf('media/media/') + 12);
-                                  cleanUrl = `media/${cleanUrl}`;
-                                } else if (url.startsWith('media/')) {
+                                if (url.startsWith('http')) {
+                                  // 이미 완전한 URL이면 그대로 사용
                                   cleanUrl = url;
-                                } else if (!url.startsWith('/')) {
-                                  cleanUrl = `media/${url}`;
+                                } else {
+                                  // 상대 경로인 경우 API_BASE_URL과 결합
+                                  // /api/로 시작하는 경우 /api를 제거
+                                  if (url.startsWith('/api/')) {
+                                    cleanUrl = url.substring(4); // '/api/' 제거
+                                  }
+                                  // media/media/ 중복 제거
+                                  if (cleanUrl.includes('media/media/')) {
+                                    cleanUrl = cleanUrl.replace('media/media/', 'media/');
+                                  }
+                                  cleanUrl = `${API_BASE_URL}/${cleanUrl}`;
                                 }
                                 
-                                const finalUrl = `/api/${cleanUrl}`;
+                                const finalUrl = cleanUrl;
                                 console.log('Final shared image URL:', finalUrl);
                                 return finalUrl;
                               })()}

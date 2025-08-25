@@ -476,6 +476,151 @@ export const getMyPosts = async () => {
 // Shares 관련 API들. 모든 Shares를 각 카테고리들 별로 불러온다다
 // =============================================================================
 
+// Public 버전 (로그인 불필요) - MainPage용
+export const getPsSharesPublic = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+
+    // 기본값 설정
+    queryParams.append("skip", params.skip || 0);
+    queryParams.append("limit", params.limit || 100); // 기본값 100개
+
+    const response = await instance.get(
+      `shares/ps/?${queryParams.toString()}`
+    );
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    console.warn("Public PS shares API failed:", error);
+    return {
+      success: false,
+      error: "PS 챌린지 결과물 목록을 가져올 수 없습니다.",
+    };
+  }
+};
+
+export const getImgSharesPublic = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+
+    // 기본값 설정
+    queryParams.append("skip", params.skip || 0);
+    queryParams.append("limit", params.limit || 100);
+
+    const response = await instance.get(
+      `shares/img/?${queryParams.toString()}`
+    );
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    console.warn("Public img shares API failed:", error);
+    return {
+      success: false,
+      error: "이미지 챌린지 결과물 목록을 가져올 수 없습니다.",
+    };
+  }
+};
+
+export const getVideoSharesPublic = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+
+    // 기본값 설정
+    queryParams.append("skip", params.skip || 0);
+    queryParams.append("limit", params.limit || 100);
+
+    const response = await instance.get(
+      `shares/video/?${queryParams.toString()}`
+    );
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
+    console.warn("Public video shares API failed:", error);
+    return {
+      success: false,
+      error: "비디오 챌린지 결과물 목록을 가져올 수 없습니다.",
+    };
+  }
+};
+
+export const getPsChallengesPublic = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+    queryParams.append("skip", params.skip || 0);
+    queryParams.append("limit", params.limit || 100); // 디폴트 100개
+
+    const response = await instance.get(
+      `challenges/ps/?${queryParams.toString()}`
+    );
+    if (response.status === 200) {
+      return { success: true, data: response.data };
+    }
+  } catch (error) {
+    console.warn("Public PS challenges API failed:", error);
+    return { 
+      success: false, 
+      error: "PS 챌린지 목록을 가져올 수 없습니다." 
+    };
+  }
+};
+
+export const getImgChallengesPublic = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+    queryParams.append("skip", params.skip || 0);
+    queryParams.append("limit", params.limit || 100); // 디폴트 100개
+
+    const response = await instance.get(
+      `challenges/img/?${queryParams.toString()}`
+    );
+    if (response.status === 200) {
+      return { success: true, data: response.data };
+    }
+  } catch (error) {
+    console.warn("Public img challenges API failed:", error);
+    return {
+      success: false,
+      error: "이미지 챌린지 목록을 가져올 수 없습니다.",
+    };
+  }
+};
+
+export const getVideoChallengesPublic = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+    queryParams.append("skip", params.skip || 0);
+    queryParams.append("limit", params.limit || 100); // 디폴트 100개
+
+    const response = await instance.get(
+      `challenges/video/?${queryParams.toString()}`
+    );
+    if (response.status === 200) {
+      return { success: true, data: response.data };
+    }
+  } catch (error) {
+    console.warn("Public video challenges API failed:", error);
+    return {
+      success: false,
+      error: "비디오 챌린지 목록을 가져올 수 없습니다.",
+    };
+  }
+};
+
 // PS 챌린지 결과물 목록 조회 API
 export const getPsShares = async (params = {}) => {
   try {

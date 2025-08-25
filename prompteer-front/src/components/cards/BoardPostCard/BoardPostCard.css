@@ -38,11 +38,10 @@
 
 .board-post-category {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4px 10px;
-  width: 44px;
+  padding: 4px 12px;
+  min-width: 44px;
   height: 24px;
   background: #E7F5FF;
   border-radius: 16px;
@@ -52,8 +51,6 @@
 }
 
 .category-text {
-  width: 24px;
-  height: 16px;
   font-family: 'Noto Sans KR';
   font-style: normal;
   font-weight: 500;
@@ -67,6 +64,7 @@
   border: none !important;
   outline: none !important;
   text-shadow: none !important;
+  white-space: nowrap;
   flex: none;
   order: 0;
   flex-grow: 0;

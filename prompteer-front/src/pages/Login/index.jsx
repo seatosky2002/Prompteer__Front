@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import Header from "../../components/common/Header/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
 import { signIn } from "../../apis/api.js";
+import { useAuth } from "../../contexts/AuthContext";
 import "./Login.css";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   // state 'id'를 'email'로 변경
   const [form, setForm] = useState({ email: "", password: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,6 +38,8 @@ const Login = () => {
       const result = await signIn(loginData);
 
       if (result.success) {
+        // Context의 login 함수 호출하여 전역 상태 업데이트
+        login(result.data);
         alert("로그인 성공!");
       } else {
         alert(result.error || "로그인에 실패했습니다.");

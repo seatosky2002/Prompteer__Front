@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../../components/common/Header/index.jsx";
 import Footer from "../../components/common/Footer/index.jsx";
 import { signUp, updateUserProfile } from "../../apis/api.js";
+import { useAuth } from "../../contexts/AuthContext";
 import "./Signup.css";
 
 const allInterests = [
@@ -31,6 +32,7 @@ const mapInterestsToAPI = (selectedInterests) => {
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -109,10 +111,14 @@ const Signup = () => {
       const profileResult = await updateUserProfile(profileData); // api로 쏠 data 생성성
 
       if (profileResult.success) {
+        // Context의 login 함수 호출하여 전역 상태 업데이트
+        login(signupResult.data);
         alert("회원가입이 완료되었습니다! 자동으로 로그인됩니다."); // 프로필 수정까지는 완료되어야 진짜 회원가입 끝끝
         // signUp 함수에서 이미 토큰 저장하고 리다이렉트 처리함
       } else {
         // 기본 회원가입은 성공했지만 프로필 저장 실패. 이런일은 거의 없겠지지
+        // Context의 login 함수 호출하여 전역 상태 업데이트
+        login(signupResult.data);
         alert(
           "회원가입은 완료되었지만 프로필 저장에 실패했습니다. 설정에서 다시 입력해주세요."
         );

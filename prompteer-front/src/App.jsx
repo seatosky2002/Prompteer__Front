@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
 import Board from "./pages/Board/index.jsx";
 import PostDetail from "./pages/PostDetail/index.jsx";
 import SharedPostDetail from "./pages/SharedPostDetail/index.jsx";
@@ -23,27 +24,29 @@ import "./App.css";
 function App() {
   return (
     <div className="App">
-      <Router>
-        <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/board" element={<Board />} />
-          <Route path="/board/post/:id" element={<PostDetail />} />
-          <Route path="/board/shared/:id" element={<SharedPostDetail />} />
-          <Route path="/board/post/:id/problem" element={<ProblemDetail />} />
-          <Route path="/board/write" element={<PostWrite />} />
-          <Route path="/category/coding" element={<CodingCategory />} />
-          <Route path="/coding/problem/:id" element={<CodingProblem />} />
-          <Route path="/category/image" element={<ImageCategory />} />
-          <Route path="/image/challenge/:id" element={<ImageProblem />} />
-          <Route path="/category/video" element={<VideoCategory />} />
-          <Route path="/video/challenge/:id" element={<VideoProblem />} />
-          <Route path="/mypage" element={<MyPage />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/category/preparing" element={<Preparing />} />
-        </Routes>
-      </Router>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/board" element={<Board />} />
+            <Route path="/board/post/:id" element={<PostDetail />} />
+            <Route path="/board/shared/:id" element={<SharedPostDetail />} />
+            <Route path="/board/post/:id/problem" element={<ProblemDetail />} />
+            <Route path="/board/write" element={<PostWrite />} />
+            <Route path="/category/coding" element={<CodingCategory />} />
+            <Route path="/coding/problem/:id" element={<CodingProblem />} />
+            <Route path="/category/image" element={<ImageCategory />} />
+            <Route path="/image/challenge/:id" element={<ImageProblem />} />
+            <Route path="/category/video" element={<VideoCategory />} />
+            <Route path="/video/challenge/:id" element={<VideoProblem />} />
+            <Route path="/mypage" element={<MyPage />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/category/preparing" element={<Preparing />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
     </div>
   );
 }

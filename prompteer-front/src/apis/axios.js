@@ -3,21 +3,19 @@
 
 import axios from "axios";
 import { API_BASE_URL } from "../config/api";
+import { getGlobalLogout } from "../contexts/AuthContext";
 
 // FastAPI 백엔드 baseURL 설정 (config에서 가져옴)
 const BASE_URL = `${API_BASE_URL}/`;
 
 // 누구나 접근 가능한 API들
 export const instance = axios.create({
-
-  baseURL: BASE_URL
-
+  baseURL: BASE_URL,
 });
 
 // 로그인 해야지 접근 가능한 API들
 export const instanceWithToken = axios.create({
-  baseURL: BASE_URL
-
+  baseURL: BASE_URL,
 });
 
 // request interceptor. 모든 '요청'에 토큰 추가
@@ -58,8 +56,15 @@ instanceWithToken.interceptors.response.use(
     // 즉, api 불러올때 토큰 만료 상황 일반적으로 처리해주는 코드
     if (error.response?.status === 401) {
       console.warn("Token expired or invalid. Redirecting to login...");
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("token_type");
+      // localStorage.removeItem("access_token");
+      // localStorage.removeItem("token_type");
+
+      // Context의 logout 함수 호출하여 전역 상태 업데이트
+      const logout = getGlobalLogout();
+      if (logout) {
+        logout();
+      }
+
       alert("로그인을 해주세요");
       window.location.href = "/login";
       return Promise.reject(new Error("Authentication failed"));

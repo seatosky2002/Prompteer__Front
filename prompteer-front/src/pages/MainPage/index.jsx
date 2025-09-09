@@ -29,9 +29,24 @@ const MainPage = () => {
       setLoading(true);
 
       const categories = [
-        { api: "ps", category: "코딩", isImageChallenge: false, isVideoChallenge: false },
-        { api: "img", category: "그림", isImageChallenge: true, isVideoChallenge: false },
-        { api: "video", category: "영상", isImageChallenge: false, isVideoChallenge: true },
+        {
+          api: "ps",
+          category: "코딩",
+          isImageChallenge: false,
+          isVideoChallenge: false,
+        },
+        {
+          api: "img",
+          category: "그림",
+          isImageChallenge: true,
+          isVideoChallenge: false,
+        },
+        {
+          api: "video",
+          category: "영상",
+          isImageChallenge: false,
+          isVideoChallenge: true,
+        },
       ];
 
       // 🚀 성능 개선: 모든 API를 병렬로 호출
@@ -39,25 +54,33 @@ const MainPage = () => {
         try {
           // 병렬로 shares와 challenges 데이터 동시 호출
           const [sharesResult, challengesResult] = await Promise.all([
-            categoryInfo.api === "ps" ? getPsSharesPublic({ limit: 50 }) :
-            categoryInfo.api === "img" ? getImgSharesPublic({ limit: 50 }) :
-            getVideoSharesPublic({ limit: 50 }),
-            
-            categoryInfo.api === "ps" ? getPsChallengesPublic({ limit: 50 }) :
-            categoryInfo.api === "img" ? getImgChallengesPublic({ limit: 50 }) :
-            getVideoChallengesPublic({ limit: 50 })
+            categoryInfo.api === "ps"
+              ? getPsSharesPublic({ limit: 50 })
+              : categoryInfo.api === "img"
+              ? getImgSharesPublic({ limit: 50 })
+              : getVideoSharesPublic({ limit: 50 }),
+
+            categoryInfo.api === "ps"
+              ? getPsChallengesPublic({ limit: 50 })
+              : categoryInfo.api === "img"
+              ? getImgChallengesPublic({ limit: 50 })
+              : getVideoChallengesPublic({ limit: 50 }),
           ]);
 
-          if (!sharesResult?.success || !challengesResult?.success || 
-              !sharesResult.data?.length || !challengesResult.data?.length) {
+          if (
+            !sharesResult?.success ||
+            !challengesResult?.success ||
+            !sharesResult.data?.length ||
+            !challengesResult.data?.length
+          ) {
             return null;
           }
 
           // shares 개수 계산 최적화
           const challengeSharesCount = {};
-          sharesResult.data.forEach(share => {
+          sharesResult.data.forEach((share) => {
             if (share.challenge_id) {
-              challengeSharesCount[share.challenge_id] = 
+              challengeSharesCount[share.challenge_id] =
                 (challengeSharesCount[share.challenge_id] || 0) + 1;
             }
           });
@@ -65,18 +88,20 @@ const MainPage = () => {
           // 가장 인기 있는 챌린지 찾기
           let topChallengeId = null;
           let maxShares = 0;
-          Object.entries(challengeSharesCount).forEach(([challengeId, count]) => {
-            if (count > maxShares) {
-              maxShares = count;
-              topChallengeId = parseInt(challengeId);
+          Object.entries(challengeSharesCount).forEach(
+            ([challengeId, count]) => {
+              if (count > maxShares) {
+                maxShares = count;
+                topChallengeId = parseInt(challengeId);
+              }
             }
-          });
+          );
 
           if (!topChallengeId || maxShares === 0) return null;
 
           // 챌린지 상세 정보 찾기 (이미 가져온 데이터에서 찾음)
           const challengeDetails = challengesResult.data.find(
-            challenge => challenge.id === topChallengeId
+            (challenge) => challenge.id === topChallengeId
           );
 
           if (!challengeDetails) return null;
@@ -84,10 +109,14 @@ const MainPage = () => {
           // 공통 데이터 변환 로직
           const getDifficulty = (level) => {
             switch (level) {
-              case "Easy": return "초급";
-              case "Medium": return "중급"; 
-              case "Hard": return "고급";
-              default: return "중급";
+              case "Easy":
+                return "초급";
+              case "Medium":
+                return "중급";
+              case "Hard":
+                return "고급";
+              default:
+                return "중급";
             }
           };
 
@@ -101,25 +130,28 @@ const MainPage = () => {
             isImageChallenge: categoryInfo.isImageChallenge,
             isVideoChallenge: categoryInfo.isVideoChallenge,
           };
-
         } catch (categoryError) {
-          console.warn(`${categoryInfo.api} 카테고리 처리 실패:`, categoryError);
+          console.warn(
+            `${categoryInfo.api} 카테고리 처리 실패:`,
+            categoryError
+          );
           return null;
         }
       });
 
       // 모든 카테고리 병렬 처리 완료 대기
       const results = await Promise.all(apiCalls);
-      const topChallengesData = results.filter(result => result !== null);
+      const topChallengesData = results.filter((result) => result !== null);
 
-      // 데이터가 없으면 임시 데이터 사용
+      // 데이터가 없으면 더미미 데이터 사용
       if (topChallengesData.length === 0) {
         console.log("API 데이터가 없어서 임시 데이터를 사용합니다.");
         const fallbackData = [
           {
             id: 201,
             title: "알파벳 대문자 문자열 변환",
-            description: "주어진 문자열에서 알파벳 대문자만 추출하여 새로운 문자열을 만드는 문제입니다.",
+            description:
+              "주어진 문자열에서 알파벳 대문자만 추출하여 새로운 문자열을 만드는 문제입니다.",
             difficulty: "중급",
             category: "코딩",
             shares: 12,
@@ -129,7 +161,8 @@ const MainPage = () => {
           {
             id: 5,
             title: "사실적인 고양이",
-            description: "털이 부드럽고 눈이 반짝이는 사실적인 고양이를 그려보세요.",
+            description:
+              "털이 부드럽고 눈이 반짝이는 사실적인 고양이를 그려보세요.",
             difficulty: "고급",
             category: "그림",
             shares: 8,
@@ -145,23 +178,23 @@ const MainPage = () => {
             shares: 6,
             isImageChallenge: false,
             isVideoChallenge: true,
-          }
+          },
         ];
         setTopChallenges(fallbackData);
       } else {
         setTopChallenges(topChallengesData);
       }
-      
     } catch (error) {
       console.error("Top challenges 가져오기 실패:", error);
       console.log("에러로 인해 임시 데이터를 사용합니다.");
-      
+
       // 에러 시에도 임시 데이터 제공
       const fallbackData = [
         {
           id: 201,
           title: "알파벳 대문자 문자열 변환",
-          description: "주어진 문자열에서 알파벳 대문자만 추출하여 새로운 문자열을 만드는 문제입니다.",
+          description:
+            "주어진 문자열에서 알파벳 대문자만 추출하여 새로운 문자열을 만드는 문제입니다.",
           difficulty: "중급",
           category: "코딩",
           shares: 12,
@@ -171,7 +204,8 @@ const MainPage = () => {
         {
           id: 5,
           title: "사실적인 고양이",
-          description: "털이 부드럽고 눈이 반짝이는 사실적인 고양이를 그려보세요.",
+          description:
+            "털이 부드럽고 눈이 반짝이는 사실적인 고양이를 그려보세요.",
           difficulty: "고급",
           category: "그림",
           shares: 8,
@@ -187,7 +221,7 @@ const MainPage = () => {
           shares: 6,
           isImageChallenge: false,
           isVideoChallenge: true,
-        }
+        },
       ];
       setTopChallenges(fallbackData);
       setError(null); // 에러 메시지 제거 (임시 데이터로 대체)
@@ -212,25 +246,37 @@ const MainPage = () => {
           try {
             // 1. 먼저 챌린지 상세 정보에서 reference image 가져오기
             const challengeDetails = await getChallengeDetails(challenge.id);
-            
+
             if (challengeDetails.success) {
               const details = challengeDetails.data;
               let referenceUrl = null;
-              
-              if (challenge.isImageChallenge && details.img_challenge?.references?.length > 0) {
+
+              if (
+                challenge.isImageChallenge &&
+                details.img_challenge?.references?.length > 0
+              ) {
                 const reference = details.img_challenge.references[0];
                 if (reference.file_path) {
                   referenceUrl = convertImagePathToUrl(reference.file_path);
-                  console.log(`Challenge ${challenge.id} reference image:`, referenceUrl);
+                  console.log(
+                    `Challenge ${challenge.id} reference image:`,
+                    referenceUrl
+                  );
                 }
-              } else if (challenge.isVideoChallenge && details.video_challenge?.references?.length > 0) {
+              } else if (
+                challenge.isVideoChallenge &&
+                details.video_challenge?.references?.length > 0
+              ) {
                 const reference = details.video_challenge.references[0];
                 if (reference.file_path) {
                   referenceUrl = convertImagePathToUrl(reference.file_path);
-                  console.log(`Challenge ${challenge.id} reference video:`, referenceUrl);
+                  console.log(
+                    `Challenge ${challenge.id} reference video:`,
+                    referenceUrl
+                  );
                 }
               }
-              
+
               if (referenceUrl) {
                 imageMap[challenge.id] = referenceUrl;
                 continue; // reference image가 있으면 share image 가져올 필요 없음
@@ -238,7 +284,7 @@ const MainPage = () => {
             }
 
             // 2. reference image가 없으면 인기 있는 share image 가져오기
-            let shareEndpoint = '';
+            let shareEndpoint = "";
             if (challenge.isImageChallenge) {
               shareEndpoint = `/api/shares/img/?challenge_id=${challenge.id}&limit=10`;
             } else if (challenge.isVideoChallenge) {
@@ -261,26 +307,34 @@ const MainPage = () => {
                   let mediaUrl = null;
 
                   if (challenge.isImageChallenge) {
-                    mediaUrl = mostLikedShare.img_share?.img_url || 
-                              mostLikedShare.img_url || 
-                              mostLikedShare.image || 
-                              mostLikedShare.img;
+                    mediaUrl =
+                      mostLikedShare.img_share?.img_url ||
+                      mostLikedShare.img_url ||
+                      mostLikedShare.image ||
+                      mostLikedShare.img;
                   } else if (challenge.isVideoChallenge) {
-                    mediaUrl = mostLikedShare.video_share?.video_url || 
-                              mostLikedShare.video_url || 
-                              mostLikedShare.video;
+                    mediaUrl =
+                      mostLikedShare.video_share?.video_url ||
+                      mostLikedShare.video_url ||
+                      mostLikedShare.video;
                   }
 
                   if (mediaUrl) {
                     const convertedUrl = convertImagePathToUrl(mediaUrl);
                     imageMap[challenge.id] = convertedUrl;
-                    console.log(`Challenge ${challenge.id} share media:`, convertedUrl);
+                    console.log(
+                      `Challenge ${challenge.id} share media:`,
+                      convertedUrl
+                    );
                   }
                 }
               }
             }
           } catch (error) {
-            console.error(`Failed to fetch media for challenge ${challenge.id}:`, error);
+            console.error(
+              `Failed to fetch media for challenge ${challenge.id}:`,
+              error
+            );
           }
         }
       }

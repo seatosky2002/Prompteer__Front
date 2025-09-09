@@ -302,7 +302,7 @@ export const getMyCompletedPsChallenges = async () => {
 // 특정 챌린지 상세 정보 조회 API
 export const getChallengeDetails = async (challengeId) => {
   try {
-    const response = await instanceWithToken.get(`challenges/${challengeId}`);
+    const response = await instance.get(`challenges/${challengeId}`); // instanceWithToken 대신 instance를 사용. general 접근 가능하도록(로그인 없어도)
 
     if (response.status === 200) {
       return {
@@ -485,9 +485,7 @@ export const getPsSharesPublic = async (params = {}) => {
     queryParams.append("skip", params.skip || 0);
     queryParams.append("limit", params.limit || 100); // 기본값 100개
 
-    const response = await instance.get(
-      `shares/ps/?${queryParams.toString()}`
-    );
+    const response = await instance.get(`shares/ps/?${queryParams.toString()}`);
 
     if (response.status === 200) {
       return {
@@ -572,9 +570,9 @@ export const getPsChallengesPublic = async (params = {}) => {
     }
   } catch (error) {
     console.warn("Public PS challenges API failed:", error);
-    return { 
-      success: false, 
-      error: "PS 챌린지 목록을 가져올 수 없습니다." 
+    return {
+      success: false,
+      error: "PS 챌린지 목록을 가져올 수 없습니다.",
     };
   }
 };

@@ -200,16 +200,29 @@ const Settings = () => {
     if (activeTab === "프로필 수정") {
       // 프로필 수정 저장
       try {
+        // 1. 계정 정보 업데이트
+        // 닉네임은 업데이트하는 api가 달라서 따로 호출해야함
+        const accountData = {
+          nickname: formData.nickname,
+        };
+
+        const accountResult = await updateUserAccount(accountData);
+        if (!accountResult.success) {
+          alert(accountResult.error || "닉네임 저장에 실패했습니다.");
+          return;
+        }
+
+        // 2. 프로필 정보 업데이트 (한줄 소개, 관심 분야)
         const profileData = {
           introduction: formData.bio,
           interested_in: mapInterestsToAPI(formData.interests), // 현재 선택된 관심 분야들, 입력된 한줄 소개를 백엔드에 보내준다.
         };
 
-        const result = await updateUserProfile(profileData); // 현재 선택된 것들을 put으로 날려버린다다
-        if (result.success) {
+        const profileResult = await updateUserProfile(profileData); // 현재 선택된 것들을 put으로 날려버린다
+        if (profileResult.success) {
           showSaveSuccess(); // 성공하면 저장 성공 애니메이션 띄우기
         } else {
-          alert(result.error || "프로필 저장에 실패했습니다.");
+          alert(profileResult.error || "프로필 저장에 실패했습니다.");
         }
       } catch (error) {
         console.error("Profile save error:", error);

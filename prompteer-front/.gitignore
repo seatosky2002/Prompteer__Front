@@ -27,3 +27,7 @@ storybook-static
 
 
 Figma-Context-MCP/
+
+# 데이터 파일
+/image_data
+/public/*.png

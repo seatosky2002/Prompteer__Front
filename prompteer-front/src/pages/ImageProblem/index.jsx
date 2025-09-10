@@ -122,9 +122,8 @@ const ImageProblem = () => {
     }
   }, [id]);
 
-  // 공유된 이미지 목록 가져오기
-  useEffect(() => {
-    const fetchSharedImages = async () => {
+  // 공유된 이미지 목록 가져오기 함수
+  const fetchSharedImages = async () => {
       if (!id) return;
       
       setLoadingImages(true);
@@ -264,6 +263,8 @@ const ImageProblem = () => {
       }
     };
 
+  // 공유된 이미지 목록 가져오기 useEffect
+  useEffect(() => {
     fetchSharedImages();
   }, [id, isGenerated]); // id가 바뀌거나 새로 이미지가 생성되면 다시 불러옴
 
@@ -317,6 +318,12 @@ const ImageProblem = () => {
       
       setGeneratedImageUrl(convertedUrl);
       setIsGenerated(true);
+      
+      // 이미지 생성 완료 후 구경하기 데이터 새로고침 (약간의 지연 후)
+      setTimeout(() => {
+        console.log('🔄 이미지 생성 완료 후 구경하기 데이터 새로고침');
+        fetchSharedImages();
+      }, 1000); // 1초 후 새로고침
     } catch (error) {
       console.error('❌ 이미지 생성 실패:', error);
       if (error.message !== 'Unauthorized') {

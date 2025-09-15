@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -28,9 +28,9 @@ const SharedPostDetail = () => {
   const [currentUser, setCurrentUser] = useState(null);
 
   // JWT 토큰에서 사용자 ID 추출하는 함수 (기존 코드와의 호환성을 위해 유지)
-  const getCurrentUserId = () => {
+  const getCurrentUserId = useCallback(() => {
     return currentUser?.id || null;
-  };
+  }, [currentUser]);
 
   // 로그인 상태 체크
   useEffect(() => {
@@ -71,55 +71,104 @@ const SharedPostDetail = () => {
 
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, []);
+  }, []); // 빈 의존성 배열로 한 번만 실행
 
 
 
-  // API로부터 post 데이터 가져오기
+  // API로부터 share 데이터 가져오기
   useEffect(() => {
-    const fetchPostData = async () => {
+    const fetchShareData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/posts/${id}`);
         
-        if (!response.ok) {
-          throw new Error('게시물 데이터를 불러오는데 실패했습니다.');
+        // 먼저 모든 타입의 shares를 확인해서 해당 ID가 있는지 찾기
+        let shareData = null;
+        let shareType = null;
+        
+        // 각 타입별로 확인
+        const types = ['ps', 'img', 'video'];
+        for (const type of types) {
+          try {
+            console.log(`Fetching ${type} shares for ID ${id}...`);
+            const response = await fetch(`/api/shares/${type}/`);
+            console.log(`${type} shares response status:`, response.status);
+            if (response.ok) {
+              const shares = await response.json();
+              console.log(`${type} shares data:`, shares);
+              const foundShare = shares.find(share => share.id === parseInt(id));
+              console.log(`Found share in ${type}:`, foundShare);
+              if (foundShare) {
+                shareData = foundShare;
+                shareType = type;
+                break;
+              }
+            }
+          } catch (err) {
+            console.warn(`Failed to fetch ${type} shares:`, err);
+          }
         }
         
-        const post = await response.json();
-        console.log('Post data:', post);
-        setShareData(post); // 기존 변수명 유지
+        if (!shareData) {
+          throw new Error('공유 데이터를 찾을 수 없습니다.');
+        }
+        
+        console.log('Share data:', shareData);
+        
+        // Post 형태로 변환
+        const postData = {
+          id: shareData.id,
+          type: 'share',
+          tag: shareType,
+          title: `${shareType === 'ps' ? '코딩' : shareType === 'img' ? '이미지' : '비디오'} 챌린지 #${shareData.challenge_id} - 프롬프트 공유`,
+          content: `**프롬프트:**\n${shareData.prompt || `${shareType} 생성`}\n\n**결과물:**\n${shareType === 'ps' ? '코딩 챌린지 해결 결과' : shareType === 'img' ? `![생성된 이미지](/api/${shareData.img_share?.img_url})` : `[영상 파일](/api/${shareData.video_share?.video_url})`}`,
+          user: shareData.user,
+          created_at: shareData.created_at,
+          challenge_id: shareData.challenge_id,
+          likes_count: shareData.likes_count || 0,
+          comments: [] // shares에는 댓글이 없으므로 빈 배열
+        };
+        
+        setShareData(postData);
         
         // 좋아요 정보 설정
-        setLikesCount(post.likes_count || 0);
+        setLikesCount(postData.likes_count);
         
         // 현재 사용자가 좋아요를 눌렀는지 확인
-        const currentUserId = getCurrentUserId();
-        if (currentUserId && post.likes) {
-          const userLiked = post.likes.some(like => like.user_id === currentUserId);
+        const currentUserId = currentUser?.id;
+        if (currentUserId && shareData.likes) {
+          const userLiked = shareData.likes.some(like => like.user_id === currentUserId);
           setIsLiked(userLiked);
         }
         
-        // 댓글 데이터 설정
-        if (post.comments) {
-          setComments(post.comments);
-          console.log('Comments from post:', post.comments);
+        // 챌린지 데이터도 가져오기
+        if (shareData.challenge_id) {
+          await fetchChallengeData(shareData.challenge_id);
         }
         
-        // 챌린지 데이터도 가져오기
-        if (post.challenge_id) {
-          await fetchChallengeData(post.challenge_id);
+        // 연결된 Post의 댓글도 가져오기
+        const postsResponse = await fetch('/api/posts/');
+        const posts = await postsResponse.json();
+        const relatedPost = posts.find(post => 
+          post.type === 'share' && 
+          post.challenge_id === shareData.challenge_id
+        );
+        
+        if (relatedPost) {
+          setShareData(prev => ({
+            ...prev,
+            comments: relatedPost.comments || []
+          }));
         }
       } catch (err) {
-        console.error('Error fetching post:', err);
+        console.error('Error fetching share:', err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPostData();
-  }, [id]);
+    fetchShareData();
+  }, [id, currentUser]);
 
   // 챌린지 데이터 가져오기
   const fetchChallengeData = async (challengeId) => {
@@ -163,7 +212,7 @@ const SharedPostDetail = () => {
 
     try {
       const method = isLiked ? 'DELETE' : 'POST';
-      const response = await fetch(`/api/posts/${id}/like`, {
+      const response = await fetch(`/api/shares/${id}/like`, {
         method: method,
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -174,7 +223,7 @@ const SharedPostDetail = () => {
       if (!response.ok) {
         if (response.status === 409) {
           // 이미 좋아요를 누른 경우 (POST 요청 시)
-          console.log('Already liked this post');
+          console.log('Already liked this share');
           return;
         }
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -184,90 +233,128 @@ const SharedPostDetail = () => {
       setIsLiked(!isLiked);
       setLikesCount(prev => isLiked ? Math.max(0, prev - 1) : prev + 1);
       
-      console.log(`${isLiked ? 'Unliked' : 'Liked'} post ${id}`);
+      console.log(`${isLiked ? 'Unliked' : 'Liked'} share ${id}`);
     } catch (error) {
       console.error('Error toggling like:', error);
       alert('좋아요 처리 중 오류가 발생했습니다.');
     }
   };
 
-  // 게시글 데이터 새로고침 (댓글 포함)
-  const refreshPostData = async () => {
+  // 공유 데이터 새로고침
+  const refreshShareData = async () => {
     try {
-      const response = await fetch(`/api/posts/${id}`);
-      
-      if (!response.ok) {
-        console.warn('게시글 데이터를 새로고침할 수 없습니다.');
-        return;
-      }
-      
-      const post = await response.json();
-      setShareData(post);
-      
-      // 댓글 데이터 업데이트
-      if (post.comments) {
-        setComments(post.comments);
-        console.log('Updated comments:', post.comments);
-      }
-      
-      // 좋아요 정보도 업데이트
-      setLikesCount(post.likes_count || 0);
-      const currentUserId = getCurrentUserId();
-      if (currentUserId && post.likes) {
-        const userLiked = post.likes.some(like => like.user_id === currentUserId);
-        setIsLiked(userLiked);
+      // 각 타입별로 확인해서 해당 share 찾기
+      const types = ['ps', 'img', 'video'];
+      for (const type of types) {
+        try {
+          const response = await fetch(`/api/shares/${type}/`);
+          if (response.ok) {
+            const shares = await response.json();
+            const foundShare = shares.find(share => share.id === parseInt(id));
+            if (foundShare) {
+              // Post 형태로 변환
+              const postData = {
+                id: foundShare.id,
+                type: 'share',
+                tag: type,
+                title: `${type === 'ps' ? '코딩' : type === 'img' ? '이미지' : '비디오'} 챌린지 #${foundShare.challenge_id} - 프롬프트 공유`,
+                content: `**프롬프트:**\n${foundShare.prompt || `${type} 생성`}\n\n**결과물:**\n${type === 'ps' ? '코딩 챌린지 해결 결과' : type === 'img' ? `![생성된 이미지](/api/${foundShare.img_share?.img_url})` : `[영상 파일](/api/${foundShare.video_share?.video_url})`}`,
+                user: foundShare.user,
+                created_at: foundShare.created_at,
+                challenge_id: foundShare.challenge_id,
+                likes_count: foundShare.likes_count || 0,
+                comments: []
+              };
+              
+              setShareData(postData);
+              setLikesCount(postData.likes_count);
+              break;
+            }
+          }
+        } catch (err) {
+          console.warn(`Failed to refresh ${type} share:`, err);
+        }
       }
     } catch (err) {
-      console.error('Error refreshing post data:', err);
+      console.error('Error refreshing share data:', err);
     }
   };
 
   // 댓글 작성
   const handleCommentSubmit = async () => {
     if (!newComment.trim()) {
+      alert('댓글 내용을 입력해주세요.');
       return;
     }
 
-    const accessToken = localStorage.getItem('access_token');
-    if (!accessToken) {
-      alert('댓글을 작성하려면 로그인이 필요합니다.');
+    if (!isLoggedIn) {
+      alert('로그인이 필요합니다.');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`/api/posts/${id}/comments`, {
+      // 1. 공유된 게시물의 challenge_id로 해당하는 Post 찾기
+      const postsResponse = await fetch('/api/posts/');
+      const posts = await postsResponse.json();
+      
+      // 같은 challenge_id와 type='share'인 Post 찾기
+      const relatedPost = posts.find(post => 
+        post.type === 'share' && 
+        post.challenge_id === shareData.challenge_id
+      );
+      
+      if (!relatedPost) {
+        alert('해당 공유 게시물에 연결된 Post를 찾을 수 없습니다.');
+        return;
+      }
+
+      // 2. 찾은 Post ID로 댓글 작성
+      const commentData = {
+        content: newComment.trim(),
+        post_id: relatedPost.id
+      };
+
+      const response = await fetch(`/api/posts/${relatedPost.id}/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         },
-        body: JSON.stringify({
-          content: newComment.trim(),
-          post_id: parseInt(id)
-        }),
+        body: JSON.stringify(commentData)
       });
 
-      if (!response.ok) {
+      if (response.ok) {
+        setNewComment('');
+        alert('댓글이 작성되었습니다.');
+        // 댓글 목록 새로고침 (Post에서 댓글 가져오기)
+        await refreshComments(relatedPost.id);
+      } else {
         const errorData = await response.json();
-        throw new Error(errorData.detail || '댓글 작성에 실패했습니다.');
+        alert(`댓글 작성 실패: ${errorData.detail || '알 수 없는 오류'}`);
       }
-
-      const newCommentData = await response.json();
-      console.log('New comment created:', newCommentData);
-      
-      // 게시글 데이터 새로고침 (댓글 포함)
-      await refreshPostData();
-      
-      // 입력 필드 초기화
-      setNewComment('');
-      
     } catch (error) {
-      console.error('Comment creation error:', error);
-      alert(error.message);
+      console.error('댓글 작성 에러:', error);
+      alert('댓글 작성 중 오류가 발생했습니다.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // 댓글 목록 새로고침
+  const refreshComments = async (postId) => {
+    try {
+      const response = await fetch(`/api/posts/${postId}`);
+      if (response.ok) {
+        const postData = await response.json();
+        setShareData(prev => ({
+          ...prev,
+          comments: postData.comments || []
+        }));
+      }
+    } catch (error) {
+      console.error('댓글 목록 새로고침 에러:', error);
     }
   };
 
@@ -483,14 +570,35 @@ const SharedPostDetail = () => {
                               remarkPlugins={[remarkGfm]}
                               components={{
                                 img: ({node, ...props}) => (
-                                  <img 
-                                    {...props} 
-                                    style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
-                                    onError={(e) => {
-                                      console.error('❌ Markdown image failed to load:', e.target.src);
-                                      e.target.style.display = 'none';
-                                    }}
-                                  />
+                                  <div style={{ 
+                                    margin: '20px 0', 
+                                    textAlign: 'center',
+                                    backgroundColor: '#F8F9FA',
+                                    borderRadius: '12px',
+                                    padding: '20px',
+                                    border: '1px solid #E9ECEF'
+                                  }}>
+                                    <img 
+                                      {...props} 
+                                      style={{ 
+                                        maxWidth: '100%', 
+                                        maxHeight: '1000px',
+                                        height: 'auto', 
+                                        borderRadius: '8px',
+                                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                                        objectFit: 'contain'
+                                      }}
+                                      onError={(e) => {
+                                        console.error('❌ Markdown image failed to load:', e.target.src);
+                                        e.target.parentElement.innerHTML = `
+                                          <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 200px; color: #6C757D;">
+                                            <span>이미지를 불러올 수 없습니다</span>
+                                            <p style="font-size: 12px; color: #ADB5BD; margin: 5px 0; word-break: break-all;">${e.target.src}</p>
+                                          </div>
+                                        `;
+                                      }}
+                                    />
+                                  </div>
                                 ),
                                 a: ({node, href, children, ...props}) => {
                                   // 비디오 파일 링크인지 확인
@@ -559,16 +667,12 @@ const SharedPostDetail = () => {
               {/* 댓글 섹션 */}
               <div className="comments-section">
                 <div className="comments-header">
-                  <h3 className="comments-title">댓글 ({comments.length})</h3>
+                  <h3 className="comments-title">댓글 ({shareData?.comments?.length || 0})</h3>
                 </div>
                 
                 <div className="figma-comments-container">
-                  {comments.length === 0 ? (
-                    <div className="no-comments">
-                      <p>아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!</p>
-                    </div>
-                  ) : (
-                    comments.map((comment) => (
+                  {shareData?.comments && shareData.comments.length > 0 ? (
+                    shareData.comments.map((comment) => (
                       <div key={comment.id} className="figma-comment-item">
                         <div className="figma-comment-content">
                           {comment.content}
@@ -578,6 +682,10 @@ const SharedPostDetail = () => {
                         </div>
                       </div>
                     ))
+                  ) : (
+                    <div className="no-comments">
+                      <p>아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!</p>
+                    </div>
                   )}
                 </div>
                 

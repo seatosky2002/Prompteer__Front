@@ -72,33 +72,197 @@ const Board = () => {
         '영상': 'video'
       };
 
-      const params = new URLSearchParams();
-      if (activeTab !== '전체') {
-        params.append('types', typeMapping[activeTab]);
-      }
-      if (activeCategory !== '전체' && tagMapping[activeCategory]) {
-        params.append('tags', tagMapping[activeCategory]);
-      }
-      
-      // 페이지네이션 파라미터 추가
-      const skip = (currentPage - 1) * postsPerPage;
-      params.append('skip', skip);
-      params.append('limit', postsPerPage);
-
       try {
-        const response = await fetch(`${API_ENDPOINTS.POSTS}/?${params.toString()}`);
-        if (!response.ok) {
-          throw new Error('데이터를 불러오는 데 실패했습니다.');
+        let data = [];
+        
+        // 프롬프트 공유 탭인 경우 shares API 사용
+        if (activeTab === '프롬프트 공유') {
+          const skip = (currentPage - 1) * postsPerPage;
+          const limit = postsPerPage;
+          
+          // 카테고리별로 다른 shares API 호출
+          if (activeCategory === '전체') {
+            // 모든 카테고리의 공유를 가져오기 위해 각각 호출
+            console.log('Fetching all shares...');
+            const [psShares, imgShares, videoShares] = await Promise.all([
+              fetch(`/api/shares/ps/?skip=${skip}&limit=${limit}`).then(r => r.json()),
+              fetch(`/api/shares/img/?skip=${skip}&limit=${limit}`).then(r => r.json()),
+              fetch(`/api/shares/video/?skip=${skip}&limit=${limit}`).then(r => r.json())
+            ]);
+            console.log('PS shares:', psShares);
+            console.log('IMG shares:', imgShares);
+            console.log('VIDEO shares:', videoShares);
+            
+            // Post 형태로 변환
+            data = [
+              ...psShares.map(share => ({
+                id: share.id,
+                type: 'share',
+                tag: 'ps',
+                title: `코딩 챌린지 #${share.challenge_id} - 프롬프트 공유`,
+                content: `**프롬프트:**\n\`\`\`\n${share.prompt || '코딩 챌린지 해결'}\n\`\`\``,
+                user: share.user,
+                created_at: share.created_at,
+                likes_count: share.likes_count || 0,
+                comments: []
+              })),
+              ...imgShares.map(share => ({
+                id: share.id,
+                type: 'share',
+                tag: 'img',
+                title: `이미지 챌린지 #${share.challenge_id} - 프롬프트 공유`,
+                content: `**프롬프트:**\n${share.prompt || '이미지 생성'}\n\n**생성된 이미지:**\n![생성된 이미지](/api/${share.img_share?.img_url})`,
+                user: share.user,
+                created_at: share.created_at,
+                likes_count: share.likes_count || 0,
+                comments: []
+              })),
+              ...videoShares.map(share => ({
+                id: share.id,
+                type: 'share',
+                tag: 'video',
+                title: `비디오 챌린지 #${share.challenge_id} - 프롬프트 공유`,
+                content: `**프롬프트:**\n${share.prompt || '비디오 생성'}\n\n**생성된 비디오:**\n[영상 파일](/api/${share.video_share?.video_url})`,
+                user: share.user,
+                created_at: share.created_at,
+                likes_count: share.likes_count || 0,
+                comments: []
+              }))
+            ];
+            
+            // 최신순으로 정렬
+            data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          } else {
+            // 특정 카테고리만
+            const categoryEndpoint = tagMapping[activeCategory];
+            const response = await fetch(`/api/shares/${categoryEndpoint}/?skip=${skip}&limit=${limit}`);
+            if (!response.ok) {
+              throw new Error('데이터를 불러오는 데 실패했습니다.');
+            }
+            const shares = await response.json();
+            
+            data = shares.map(share => ({
+              id: share.id,
+              type: 'share',
+              tag: categoryEndpoint,
+              title: `${activeCategory} 챌린지 #${share.challenge_id} - 프롬프트 공유`,
+              content: `**프롬프트:**\n${share.prompt || `${activeCategory} 생성`}\n\n**결과물:**\n${categoryEndpoint === 'ps' ? '코딩 챌린지 해결 결과' : categoryEndpoint === 'img' ? `![생성된 이미지](/api/${share.img_share?.img_url})` : `[영상 파일](/api/${share.video_share?.video_url})`}`,
+              user: share.user,
+              created_at: share.created_at,
+              likes_count: share.likes_count || 0,
+              comments: []
+            }));
+          }
+        } else if (activeTab === '질문') {
+          // 질문 탭인 경우 기존 posts API 사용
+          const params = new URLSearchParams();
+          params.append('types', typeMapping[activeTab]);
+          if (activeCategory !== '전체' && tagMapping[activeCategory]) {
+            params.append('tags', tagMapping[activeCategory]);
+          }
+          
+          // 페이지네이션 파라미터 추가
+          const skip = (currentPage - 1) * postsPerPage;
+          params.append('skip', skip);
+          params.append('limit', postsPerPage);
+
+          const response = await fetch(`${API_ENDPOINTS.POSTS}/?${params.toString()}`);
+          if (!response.ok) {
+            throw new Error('데이터를 불러오는 데 실패했습니다.');
+          }
+          data = await response.json();
+        } else {
+          // 전체 탭인 경우: 일반 게시물 + 공유 게시물 모두 가져오기
+          console.log('Fetching all posts and shares for 전체 탭...');
+          
+          // 더 많은 데이터를 가져와서 클라이언트 사이드에서 페이지네이션
+          const largeLimit = 100; // 충분히 큰 값
+          
+          // 일반 게시물 가져오기
+          const postsParams = new URLSearchParams();
+          if (activeCategory !== '전체' && tagMapping[activeCategory]) {
+            postsParams.append('tags', tagMapping[activeCategory]);
+          }
+          postsParams.append('skip', 0);
+          postsParams.append('limit', largeLimit);
+          
+          const [postsResponse, psShares, imgShares, videoShares] = await Promise.all([
+            fetch(`${API_ENDPOINTS.POSTS}/?${postsParams.toString()}`).then(r => r.json()),
+            fetch(`/api/shares/ps/?skip=0&limit=${largeLimit}`).then(r => r.json()),
+            fetch(`/api/shares/img/?skip=0&limit=${largeLimit}`).then(r => r.json()),
+            fetch(`/api/shares/video/?skip=0&limit=${largeLimit}`).then(r => r.json())
+          ]);
+          
+          console.log('Posts:', postsResponse);
+          console.log('PS shares:', psShares);
+          console.log('IMG shares:', imgShares);
+          console.log('VIDEO shares:', videoShares);
+          
+          // 공유 게시물을 Post 형태로 변환
+          const sharesAsPosts = [
+            ...psShares.map(share => ({
+              id: share.id,
+              type: 'share',
+              tag: 'ps',
+              title: `코딩 챌린지 #${share.challenge_id} - 프롬프트 공유`,
+              content: `**프롬프트:**\n${share.prompt || '코딩 생성'}\n\n**결과물:**\n코딩 챌린지 해결 결과`,
+              user: share.user,
+              created_at: share.created_at,
+              likes_count: share.likes_count || 0,
+              comments: []
+            })),
+            ...imgShares.map(share => ({
+              id: share.id,
+              type: 'share',
+              tag: 'img',
+              title: `이미지 챌린지 #${share.challenge_id} - 프롬프트 공유`,
+              content: `**프롬프트:**\n${share.prompt || '이미지 생성'}\n\n**결과물:**\n![생성된 이미지](/api/${share.img_share?.img_url})`,
+              user: share.user,
+              created_at: share.created_at,
+              likes_count: share.likes_count || 0,
+              comments: []
+            })),
+            ...videoShares.map(share => ({
+              id: share.id,
+              type: 'share',
+              tag: 'video',
+              title: `비디오 챌린지 #${share.challenge_id} - 프롬프트 공유`,
+              content: `**프롬프트:**\n${share.prompt || '비디오 생성'}\n\n**결과물:**\n[영상 파일](/api/${share.video_share?.video_url})`,
+              user: share.user,
+              created_at: share.created_at,
+              likes_count: share.likes_count || 0,
+              comments: []
+            }))
+          ];
+          
+          // 일반 게시물과 공유 게시물 합치기
+          let allData = [...postsResponse, ...sharesAsPosts];
+          
+          // 카테고리 필터링 (전체가 아닌 경우)
+          if (activeCategory !== '전체') {
+            allData = allData.filter(post => post.tag === tagMapping[activeCategory]);
+          }
+          
+          // 최신순으로 정렬
+          allData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          
+          // 클라이언트 사이드 페이지네이션
+          const skip = (currentPage - 1) * postsPerPage;
+          data = allData.slice(skip, skip + postsPerPage);
+          
+          // 더 많은 데이터가 있는지 확인
+          setHasMore(skip + postsPerPage < allData.length);
         }
-        const data = await response.json();
 
         console.log('게시판 API 응답 데이터:', data);
         console.log('각 게시물의 ID들:', data.map(post => ({ id: post.id, title: post.title, type: post.type, tag: post.tag })));
 
         setPosts(data);
         
-        // 더 많은 게시물이 있는지 확인 (limit 만큼 데이터가 왔는지로 판단)
-        setHasMore(data.length === postsPerPage);
+        // 더 많은 게시물이 있는지 확인 (전체 탭이 아닌 경우에만)
+        if (activeTab !== '전체') {
+          setHasMore(data.length === postsPerPage);
+        }
       } catch (err) {
         setError(err.message);
       } finally {
